@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>调解申请提交结果</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #102033;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(37,99,235,.09), transparent 30%),
+        radial-gradient(circle at 88% 8%, rgba(20,162,147,.12), transparent 28%),
+        linear-gradient(180deg, #f8fbff 0%, #eef4f8 100%);
+      display: grid;
+      grid-template-rows: 60px 1fr;
+    }
+    .topbar {
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #dbe3ee;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 8px 24px rgba(15,23,42,.06);
+    }
+    .brand, .top-actions, .flow-step { display: flex; align-items: center; }
+    .brand { gap: 12px; }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(145deg, #2367e8, #1746b3);
+      box-shadow: 0 10px 22px rgba(35,103,232,.22);
+      font-size: 20px;
+    }
+    .brand-org { color: #6b7a90; font-size: 12px; line-height: 1.1; font-weight: 800; }
+    .brand-title { margin-top: 3px; color: #13233a; font-size: 16px; line-height: 1.1; font-weight: 900; }
+    .flow-progress {
+      flex: 1;
+      max-width: 1040px;
+      margin: 0 22px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(112px, 1fr));
+      gap: 7px;
+    }
+    .flow-step {
+      position: relative;
+      gap: 6px;
+      min-width: 0;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      left: calc(100% - 2px);
+      top: 50%;
+      width: 9px;
+      height: 2px;
+      background: #dbe4f0;
+      transform: translateY(-50%);
+    }
+    .flow-step:last-child::after { display: none; }
+    .flow-index {
+      width: 23px;
+      height: 23px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #99f6e4;
+      background: #ecfdf5;
+      color: #0f766e;
+      font-size: 11px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+    .flow-label { overflow: hidden; text-overflow: ellipsis; }
+    .flow-step.done { color: #0f766e; }
+    .flow-step.done::after { background: #38bdf8; }
+    .flow-step.active .flow-index {
+      color: #fff;
+      border-color: #2367e8;
+      background: #2367e8;
+      box-shadow: 0 0 0 6px rgba(35,103,232,.12);
+    }
+    .top-actions { gap: 18px; color: #13233a; font-weight: 900; }
+    .score { display: flex; align-items: center; gap: 8px; color: #f59e0b; }
+    .score-pill {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #2367e8, #4455e8);
+      font-weight: 900;
+      box-shadow: 0 12px 24px rgba(35,103,232,.24);
+    }
+    .page {
+      padding: 44px 24px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(180deg, rgba(239,244,248,.1), rgba(20,39,51,.28)),
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,.82), transparent 28%),
+        radial-gradient(circle at 78% 20%, rgba(160,190,198,.62), transparent 36%),
+        linear-gradient(135deg, #e9eef3 0%, #b9cbd0 46%, #6f8791 100%);
+    }
+    .result-card {
+      width: min(560px, 100%);
+      padding: 34px;
+      border-radius: 28px;
+      border: 1px solid rgba(219,229,240,.96);
+      background: rgba(255,255,255,.97);
+      box-shadow: 0 28px 80px rgba(15,23,42,.18);
+      text-align: center;
+    }
+    .result-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      color: #0f766e;
+      background: linear-gradient(180deg, #ecfdf5, #dff8f4);
+      font-size: 30px;
+      box-shadow: inset 0 0 0 1px rgba(20,162,147,.16);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+    .desc {
+      margin: 0 auto 24px;
+      max-width: 440px;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .meta {
+      margin: 0 0 24px;
+      padding: 22px;
+      border-radius: 20px;
+      background: #f8fbff;
+      border: 1px solid #dce7f2;
+      display: grid;
+      gap: 15px;
+      text-align: left;
+    }
+    .meta-row {
+      display: grid;
+      grid-template-columns: 108px 1fr;
+      gap: 12px;
+      align-items: center;
+      color: #23344f;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .meta-row span { color: #64748b; font-weight: 900; }
+    .meta-row strong { font-weight: 700; }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .btn {
+      height: 46px;
+      border-radius: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid #d9e3f0;
+      color: #1d4ed8;
+      background: #f8fbff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .btn.primary {
+      color: #fff;
+      border-color: #2367e8;
+      background: linear-gradient(135deg, #2367e8, #1746b3);
+      box-shadow: 0 16px 30px rgba(35,103,232,.24);
+    }
+    @media (max-width: 1080px) {
+      body { grid-template-rows: auto 1fr; }
+      .topbar { height: auto; min-height: 86px; align-items: flex-start; padding: 10px 14px; }
+      .flow-progress { grid-template-columns: repeat(2, minmax(120px, 1fr)); margin: 0 12px; }
+    }
+    @media (max-width: 640px) {
+      .actions { grid-template-columns: 1fr; }
+      .meta-row { grid-template-columns: 1fr; gap: 3px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fas fa-scale-balanced"></i></div>
+      <div>
+        <div class="brand-org">广州仲裁委</div>
+        <div class="brand-title">立案服务部</div>
+      </div>
+    </div>
+    <nav class="flow-progress" aria-label="立案全流程进度">
+      <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">AI对话辅助立案</span></div>
+      <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">案件评估报告</span></div>
+      <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">后续路径选择</span></div>
+      <div class="flow-step active"><span class="flow-index">4</span><span class="flow-label">完成立案</span></div>
+    </nav>
+    <div class="top-actions" aria-label="用户状态">
+      <div class="score"><i class="fas fa-star"></i><span>10</span></div>
+      <button class="score-pill" type="button">获取积分</button>
+    </div>
+  </header>
+  <main class="page">
+    <section class="result-card" aria-label="调解申请提交成功">
+      <div class="result-icon"><i class="fas fa-handshake"></i></div>
+      <h1>调解申请提交成功</h1>
+      <p class="desc">系统已记录您的调解选择。调解以双方自愿为基础，后续将由工作人员或调解员联系双方确认调解意愿和沟通安排。</p>
+      <div class="meta">
+        <div class="meta-row"><span>收案号</span><strong>2026012150</strong></div>
+        <div class="meta-row"><span>提交时间</span><strong>2026-03-20 10:08</strong></div>
+        <div class="meta-row"><span>当前状态</span><strong>待确认对方调解意愿</strong></div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="javascript:history.back()"><i class="fas fa-arrow-left"></i>返回上一步</a>
+        <a class="btn primary" href="./立案bot.html"><i class="fas fa-check"></i>完成</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

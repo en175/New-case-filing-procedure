@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>调解仲裁路径说明</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+    :root {
+      --ink: #102033;
+      --muted: #64748b;
+      --soft: #8a9ab0;
+      --line: #dce6f0;
+      --wash: #f4f7fb;
+      --blue: #2563eb;
+      --blue-soft: #e9f1ff;
+      --teal: #059669;
+      --teal-soft: #e7f8ef;
+      --shadow: 0 24px 70px rgba(25, 39, 66, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--wash);
+    }
+
+    body { overflow: auto; }
+
+    .system-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 60px 1fr;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(37,99,235,.09), transparent 30%),
+        radial-gradient(circle at 88% 8%, rgba(16,161,147,.1), transparent 28%),
+        linear-gradient(180deg, #f8fbff 0%, #eef4f8 100%);
+    }
+
+    .system-topbar {
+      position: sticky;
+      top: 0;
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #dbe3ee;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+      z-index: 10;
+    }
+
+    .brand,
+    .top-actions,
+    .score {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand { gap: 12px; }
+    .top-actions { gap: 18px; color: #13233a; font-weight: 900; }
+    .score { gap: 8px; color: #f59e0b; }
+
+    .flow-progress {
+      flex: 1;
+      max-width: 1040px;
+      margin: 0 22px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(112px, 1fr));
+      align-items: center;
+      gap: 7px;
+    }
+
+    .flow-step {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      left: calc(100% - 2px);
+      top: 50%;
+      width: 9px;
+      height: 2px;
+      background: #dbe4f0;
+      transform: translateY(-50%);
+    }
+
+    .flow-step:last-child::after { display: none; }
+
+    .flow-index {
+      width: 23px;
+      height: 23px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #2367e8;
+      font-size: 11px;
+      font-weight: 900;
+      animation: flowPulse 1.8s ease-in-out infinite;
+      flex: 0 0 auto;
+    }
+
+    .flow-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .flow-step.done { color: #0f766e; }
+    .flow-step.done::after { background: #38bdf8; }
+    .flow-step.done .flow-index {
+      color: #0f766e;
+      border-color: #99f6e4;
+      background: #ecfdf5;
+      animation: none;
+    }
+    .flow-step.active { color: #1d4ed8; }
+    .flow-step.active .flow-index {
+      color: #fff;
+      border-color: #2367e8;
+      background: #2367e8;
+      box-shadow: 0 0 0 6px rgba(35,103,232,.12);
+    }
+
+    @keyframes flowPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(35,103,232,.18); }
+      50% { box-shadow: 0 0 0 5px rgba(35,103,232,.08); }
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(145deg, #2367e8, #1746b3);
+      box-shadow: 0 10px 22px rgba(35,103,232,.22);
+      font-size: 20px;
+    }
+
+    .brand-org {
+      color: #6b7a90;
+      font-size: 12px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .brand-title {
+      margin-top: 3px;
+      color: #13233a;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .score-pill {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #2367e8, #4455e8);
+      font-weight: 900;
+      box-shadow: 0 12px 24px rgba(35,103,232,.24);
+    }
+
+    .medal {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 2px solid #d8e2ef;
+      display: grid;
+      place-items: center;
+      color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    .work-area {
+      position: relative;
+      padding: 28px 44px 132px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(239, 244, 248, .1), rgba(20, 39, 51, .32)),
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,.82), transparent 28%),
+        radial-gradient(circle at 78% 20%, rgba(160, 190, 198, .62), transparent 36%),
+        linear-gradient(135deg, #e9eef3 0%, #b9cbd0 46%, #6f8791 100%);
+    }
+
+    .work-area::before {
+      content: "";
+      position: absolute;
+      inset: 20px 34px;
+      border-radius: 28px;
+      background:
+        linear-gradient(90deg, rgba(18, 33, 58, .045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(18, 33, 58, .035) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(circle at center, #000 0%, rgba(0,0,0,.82) 56%, transparent 80%);
+      pointer-events: none;
+    }
+
+    .route-shell {
+      position: relative;
+      width: min(1320px, 100%);
+      margin: 0 auto;
+      padding: 34px;
+      border-radius: 26px;
+      border: 1px solid rgba(219,229,240,.92);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.92)),
+        radial-gradient(circle at 72% 0%, rgba(16,161,147,.1), transparent 34%);
+      box-shadow: var(--shadow);
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 22px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 38px;
+      line-height: 1.18;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .page-title span { color: var(--blue); }
+
+    .page-subtitle {
+      margin: 10px 0 0;
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .back-link {
+      flex: none;
+      height: 44px;
+      padding: 0 17px;
+      border-radius: 14px;
+      border: 1px solid #d9e3f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #1d4ed8;
+      background: #f8fbff;
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .back-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(37,99,235,.1);
+    }
+
+    .case-card {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 22px;
+      align-items: stretch;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid #dce7f2;
+      background:
+        linear-gradient(90deg, #f8fbff, #f6fbfa),
+        radial-gradient(circle at right center, rgba(16,161,147,.12), transparent 30%);
+      margin-bottom: 20px;
+    }
+
+    .case-id {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-right: 20px;
+      border-right: 1px solid #d9e5f0;
+    }
+
+    .case-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      color: var(--teal);
+      background: var(--teal-soft);
+      font-size: 24px;
+    }
+
+    .case-id span,
+    .case-focus span {
+      display: block;
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .case-id strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .case-focus {
+      align-self: center;
+      color: #40526a;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .timeline-board {
+      position: relative;
+      padding: 22px 22px 26px;
+      border-radius: 24px;
+      border: 1px solid #dce7f2;
+      background:
+        radial-gradient(circle at 82% 8%, rgba(37,99,235,.12), transparent 28%),
+        linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+      box-shadow: 0 18px 48px rgba(20,37,60,.08);
+      overflow: hidden;
+    }
+
+    .timeline-board::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(16,32,51,.035) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(16,32,51,.035) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: radial-gradient(circle at center, #000 0%, rgba(0,0,0,.54) 58%, transparent 84%);
+      pointer-events: none;
+    }
+
+    .timeline-head {
+      position: sticky;
+      top: 60px;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 130px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin: -4px 0 18px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(220,230,240,.8);
+    }
+
+    .track-title {
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .track-title i {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+    }
+
+    .track-title.arbitration {
+      color: #047857;
+      background: linear-gradient(135deg, #e7f8ef, #f6fffa);
+      border: 1px solid rgba(5,150,105,.2);
+    }
+
+    .track-title.arbitration i { background: #fff; }
+
+    .track-title.mediation {
+      color: #1d4ed8;
+      background: linear-gradient(135deg, #e9f1ff, #f7fbff);
+      border: 1px solid rgba(37,99,235,.18);
+      box-shadow: 0 18px 38px rgba(37,99,235,.14);
+    }
+
+    .track-title.mediation i { background: #fff; }
+
+    .track-title-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mediation-select-btn {
+      height: 42px;
+      padding: 0 16px;
+      border-radius: 14px;
+      border: 1px solid #b7ebe3;
+      color: #fff;
+      background: linear-gradient(135deg, #14a293, #0f766e);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 16px 30px rgba(20,162,147,.22);
+      transition: transform .18s ease, box-shadow .18s ease;
+      white-space: nowrap;
+    }
+
+    .mediation-select-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(20,162,147,.28);
+    }
+
+    .center-label {
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 900;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 18px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 22px;
+      bottom: 22px;
+      width: 2px;
+      background: linear-gradient(180deg, #c8d6e6, #7aa7ff, #dce6f0);
+      transform: translateX(-50%);
+    }
+
+    .time-row {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 130px minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .time-node {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .time-pill {
+      width: 112px;
+      min-height: 76px;
+      padding: 10px 8px;
+      border-radius: 20px;
+      border: 1px solid #dbe7f2;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 12px 28px rgba(20,37,60,.08);
+      text-align: center;
+    }
+
+    .time-pill b {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      margin: 0 auto 6px;
+      border-radius: 13px;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #7aa7ff);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .time-pill span {
+      display: block;
+      color: #40536b;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .path-panel {
+      position: relative;
+      min-height: 138px;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid #dfe8f2;
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 16px 38px rgba(20,37,60,.07);
+    }
+
+    .path-panel::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 18px;
+      height: 2px;
+      background: #d8e3ee;
+    }
+
+    .path-panel.arbitration::before {
+      right: -18px;
+      background: linear-gradient(90deg, #d8e3ee, #059669);
+    }
+
+    .path-panel.mediation::before {
+      left: -18px;
+      background: linear-gradient(90deg, var(--blue), #d8e3ee);
+    }
+
+    .path-panel.arbitration {
+      border-left: 4px solid var(--teal);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(5,150,105,.12), transparent 32%),
+        rgba(255,255,255,.94);
+    }
+
+    .path-panel.mediation {
+      border-left: 5px solid var(--blue);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(37,99,235,.14), transparent 34%),
+        rgba(255,255,255,.98);
+      box-shadow: 0 24px 52px rgba(37,99,235,.14);
+    }
+
+    .panel-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 900;
+    }
+
+    .panel-kicker i {
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      flex: none;
+    }
+
+    .path-panel h3 {
+      margin: 10px 0 8px;
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .path-panel p {
+      margin: 0;
+      color: #53677f;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .path-panel.mediation h3 { color: #1d4ed8; }
+
+    .path-panel.arbitration h3 { color: #047857; }
+
+    .effect-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .effect-tags span {
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: var(--tone);
+      background: var(--tone-soft);
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .arbitration {
+      --tone: var(--teal);
+      --tone-soft: var(--teal-soft);
+    }
+
+    .mediation {
+      --tone: var(--blue);
+      --tone-soft: var(--blue-soft);
+    }
+
+    .bottom-sentinel { height: 1px; }
+
+    .decision-footer {
+      position: fixed;
+      right: 54px;
+      bottom: 26px;
+      z-index: 12;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      border-radius: 16px;
+      border: 1px solid #dce6f0;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 42px rgba(20,37,60,.14);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(14px);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .completion-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15,23,42,.34);
+      backdrop-filter: blur(12px);
+      padding: 24px;
+    }
+
+    .completion-mask.show { display: flex; }
+
+    .completion-card {
+      width: min(440px, 100%);
+      padding: 30px;
+      border-radius: 24px;
+      border: 1px solid #dce7f2;
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(15,23,42,.22);
+      text-align: center;
+    }
+
+    .completion-icon {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 16px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      color: #0f766e;
+      background: #ecfdf5;
+      font-size: 26px;
+    }
+
+    .completion-card h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .completion-card p {
+      margin: 0 0 22px;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .completion-card a {
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #fff;
+      background: #2367e8;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .decision-footer.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .primary-btn {
+      height: 42px;
+      min-width: 168px;
+      border: 0;
+      border-radius: 15px;
+      padding: 0 18px;
+      color: #fff;
+      background: linear-gradient(135deg, #2367e8, #1746b3);
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 18px 34px rgba(35,103,232,.24);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 42px rgba(35,103,232,.3);
+    }
+
+    @media (max-width: 1080px) {
+      .work-area { padding: 20px 14px 132px; }
+      .route-shell { padding: 24px 18px; }
+      .case-card { grid-template-columns: 1fr; }
+      .case-id {
+        border-right: 0;
+        border-bottom: 1px solid #d9e5f0;
+        padding-right: 0;
+        padding-bottom: 16px;
+      }
+      .timeline-head,
+      .time-row {
+        grid-template-columns: 1fr;
+      }
+      .timeline::before { left: 24px; }
+      .center-label { display: none; }
+      .time-node { justify-items: start; }
+      .time-pill { width: 100%; min-height: 0; display: flex; align-items: center; gap: 12px; text-align: left; }
+      .time-pill b { margin: 0; }
+      .path-panel::before { display: none; }
+      .track-title-wrap { grid-template-columns: 1fr; }
+      .decision-footer { right: 14px; }
+      .primary-btn { min-width: 0; }
+      .system-topbar { height: auto; min-height: 86px; align-items: flex-start; padding: 10px 14px; }
+      .flow-progress { grid-template-columns: repeat(2, minmax(120px, 1fr)); margin: 0 12px; }
+    }
+
+    @media (max-width: 760px) {
+      .page-head { flex-direction: column; }
+      .page-title { font-size: 30px; }
+      .timeline-board { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="system-page">
+    <header class="system-topbar">
+      <div class="brand">
+        <div class="brand-mark"><i class="fas fa-scale-balanced"></i></div>
+        <div>
+          <div class="brand-org">广州仲裁委</div>
+          <div class="brand-title">立案服务部</div>
+        </div>
+      </div>
+      <nav class="flow-progress" aria-label="立案全流程进度">
+        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">AI对话辅助立案</span></div>
+        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">案件评估报告</span></div>
+        <div class="flow-step active"><span class="flow-index">3</span><span class="flow-label">后续路径选择</span></div>
+        <div class="flow-step"><span class="flow-index">4</span><span class="flow-label">完成立案</span></div>
+      </nav>
+      <div class="top-actions" aria-label="用户状态">
+        <div class="score"><i class="fas fa-star"></i><span>10</span></div>
+        <button class="score-pill" type="button">获取积分</button>
+        <div class="medal"><i class="fas fa-medal"></i></div>
+      </div>
+    </header>
+
+    <main class="work-area">
+      <section class="route-shell" aria-label="调解仲裁路径说明">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">了解<span>调解</span> / 仲裁路径</h1>
+            <p class="page-subtitle">按同一案件、同一时间窗口展示两条办理路线分别会触发什么节点。左侧为仲裁，右侧为调解，便于直接对比办理节奏和当事人需要面对的事项。</p>
+          </div>
+          <a class="back-link" href="./立案提交后路径选择.html"><i class="fas fa-arrow-left"></i>返回路径选择</a>
+        </div>
+
+        <section class="case-card" aria-label="当前案件类型">
+          <div class="case-id">
+            <div class="case-icon"><i class="fas fa-file-contract"></i></div>
+            <div>
+              <span>当前案件类型</span>
+              <strong>教育培训服务合同退费纠纷</strong>
+            </div>
+          </div>
+          <div class="case-focus">
+            <span>对比口径</span>
+            围绕课程是否实际提供、退款条款是否充分提示、未消耗课时如何计算、销售承诺与合同约定是否一致、机构是否具备继续履行能力进行同步对照。
+          </div>
+        </section>
+
+        <section class="timeline-board" aria-label="同一时间轴路径对比">
+          <div class="timeline-head">
+            <div class="track-title arbitration"><i class="fas fa-gavel"></i>仲裁</div>
+            <div class="center-label">同一案件<br>同一时间窗口</div>
+            <div class="track-title-wrap">
+              <div class="track-title mediation"><i class="fas fa-handshake"></i>调解</div>
+              <a class="mediation-select-btn" id="selectMediationBtn" href="./调解申请提交结果.html"><i class="fas fa-arrow-right"></i>选择调解</a>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="time-row">
+              <article class="path-panel arbitration">
+                <div class="panel-kicker"><span>仲裁触发</span><i class="fas fa-file-circle-question"></i></div>
+                <h3>申请材料与仲裁协议审查</h3>
+                <p>先核验申请书、主体信息、仲裁协议、请求事项和证据目录。材料符合受理条件后，进入正式受理和费用通知。</p>
+                <div class="effect-tags"><span>受理门槛</span><span>材料完整性</span></div>
+              </article>
+              <div class="time-node"><div class="time-pill"><b>1</b><span>提交后<br>先行审查</span></div></div>
+              <article class="path-panel mediation">
+                <div class="panel-kicker"><span>调解触发</span><i class="fas fa-clipboard-check"></i></div>
+                <h3>自愿调解意愿确认</h3>
+                <p>调解以双方自愿为基础。申请人选择调解后，先确认诉求、联系方式和可沟通方案，再向对方发起调解意愿确认。</p>
+                <div class="effect-tags"><span>自愿基础</span><span>低成本启动</span></div>
+              </article>
+            </div>
+
+            <div class="time-row">
+              <article class="path-panel arbitration">
+                <div class="panel-kicker"><span>仲裁触发</span><i class="fas fa-folder-open"></i></div>
+                <h3>受理通知与材料送达</h3>
+                <p>受理后向申请人发送受理通知，并向被申请人发送仲裁通知、仲裁申请书副本、证据材料和规则等文件。</p>
+                <div class="effect-tags"><span>正式受理</span><span>程序送达</span></div>
+              </article>
+              <div class="time-node"><div class="time-pill"><b>2</b><span>受理后<br>启动送达</span></div></div>
+              <article class="path-panel mediation">
+                <div class="panel-kicker"><span>调解触发</span><i class="fas fa-phone-volume"></i></div>
+                <h3>对方反馈是否同意调解</h3>
+                <p>被申请人收到调解通知后，应在规则期限内反馈是否同意调解；不同意或逾期未反馈的，不强制进入调解。</p>
+                <div class="effect-tags"><span>10个工作日</span><span>不强制调解</span></div>
+              </article>
+            </div>
+
+            <div class="time-row">
+              <article class="path-panel arbitration">
+                <div class="panel-kicker"><span>仲裁触发</span><i class="fas fa-scale-balanced"></i></div>
+                <h3>答辩与证据交换</h3>
+                <p>普通程序中，被申请人通常自收到仲裁通知之日起15日内提交答辩书；简易程序通常为10日。具体以本会规则和案件通知为准。</p>
+                <div class="effect-tags"><span>普通15日</span><span>简易10日</span></div>
+              </article>
+              <div class="time-node"><div class="time-pill"><b>3</b><span>送达后<br>答辩期</span></div></div>
+              <article class="path-panel mediation">
+                <div class="panel-kicker"><span>调解触发</span><i class="fas fa-calculator"></i></div>
+                <h3>确定调解员与沟通方案</h3>
+                <p>双方同意调解后，由双方选定或由机构指定调解员，围绕课时、退款比例、补课、延期或分期履行组织沟通。</p>
+                <div class="effect-tags"><span>调解员介入</span><span>争点收敛</span></div>
+              </article>
+            </div>
+
+            <div class="time-row">
+              <article class="path-panel arbitration">
+                <div class="panel-kicker"><span>仲裁触发</span><i class="fas fa-users-gear"></i></div>
+                <h3>组庭与开庭安排</h3>
+                <p>组庭后由仲裁庭推进程序。首次开庭通常应提前通知双方，普通程序不少于5日，简易程序不少于3日。</p>
+                <div class="effect-tags"><span>组庭后推进</span><span>开庭通知</span></div>
+              </article>
+              <div class="time-node"><div class="time-pill"><b>4</b><span>组庭后<br>安排审理</span></div></div>
+              <article class="path-panel mediation">
+                <div class="panel-kicker"><span>调解触发</span><i class="fas fa-file-circle-check"></i></div>
+                <h3>形成可执行调解方案</h3>
+                <p>方案应写清付款金额、付款期限、课程服务安排、违约后果和履行凭证，避免只达成口头意向。</p>
+                <div class="effect-tags"><span>方案弹性</span><span>履行节点明确</span></div>
+              </article>
+            </div>
+
+            <div class="time-row">
+              <article class="path-panel arbitration">
+                <div class="panel-kicker"><span>仲裁触发</span><i class="fas fa-gavel"></i></div>
+                <h3>开庭、书面审理或庭中调解</h3>
+                <p>仲裁庭围绕合同、履行事实和证据规则进行审理。仲裁程序中也可以根据双方意愿组织调解，调解不成则继续审理。</p>
+                <div class="effect-tags"><span>正式审理</span><span>可庭中调解</span></div>
+              </article>
+              <div class="time-node"><div class="time-pill"><b>5</b><span>审理中<br>可调可裁</span></div></div>
+              <article class="path-panel mediation">
+                <div class="panel-kicker"><span>调解触发</span><i class="fas fa-pen-to-square"></i></div>
+                <h3>签署协议或终止调解</h3>
+                <p>达成一致的，签署调解协议；未达成一致、任一方退出或对方不配合的，可回到仲裁或其他法定路径。</p>
+                <div class="effect-tags"><span>成功则履行</span><span>不成可转程序</span></div>
+              </article>
+            </div>
+
+            <div class="time-row">
+              <article class="path-panel arbitration">
+                <div class="panel-kicker"><span>仲裁触发</span><i class="fas fa-file-signature"></i></div>
+                <h3>裁决、调解书与执行衔接</h3>
+                <p>普通程序裁决期限通常为组庭后4个月内；简易程序通常为组庭后75日内。裁决或调解书生效后，对方不履行的，可依法申请执行。</p>
+                <div class="effect-tags"><span>普通4个月</span><span>简易75日</span></div>
+              </article>
+              <div class="time-node"><div class="time-pill"><b>6</b><span>组庭后<br>规则期限</span></div></div>
+              <article class="path-panel mediation">
+                <div class="panel-kicker"><span>调解结果</span><i class="fas fa-circle-check"></i></div>
+                <h3>按协议履行或申请确认</h3>
+                <p>调解成功后按协议履行；如需增强执行保障，可依法办理司法确认，或在仲裁程序内由仲裁庭制作调解书。</p>
+                <div class="effect-tags"><span>优先履行</span><span>保留保障路径</span></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <div class="bottom-sentinel" id="bottomSentinel" aria-hidden="true"></div>
+        <section class="decision-footer" id="nextAction" aria-label="查看案件评估报告">
+          <button class="primary-btn" id="finishBtn" type="button">完成 <i class="fas fa-check"></i></button>
+        </section>
+      </section>
+    </main>
+    <div class="completion-mask" id="completionMask" role="dialog" aria-modal="true" aria-label="立案流程完成">
+      <div class="completion-card">
+        <div class="completion-icon"><i class="fas fa-check"></i></div>
+        <h2>立案流程已完成</h2>
+        <p>本次演示已完成在线立案、案件评估报告和后续路径选择。后续以仲裁委正式审核、通知和当事人实际选择为准。</p>
+        <a href="./立案bot.html"><i class="fas fa-house"></i>返回立案服务部</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'filingDemoCompletedPaths';
+
+    function markCompleted() {
+      try {
+        const completed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        completed.map = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+      } catch (error) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ map: true }));
+      }
+    }
+
+    document.getElementById('finishBtn').addEventListener('click', () => {
+      markCompleted();
+      localStorage.setItem('filingDemoFinalCompleted', 'true');
+      document.getElementById('completionMask').classList.add('show');
+    });
+
+    document.getElementById('selectMediationBtn').addEventListener('click', () => {
+      try {
+        const completed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        completed.mediation = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+      } catch (error) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ mediation: true }));
+      }
+      localStorage.setItem('filingDemoSelectedRoute', 'mediation');
+    });
+
+    const footer = document.getElementById('nextAction');
+    const sentinel = document.getElementById('bottomSentinel');
+    if ('IntersectionObserver' in window && sentinel) {
+      const observer = new IntersectionObserver((entries) => {
+        footer.classList.toggle('show', entries.some((entry) => entry.isIntersecting));
+      }, { threshold: 1 });
+      observer.observe(sentinel);
+    } else {
+      window.addEventListener('scroll', () => {
+        const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 24;
+        footer.classList.toggle('show', nearBottom);
+      }, { passive: true });
+    }
+  </script>
+</body>
+</html>

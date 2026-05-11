@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第二步：提交案件材料</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 18px;
+      background: #f3f6fb;
+      color: #303133;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    .hz-step-content {
+      max-width: 1500px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px 30px;
+      border: 1px solid #edf2fa;
+    }
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 40px 30px;
+      border-radius: 16px;
+      background: #153f95;
+      border: 1px solid #123a88;
+      margin-bottom: 22px;
+      box-shadow: 0 8px 18px #153f9530;
+    }
+    .hero-icon { display: none; }
+    .hero-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; }
+    .upload-card {
+      background: #fff;
+      border: 1px solid #eef3fa;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      box-shadow: none;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 18px 20px;
+    }
+    .header-left { display: flex; align-items: center; }
+    .header-icon { font-size: 22px; color: #2f6fff; margin-right: 8px; }
+    .header-title { font-size: 22px; font-weight: 700; color: #1f2937; margin-right: 8px; line-height: 1.1; }
+    .required-tag {
+      font-size: 16px;
+      line-height: 1;
+      color: #f06060;
+      background-color: #fff1f1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    .card-body { padding: 24px; position: relative; }
+    .btn {
+      border: 1px solid #dcdfe6;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #fff;
+      color: #606266;
+    }
+    .btn-primary {
+      background: #153f95;
+      border-color: #153f95;
+      color: #fff;
+    }
+    .step-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .step-nav-btn {
+      min-width: 92px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .step-nav-btn.prev {
+      border: 1px solid #e5edf9;
+      background: #fff;
+      color: #8ea0bf;
+    }
+    .step-nav-btn.prev:hover {
+      border-color: #c6d7f3;
+      color: #6f86ad;
+    }
+    .step-nav-btn.next {
+      border: 1px solid #153f95;
+      background: #153f95;
+      color: #fff;
+    }
+    .step-nav-btn.next:hover { background: #1d4db1; border-color: #1d4db1; }
+    .btn:hover { opacity: 0.9; }
+    .uploaded-files-title { font-size: 14px; font-weight: 500; color: #333; margin-bottom: 8px; }
+    .uploaded-file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #eef2f7;
+    }
+    .uploaded-file-item:last-child { border-bottom: none; }
+    .file-name { font-size: 14px; color: #606266; }
+    .no-evidence {
+      text-align: center;
+      color: #b5bbc6;
+      padding: 54px 0;
+      font-size: 20px;
+    }
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: #00000073;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+      width: 860px;
+      max-width: calc(100vw - 40px);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px #0f172a40;
+    }
+    .modal-header {
+      padding: 20px 24px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 26px;
+      color: #111827;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .modal-close {
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      font-size: 30px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+    }
+    .modal-close:hover { color: #6b7280; }
+    .modal-body {
+      padding: 8px 24px 0;
+    }
+    .modal-footer {
+      padding: 18px 24px 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .modal-footer .btn {
+      min-width: 80px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1;
+      padding: 12px 22px;
+    }
+    .ai-confirm-modal {
+      width: 500px;
+      max-width: calc(100vw - 48px);
+      overflow: hidden;
+      text-align: center;
+      padding: 34px 38px 28px;
+    }
+    .ai-confirm-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      box-shadow: inset 0 0 0 8px #f8fbff;
+    }
+    .ai-confirm-title {
+      margin: 0 0 12px;
+      color: #0f172a;
+      font-size: 20px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+    .ai-confirm-desc {
+      margin: 0;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.75;
+      text-align: left;
+    }
+    .ai-confirm-desc strong {
+      color: #1d4ed8;
+      font-weight: 800;
+    }
+    .ai-confirm-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .ai-confirm-actions button {
+      min-width: 112px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+    .ai-confirm-primary {
+      min-width: 156px;
+      padding: 0 22px;
+      white-space: nowrap;
+    }
+    .ai-confirm-cancel {
+      border: 1px solid #dbe3ef;
+      color: #64748b;
+      background: #fff;
+    }
+    .ai-confirm-cancel:hover {
+      color: #334155;
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+    .ai-confirm-primary {
+      border: none;
+      color: #fff;
+      background: #2563eb;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, .28);
+    }
+    .ai-confirm-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+    .arb-dialog-panel {
+      border: 2px dashed #dbe3ef;
+      border-radius: 18px;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      min-height: 280px;
+    }
+    .arb-upload-side {
+      width: 46%;
+      border-right: 1px solid #e8eef8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .arb-upload-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #eef4ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: 12px;
+    }
+    .arb-upload-title {
+      font-size: 14px;
+      color: #111827;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .arb-upload-sub {
+      font-size: 16px;
+      color: #9ca3af;
+      margin-bottom: 18px;
+      line-height: 1.2;
+    }
+    .arb-upload-trigger {
+      border: none;
+      background: #1d4db1;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      line-height: 1;
+      padding: 12px 28px;
+      cursor: pointer;
+    }
+    .arb-upload-trigger:hover { opacity: 0.92; }
+    .arb-upload-side input { display: none; }
+    .arb-rule-side {
+      flex: 1;
+      padding: 14px 18px 14px 22px;
+    }
+    .arb-rule-side .upload-instructions-content {
+      margin-top: 0;
+      padding: 0;
+    }
+    .arb-rule-side .instructions-title {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .arb-rule-side .instructions-list {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.55;
+    }
+    .arb-rule-side .instruction-item { margin-bottom: 10px; }
+    .arb-rule-side .index {
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      font-size: 13px;
+      margin-right: 10px;
+      margin-top: 0;
+    }
+    .temp-file-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .temp-file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px 16px;
+    }
+    .temp-file-left {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 12px;
+    }
+    .temp-file-icon {
+      color: #ff4d4f;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .temp-file-meta {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .temp-file-name {
+      font-size: 14px;
+      color: #1f2937;
+      font-weight: 600;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 420px;
+    }
+    .temp-file-size {
+      margin-top: 2px;
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.2;
+    }
+    .temp-file-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-left: 16px;
+    }
+    .temp-file-actions .action-btn {
+      font-size: 24px;
+      color: #9aa3b2;
+    }
+    .temp-file-actions .action-btn.delete-btn { color: #ff6b6b; }
+    .upload-box {
+      border: 2px dashed #d9dfe9;
+      border-radius: 16px;
+      min-height: 180px;
+      padding: 26px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .upload-box input { margin-top: 6px; font-size: 20px; }
+    .upload-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #edf4ff;
+      color: #2f6fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+    .upload-main-text { font-size: 20px; color: #111827; font-weight: 600; line-height: 1.1; }
+    .upload-sub-text { font-size: 16px; color: #98a1b3; line-height: 1.1; }
+    .upload-select-btn {
+      border: none;
+      background: #153f95;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      padding: 8px 26px;
+      line-height: 1.2;
+      cursor: pointer;
+    }
+    .temp-file-item:last-child { margin-bottom: 0; }
+    .upload-instructions-content {
+      margin-top: 16px;
+      padding: 10px 0 10px 20px;
+      width: 100%;
+    }
+    .instructions-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #303133;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+    .instructions-list { font-size: 12px; color: #606266; line-height: 1.8; }
+    .instruction-item { display: flex; margin-bottom: 8px; }
+    .instruction-des { display: inline; text-align: start; }
+    .index {
+      background-color: #dbeafe;
+      color: #2563eb;
+      width: 20px;
+      height: 20px;
+      border-radius: 8px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .catalog-card-content { position: relative; }
+    .catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .catalog-upload-content {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      background-color: transparent;
+      border-radius: 0;
+    }
+    .catalog-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .catalog-count {
+      font-size: 16px;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-left: 8px;
+    }
+    .catalog-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .catalog-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid #ebeef5;
+      border-radius: 12px;
+      background-color: #fff;
+      transition: all 0.3s;
+    }
+    .catalog-item:hover { box-shadow: 0 4px 12px #0000000d; }
+    .catalog-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 0;
+    }
+    .catalog-icon-wrapper {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .catalog-details {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      line-height: 20px;
+    }
+    .catalog-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    .file-size { font-size: 13px; color: #94a3b8; }
+    .catalog-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-left: 16px;
+    }
+    .action-btn {
+      font-size: 20px;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .action-btn:hover { color: #3b82f6; }
+    .action-btn.delete-btn:hover { color: #ef4444; }
+    .catalog-empty {
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #b5bbc6;
+      gap: 8px;
+    }
+    .catalog-empty-icon {
+      width: 88px;
+      height: 88px;
+      border-radius: 18px;
+      background: #f3f5f9;
+      color: #c3cad6;
+      font-size: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .catalog-empty-text { font-size: 18px; }
+    .evidence-section {
+      display: flex;
+      border: 1px solid #e6ebf4;
+      border-radius: 16px;
+    }
+    .evidence-left {
+      flex: 1;
+      min-width: 0;
+      padding: 20px;
+    }
+    .evidence-list { margin-top: 8px; }
+    .evidence-item {
+      border: 1px solid #e8edf5;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+    .evidence-item.error { border-color: #f56c6c; }
+    .evidence-item:last-child { margin-bottom: 0; }
+    .evidence-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .evidence-title {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      color: #2563eb;
+      background-color: #eff6ff;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .delete-link {
+      color: #909399;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .delete-link:hover { color: #f56c6c; }
+    .uploader-inline {
+      border: 2px dashed #d7dce7;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fff;
+    }
+    .inline-files {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .inline-file {
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      background: #fff;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .inline-file-left {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 12px;
+    }
+    .inline-file-icon {
+      color: #ff4d4f;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .inline-file-meta {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .inline-file-name {
+      font-size: 18px;
+      line-height: 1.2;
+      color: #1f2937;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 560px;
+    }
+    .inline-file-size {
+      margin-top: 2px;
+      font-size: 14px;
+      line-height: 1.2;
+      color: #9ca3af;
+    }
+    .inline-file-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-left: 16px;
+    }
+    .inline-file-actions .action-btn {
+      font-size: 18px;
+      color: #9ca3af;
+    }
+    .inline-file-actions .action-btn.delete-btn { color: #ff6b6b; }
+    .add-evidence-btn-wrapper {
+      margin-top: 16px;
+      border: 2px dashed #cdddf4;
+      border-radius: 10px;
+      text-align: center;
+      padding: 14px;
+      cursor: pointer;
+      color: #9ba5b7;
+      transition: all 0.3s;
+      background-color: #fff;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+    .add-evidence-btn-wrapper:hover {
+      border-color: #2563eb;
+      color: #2563eb;
+      background-color: #f0f7ff;
+    }
+    .instructions-divider {
+      width: 1px;
+      background-color: #e8edf5;
+      margin: 16px 0;
+    }
+    .evidence-right {
+      padding: 16px;
+      width: 420px;
+      flex-shrink: 0;
+    }
+    .bold { font-weight: 700; font-size: 22px; color: #1f2937; }
+    .instructions-list { font-size: 16px; color: #7a8598; line-height: 1.55; }
+    .instruction-item { align-items: flex-start; margin-bottom: 10px; }
+    .index {
+      width: 24px;
+      height: 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-top: 2px;
+    }
+    @media (max-width: 1080px) {
+      .hz-step-content { padding: 16px; }
+      .hero-title { font-size: 24px; }
+      .header-title { font-size: 20px; }
+      .required-tag, .btn, .catalog-section-title, .catalog-count, .bold, .instructions-list, .upload-main-text, .upload-sub-text, .add-evidence-btn-wrapper, .catalog-empty-text { font-size: 12px; }
+      .catalog-grid { grid-template-columns: 1fr; }
+      .evidence-section { flex-direction: column; }
+      .instructions-divider { width: auto; height: 1px; margin: 0 16px 16px; }
+      .evidence-right { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hz-step-content">
+    <div class="hero">
+      <div class="hero-icon">②</div>
+      <div class="hero-title">第二步：提交案件材料</div>
+    </div>
+
+    <section class="upload-card">
+      <div class="card-header">
+        <div class="header-left">
+          <i class="el-icon-document header-icon"></i>
+          <span class="header-title">仲裁申请书</span>
+          <span class="required-tag">必填</span>
+        </div>
+        <button class="btn btn-primary" id="openUploadDialogBtn">上传仲裁申请书</button>
+      </div>
+      <div class="card-body">
+        <div id="arbUploadList"></div>
+      </div>
+    </section>
+
+    <section class="upload-card">
+      <div class="card-header">
+        <div class="header-left">
+          <i class="el-icon-folder header-icon"></i>
+          <span class="header-title">证据目录</span>
+          <span class="required-tag">必填</span>
+        </div>
+      </div>
+      <div class="card-body catalog-card-content">
+        <div class="catalog-grid">
+          <div class="catalog-upload-content">
+            <div class="catalog-section-title">新增证据目录</div>
+            <div class="upload-box">
+              <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-main-text">点击或拖拽上传</div>
+              <div class="upload-sub-text">支持 PDF</div>
+              <button type="button" class="upload-select-btn" data-action="trigger-catalog-input">选择文件</button>
+              <input id="catalogInput" type="file" accept=".pdf" multiple style="display:none;" />
+            </div>
+          </div>
+          <div>
+            <div class="catalog-section-title">
+              目录列表
+              <span class="catalog-count" id="catalogCount">当前共 0 份</span>
+            </div>
+            <div id="catalogList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="upload-card">
+      <div class="card-header">
+        <div class="header-left">
+          <i class="el-icon-folder-opened header-icon"></i>
+          <span class="header-title">证据材料</span>
+          <span class="required-tag">必填</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="evidence-section">
+          <div class="evidence-left">
+            <span class="bold">请将证据文件依据证明的内容，分类后上传</span>
+            <div class="evidence-list" id="evidenceList"></div>
+            <div class="add-evidence-btn-wrapper" id="addEvidenceBtn"><i class="el-icon-plus"></i> 添加更多证据材料</div>
+          </div>
+          <div class="instructions-divider"></div>
+          <div class="evidence-right">
+            <div class="instructions-title"><i class="el-icon-info" style="color:#2563eb;margin-right:4px;"></i> 上传须知</div>
+            <div class="instructions-list">
+              <div class="instruction-item"><span class="index">1</span><span class="instruction-des">请确保证据材料清晰、完整、页码连续、无空白页。请保持单双页设置一致，切勿出现证据中一半是单页一半是双页的情况。</span></div>
+              <div class="instruction-item"><span class="index">2</span><span class="instruction-des">请勿重复上传证据。</span></div>
+              <div class="instruction-item"><span class="index">3</span><span class="instruction-des">提交录音证据，建议附文字整理材料。</span></div>
+              <div class="instruction-item"><span class="index">4</span><span class="instruction-des">建工类案件中如果合同材料页数较多，请尽量上传完整，若实在不方便，请务必上传合同签章页、争议条款所在页以及其他与案件信息相关的重要页面。</span></div>
+              <div class="instruction-item"><span class="index">5</span><span class="instruction-des">证据需附证据目录，应列明证据名称、证明内容、证据对应的页码范围。上传的证据目录需签字/盖章、写日期（日期为提交材料当日）。</span></div>
+              <div class="instruction-item"><span class="index">6</span><span class="instruction-des">请您确保上传文件的格式为PDF、彩色、分辨率不低于300dpi、影像倾斜度小于0.5度、并保持纸质案件材料原貌。</span></div>
+              <div class="instruction-item"><span class="index">7</span><span class="instruction-des">文件名称中除后缀外，不要包含多个"."点号</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="step-footer">
+      <button class="step-nav-btn prev" id="prevStepBtn">上一步</button>
+      <button class="step-nav-btn next" id="smartGenerateBtn">下一步</button>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="uploadModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">上传仲裁申请书</div>
+        <button type="button" class="modal-close" id="closeUploadBtn" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="arb-dialog-panel">
+          <div class="arb-upload-side">
+            <div class="arb-upload-icon"><i class="el-icon-upload2"></i></div>
+            <div class="arb-upload-title">点击或拖拽上传</div>
+            <div class="arb-upload-sub">支持 PDF</div>
+            <button type="button" class="arb-upload-trigger" data-action="trigger-arb-input">选择文件</button>
+            <input id="arbInput" type="file" accept=".pdf" multiple />
+          </div>
+          <div class="arb-rule-side">
+            <div class="upload-instructions-content">
+              <div class="instructions-title"><i class="el-icon-info" style="color:#2563eb;margin-right:4px;"></i> 上传须知</div>
+              <div class="instructions-list">
+                <div class="instruction-item"><span class="index">1</span><span class="instruction-des">文件类型: .pdf，最大50M，如单个文件超过50M请分卷上传</span></div>
+                <div class="instruction-item"><span class="index">2</span><span class="instruction-des">请上传清晰完整的扫描版或电子版仲裁申请书</span></div>
+                <div class="instruction-item"><span class="index">3</span><span class="instruction-des">仲裁申请书请不要上传手写版或者拍照版，否则无法识别</span></div>
+                <div class="instruction-item"><span class="index">4</span><span class="instruction-des">文件名称中除后缀外，不要包含多个"."点号</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="temp-file-list" id="tempArbList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="cancelUploadBtn">取消</button>
+        <button class="btn btn-primary" id="confirmUploadBtn">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="aiConfirmModal">
+    <div class="modal ai-confirm-modal">
+      <div class="ai-confirm-icon"><i class="el-icon-warning-outline"></i></div>
+      <h3 class="ai-confirm-title">温馨提示</h3>
+      <p class="ai-confirm-desc">
+        请您在提交案件前逐条仔细确认，<strong>谨慎核对</strong>AI自动提取生成的内容，<br>
+        确保<strong>内容真实、准确、完整</strong>后再提交立案申请<br>
+        <strong>立案尚未完成</strong>，请继续完成后续步骤。
+      </p>
+      <div class="ai-confirm-actions">
+        <button type="button" class="ai-confirm-cancel" id="closeAiConfirmBtn">返回核对</button>
+        <button type="button" class="ai-confirm-primary" id="confirmAiNextBtn">确认，进入下一步</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      hasUploadList: [],
+      tempArbList: [],
+      catalogFiles: [],
+      evidenceUploads: []
+    }
+
+    function createLocalFileRecord(file) {
+      return {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2)}`,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        raw: file,
+        objectURL: URL.createObjectURL(file)
+      }
+    }
+
+    function formatFileSize(size) {
+      if (!size) return '0 B'
+      const k = 1024
+      const sizes = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(size) / Math.log(k))
+      return (size / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i]
+    }
+
+    function getFileIconColor(fileName) {
+      if (!fileName) return '#909399'
+      const ext = fileName.split('.').pop().toLowerCase()
+      if (['pdf'].includes(ext)) return '#ff4d4f'
+      if (['doc', 'docx'].includes(ext)) return '#409eff'
+      if (['xls', 'xlsx'].includes(ext)) return '#67c23a'
+      if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) return '#e6a23c'
+      return '#909399'
+    }
+
+    function downloadFile(file) {
+      const a = document.createElement('a')
+      a.href = file.objectURL
+      a.download = file.name
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+
+    function renderArbList() {
+      const box = document.getElementById('arbUploadList')
+      if (!state.hasUploadList.length) {
+        box.innerHTML = '<div class="no-evidence">暂未上传仲裁申请书，请点击右上角“上传仲裁申请书”</div>'
+        return
+      }
+      box.innerHTML = `
+        <div class="uploaded-files">
+          <div class="uploaded-files-title">已上传的仲裁申请书：</div>
+          ${state.hasUploadList.map(file => `<div class="uploaded-file-item"><span class="file-name">${file.name}</span><span class="file-size">${formatFileSize(file.size)}</span></div>`).join('')}
+        </div>
+      `
+    }
+
+    function renderTempArbList() {
+      const box = document.getElementById('tempArbList')
+      if (!state.tempArbList.length) {
+        box.innerHTML = '<div class="no-evidence" style="padding:16px 0;">请先选择文件</div>'
+        return
+      }
+      box.innerHTML = state.tempArbList.map(file => `
+        <div class="temp-file-item" data-id="${file.id}">
+          <div class="temp-file-left">
+            <i class="el-icon-document temp-file-icon"></i>
+            <div class="temp-file-meta">
+              <div class="temp-file-name" title="${file.name}">${file.name}</div>
+              <div class="temp-file-size">${formatFileSize(file.size)}</div>
+            </div>
+          </div>
+          <div class="temp-file-actions">
+            <i class="el-icon-view action-btn" data-action="preview-temp"></i>
+            <i class="el-icon-download action-btn" data-action="download-temp"></i>
+            <i class="el-icon-delete action-btn delete-btn" data-action="delete-temp"></i>
+          </div>
+        </div>
+      `).join('')
+      box.querySelectorAll('.temp-file-item').forEach(el => {
+        const id = el.dataset.id
+        const file = state.tempArbList.find(item => item.id === id)
+        el.querySelector('[data-action="preview-temp"]').onclick = () => window.open(file.objectURL, '_blank')
+        el.querySelector('[data-action="download-temp"]').onclick = () => downloadFile(file)
+        el.querySelector('[data-action="delete-temp"]').onclick = () => {
+          URL.revokeObjectURL(file.objectURL)
+          state.tempArbList = state.tempArbList.filter(item => item.id !== id)
+          renderTempArbList()
+        }
+      })
+    }
+
+    function renderCatalogList() {
+      const list = document.getElementById('catalogList')
+      document.getElementById('catalogCount').textContent = `当前共 ${state.catalogFiles.length} 份`
+      if (!state.catalogFiles.length) {
+        list.innerHTML = '<div class="catalog-empty"><div class="catalog-empty-icon"><i class="el-icon-document"></i></div><div class="catalog-empty-text">尚未上传证据目录</div></div>'
+        return
+      }
+      list.innerHTML = `<div class="catalog-list">
+        ${state.catalogFiles.map(item => `
+          <div class="catalog-item" data-id="${item.id}">
+            <div class="catalog-info">
+              <div class="catalog-icon-wrapper">
+                <i class="el-icon-document" style="color:${getFileIconColor(item.name)};font-size:28px;"></i>
+              </div>
+              <div class="catalog-details">
+                <div class="catalog-name" title="${item.name}">${item.name}</div>
+                <div class="file-size">${formatFileSize(item.size)}</div>
+              </div>
+            </div>
+            <div class="catalog-actions">
+              <i class="el-icon-view action-btn" data-action="preview"></i>
+              <i class="el-icon-download action-btn" data-action="download"></i>
+              <i class="el-icon-delete action-btn delete-btn" data-action="delete"></i>
+            </div>
+          </div>
+        `).join('')}
+      </div>`
+      list.querySelectorAll('.catalog-item').forEach(el => {
+        const id = el.dataset.id
+        const file = state.catalogFiles.find(x => x.id === id)
+        el.querySelector('[data-action="preview"]').onclick = () => window.open(file.objectURL, '_blank')
+        el.querySelector('[data-action="download"]').onclick = () => downloadFile(file)
+        el.querySelector('[data-action="delete"]').onclick = () => {
+          URL.revokeObjectURL(file.objectURL)
+          state.catalogFiles = state.catalogFiles.filter(x => x.id !== id)
+          renderCatalogList()
+        }
+      })
+    }
+
+    function addEvidence() {
+      state.evidenceUploads.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2)}`,
+        uploadList: [],
+        showError: false
+      })
+      renderEvidenceList()
+    }
+
+    function renderEvidenceList() {
+      const list = document.getElementById('evidenceList')
+      if (!state.evidenceUploads.length) {
+        list.innerHTML = '<div class="no-evidence">暂无证据，请点击下方“添加更多证据材料”</div>'
+        return
+      }
+      list.innerHTML = state.evidenceUploads.map((item, index) => `
+        <div class="evidence-item ${item.showError ? 'error' : ''}" data-id="${item.id}">
+          <div class="evidence-header">
+            <div class="evidence-title">证据${index + 1}</div>
+            ${state.evidenceUploads.length > 1 ? '<span class="delete-link" data-action="remove-evidence">删除此项</span>' : ''}
+          </div>
+          <div class="uploader-inline">
+            <div class="upload-box" style="min-height:150px;">
+              <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-main-text">点击或拖拽上传</div>
+              <div class="upload-sub-text">支持 PDF, 单文件最大50M</div>
+              <button type="button" class="upload-select-btn" data-action="trigger-evidence-input">选择文件</button>
+              <input type="file" accept=".pdf" multiple data-action="evidence-input" style="display:none;" />
+            </div>
+            <div class="inline-files">
+              ${item.uploadList.length ? item.uploadList.map(file => `
+                <div class="inline-file">
+                  <div class="inline-file-left">
+                    <i class="el-icon-document inline-file-icon"></i>
+                    <div class="inline-file-meta">
+                      <div class="inline-file-name" title="${file.name}">${file.name}</div>
+                      <div class="inline-file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                  </div>
+                  <div class="inline-file-actions">
+                    <i class="el-icon-view action-btn" data-action="preview-file" data-file-id="${file.id}"></i>
+                    <i class="el-icon-download action-btn" data-action="download-file" data-file-id="${file.id}"></i>
+                    <i class="el-icon-delete action-btn delete-btn" data-action="remove-file" data-file-id="${file.id}"></i>
+                  </div>
+                </div>
+              `).join('') : '<div class="no-evidence" style="padding:12px 0;">尚未上传证据文件</div>'}
+            </div>
+          </div>
+        </div>
+      `).join('')
+
+      list.querySelectorAll('.evidence-item').forEach(el => {
+        const evidenceId = el.dataset.id
+        const evidence = state.evidenceUploads.find(e => e.id === evidenceId)
+        const input = el.querySelector('[data-action="evidence-input"]')
+        const triggerBtn = el.querySelector('[data-action="trigger-evidence-input"]')
+        triggerBtn.onclick = () => input.click()
+        input.onchange = (e) => {
+          const files = Array.from(e.target.files || []).map(createLocalFileRecord)
+          evidence.uploadList.push(...files)
+          evidence.showError = false
+          renderEvidenceList()
+          input.value = ''
+        }
+        const removeBtn = el.querySelector('[data-action="remove-evidence"]')
+        if (removeBtn) {
+          removeBtn.onclick = () => {
+            if (state.evidenceUploads.length <= 1) return
+            if (window.confirm('确定删除该证据?')) {
+              evidence.uploadList.forEach(f => URL.revokeObjectURL(f.objectURL))
+              state.evidenceUploads = state.evidenceUploads.filter(x => x.id !== evidenceId)
+              renderEvidenceList()
+            }
+          }
+        }
+        el.querySelectorAll('[data-action="preview-file"]').forEach(btn => {
+          const file = evidence.uploadList.find(f => f.id === btn.dataset.fileId)
+          btn.onclick = () => window.open(file.objectURL, '_blank')
+        })
+        el.querySelectorAll('[data-action="download-file"]').forEach(btn => {
+          const file = evidence.uploadList.find(f => f.id === btn.dataset.fileId)
+          btn.onclick = () => downloadFile(file)
+        })
+        el.querySelectorAll('[data-action="remove-file"]').forEach(btn => {
+          btn.onclick = () => {
+            const file = evidence.uploadList.find(f => f.id === btn.dataset.fileId)
+            if (file) URL.revokeObjectURL(file.objectURL)
+            evidence.uploadList = evidence.uploadList.filter(f => f.id !== btn.dataset.fileId)
+            renderEvidenceList()
+          }
+        })
+      })
+    }
+
+    const uploadModal = document.getElementById('uploadModal')
+    document.getElementById('openUploadDialogBtn').addEventListener('click', () => {
+      state.tempArbList = state.hasUploadList.map(file => ({ ...file }))
+      renderTempArbList()
+      uploadModal.classList.add('show')
+    })
+    document.getElementById('cancelUploadBtn').addEventListener('click', () => {
+      uploadModal.classList.remove('show')
+      state.tempArbList = []
+    })
+    document.getElementById('closeUploadBtn').addEventListener('click', () => {
+      uploadModal.classList.remove('show')
+      state.tempArbList = []
+    })
+    document.getElementById('confirmUploadBtn').addEventListener('click', () => {
+      if (!state.tempArbList.length) {
+        alert('请上传文件')
+        return
+      }
+      state.hasUploadList = state.tempArbList.map(file => ({ ...file }))
+      uploadModal.classList.remove('show')
+      state.tempArbList = []
+      renderArbList()
+    })
+    document.getElementById('arbInput').addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []).map(createLocalFileRecord)
+      state.tempArbList.push(...files)
+      renderTempArbList()
+      e.target.value = ''
+    })
+    document.querySelector('[data-action="trigger-arb-input"]').addEventListener('click', () => {
+      document.getElementById('arbInput').click()
+    })
+    document.querySelector('[data-action="trigger-catalog-input"]').addEventListener('click', () => {
+      document.getElementById('catalogInput').click()
+    })
+    document.getElementById('catalogInput').addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []).map(createLocalFileRecord)
+      state.catalogFiles.push(...files)
+      renderCatalogList()
+      e.target.value = ''
+    })
+    document.getElementById('addEvidenceBtn').addEventListener('click', addEvidence)
+    document.getElementById('prevStepBtn').addEventListener('click', () => {
+      window.location.href = './Step1CaseType.html'
+    })
+    document.getElementById('smartGenerateBtn').addEventListener('click', () => {
+      document.getElementById('aiConfirmModal').classList.add('show')
+    })
+    document.getElementById('closeAiConfirmBtn').addEventListener('click', () => {
+      document.getElementById('aiConfirmModal').classList.remove('show')
+    })
+    document.getElementById('confirmAiNextBtn').addEventListener('click', () => {
+      window.location.href = './立案bot.html'
+    })
+    uploadModal.addEventListener('click', (e) => {
+      if (e.target === uploadModal) {
+        uploadModal.classList.remove('show')
+        state.tempArbList = []
+      }
+    })
+
+    addEvidence()
+    addEvidence()
+    renderArbList()
+    renderCatalogList()
+  </script>
+</body>
+</html>

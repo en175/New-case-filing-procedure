@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第一步：身份选择</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .tw-shadow-md { box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; }
+    .tw-shadow-sm { box-shadow: 0 1px 2px 0 #0000000d; }
+    .hz-step-content {
+      display: flex;
+      gap: 24px;
+      min-height: 600px;
+      flex-direction: column;
+      background: transparent;
+    }
+    .video-content-block {
+      display: flex;
+      gap: 24px;
+    }
+    .step-content-wrapper {
+      padding: 32px;
+      border-radius: 20px;
+      border: 1px solid #f1f5f9;
+      background: #fff;
+    }
+    .left-video-card {
+      flex: 0 0 30%;
+      background: #fff;
+      border-radius: 24px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      min-width: 350px;
+    }
+    .video-wrapper {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .step-video {
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      object-fit: cover;
+    }
+    .right-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .institution-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: box-shadow 0.3s;
+      border: 1px solid #f1f5f9;
+    }
+    .institution-card:hover { box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a; }
+    .icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+    .icon-box i { font-size: 28px; color: #1E3A8A; }
+    .icon-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .info-box { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .label { font-size: 12px; color: #94a3b8; margin: 0 0 4px; }
+    .value { font-size: 20px; font-weight: bold; color: #0f172a; }
+    .reselect-btn {
+      background: #f8fafc;
+      border: 1px solid transparent;
+      color: #64748b;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .reselect-btn:hover { background: #eff6ff; color: #1E3A8A; border-color: #bfdbfe; }
+    .step-title-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .blue-bar {
+      width: 6px;
+      height: 24px;
+      background: #1E3A8A;
+      border-radius: 3px;
+    }
+    .title-text { font-size: 20px; font-weight: bold; color: #0f172a; }
+    .applicant-type-group {
+      display: flex;
+      gap: 24px;
+      width: 100%;
+    }
+    .applicant-type-item {
+      flex: 1;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+    .applicant-card-content {
+      border-radius: 20px;
+      padding: 32px;
+      min-height: 280px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .applicant-card-content:hover { background: #fff; box-shadow: 0 2px 4px #0000000f; }
+    .applicant-type-item.active .applicant-card-content {
+      background: #fafcff;
+      box-shadow: 0 10px 15px -3px #1e3a8a0d, 0 4px 6px -4px #1e3a8a0d;
+      border-color: #dbeafe;
+    }
+    .card-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+    .icon-wrapper {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .icon-wrapper i { font-size: 32px; color: #1E3A8A; }
+    .icon-wrapper.active { background: #1E3A8A; }
+    .icon-wrapper.active i { color: #fff; }
+    .check-icon i { font-size: 24px; color: #1E3A8A; }
+    .card-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+    .card-title.active { color: #1E3A8A; }
+    .card-desc { font-size: 15px; color: #64748b; line-height: 1.6; }
+    .materials-section { margin-top: 24px; }
+    .step-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+    .next-step-btn {
+      min-width: 120px;
+      height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: #1E40AF;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .next-step-btn:hover { background: #1D4ED8; }
+    .subtitle-text {
+      font-size: 14px;
+      color: #64748b;
+      margin-left: 8px;
+      font-weight: normal;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #ebeef5;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ebeef5;
+      padding: 12px;
+      vertical-align: top;
+      font-size: 14px;
+      color: #000000e8;
+    }
+    th {
+      background-color: #f8fafc;
+      color: #000;
+      font-size: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .materials-category-cell {
+      position: relative;
+      font-weight: bold;
+      text-align: center;
+      width: 160px;
+    }
+    .materials-category-link {
+      color: #2563eb;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .materials-category-link:hover { color: #1d4ed8; }
+    .materials-warn-text { font-size: 10px; color: #64748b; margin-top: 4px; }
+    .materials-popover {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 6px;
+      min-width: 230px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px #00000014;
+      padding: 10px 12px;
+      z-index: 8;
+      display: none;
+      text-align: left;
+    }
+    .materials-category-cell:hover .materials-popover { display: block; }
+    .materials-file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 200px;
+    }
+    .materials-file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .materials-file-name {
+      flex: 1;
+      font-size: 13px;
+      color: #0f172a;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .action-icon {
+      font-size: 16px;
+      color: #2563eb;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .action-icon:hover { color: #1d4ed8; }
+    /* @media (max-width: 1200px) {
+      .video-content-block { flex-direction: column; }
+      .left-video-card { min-width: auto; }
+    } */
+  </style>
+</head>
+<body>
+  <div class="hz-step-content">
+    <div class="video-content-block">
+      <div class="left-video-card tw-shadow-md">
+        <div class="video-wrapper">
+          <video class="step-video" controls autoplay muted loop>
+            <source src="./视频1/step1.mp4" type="video/mp4" />
+            您的浏览器不支持视频播放。
+          </video>
+        </div>
+      </div>
+      <div class="right-content">
+        <div class="institution-card tw-shadow-sm">
+          <div class="icon-box">
+            <img src="./广仲logo.png" alt="广州仲裁委员会标识" />
+          </div>
+          <div class="info-box">
+            <h3 class="label">当前收案机构</h3>
+            <div class="value" id="institutionName">立案服务部</div>
+          </div>
+          <button class="reselect-btn" id="reselectBtn"><i class="el-icon-refresh"></i> 重选</button>
+        </div>
+
+        <div class="step-content-wrapper tw-shadow-sm">
+          <div class="step-title-block">
+            <div class="blue-bar"></div>
+            <div class="title-text">第一步：身份选择</div>
+          </div>
+          <div class="applicant-type-group" id="applicantGroup"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-content-wrapper materials-section tw-shadow-md">
+      <div class="step-title-block">
+        <div class="blue-bar"></div>
+        <div class="title-text">网上立案必备材料</div>
+        <div class="subtitle-text">请在填写立案申请表单前准备好以下材料</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px;">序号</th>
+            <th style="width:160px;">材料类别</th>
+            <th>具体材料及要求</th>
+            <th style="width:220px;">注意事项</th>
+          </tr>
+        </thead>
+        <tbody id="materialsBody"></tbody>
+      </table>
+    </div>
+    <div class="step-footer">
+      <button class="next-step-btn" id="nextStepBtn">下一步</button>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      applicantType: '本人申请',
+      caseTypeArr: [
+        { value: '本人申请', label: '本人申请', desc: '我是案件的直接当事人，代表个人权益提起仲裁申请。', icon: 'el-icon-user' },
+        { value: '为他人或公司等组织申请（授权代理人申请）', label: '为他人或组织申请', desc: '我是代理人，或代表公司、企业及其他组织提起仲裁。', icon: 'el-icon-s-custom' }
+      ],
+      materialsData: [
+        {
+          id: 1,
+          category: '申请人主体资料',
+          details: '<b>• 自然人：</b>身份证复印件（身份证国徽面和人像面）<br><b>• 公司/组织：</b>营业执照复印件、法定代表人（负责人）证明书、法定代表人（负责人）身份证明复印件',
+          notes: '信息须与官方登记一致',
+          files: [
+            { name: '身份证正反面模板.jpg', url: '../../assets/materialFile/idCardTemplate.jpg' },
+            { name: '营业执照模板.jpg', url: '../../assets/materialFile/businessLicenseTemplate.jpg' },
+            { name: '法定代表人身份证明.doc', url: '../../assets/materialFile/legalRepresentativeId.doc' }
+          ]
+        },
+        { id: 2, category: '被申请人主体资料', details: '• 自然人：身份证复印件或公安局出具的人口信息表<br>• 公司/组织：国家企业信用信息公示系统打印的注册信息', notes: '须确保信息最新、有效' },
+        {
+          id: 3,
+          category: '授权委托资料',
+          details: '授权委托书（需签名/盖章）、受托人身份证复印件（如律师则需要提交律师事务所函、律师证复印件；如员工则需要提交工作证明；如亲属则需要提交亲属证明；如当事人所在社区公民，则需要提交推荐信）',
+          notes: '<b>若无授权委托，无需提交</b><br>委托书须注明代理权限、送达地址、电话及邮箱',
+          files: [
+            { name: '授权委托书（个人）.doc', url: '../../assets/materialFile/authorizationPersonal.doc' },
+            { name: '授权委托书（公司）.doc', url: '../../assets/materialFile/authorizationCompany.doc' }
+          ]
+        },
+        { id: 4, category: '送达地址确认书', details: '需填写申请人、被申请人的有效联系地址、电话及电子邮箱', notes: '用于案件审理期间文书送达', warn: '需签名/盖章', files: [{ name: '地址确认书.doc', url: '../../assets/materialFile/deliveryAddressConfirmation.doc' }] },
+        {
+          id: 5,
+          category: '仲裁申请书',
+          details: '须包含以下要素：<br>1. 当事人信息：详列双方名称/姓名、住所、电话；法人需注明法定代表人姓名、职务及联系方式；有代理人的需注明其详细信息<br>2. 仲裁依据：明确有效的仲裁协议或合同仲裁条款<br>3. 仲裁请求：清晰具体（金额明确）<br>4. 事实与理由：充分陈述案情及法律依据<br>5. 签章落款：申请人签字（自然人）或盖章（法人），并注明日期',
+          notes: '手写修改处须由申请人或有权代理人签章确认',
+          warn: '需签名/盖章',
+          files: [{ name: '仲裁申请书.doc', url: '../../assets/materialFile/arbitrationApplication.doc' }]
+        },
+        {
+          id: 6,
+          category: '证据目录',
+          details: '须包含：序号、名称、证明内容、证明目的、页码<br>特别要求：<br><b>1. 请勿将主体资料（营业执照、身份证等）列入证据目录<br>2. 证明目的清晰且与内容相符<br>3. 所有证据连续编制页码，目录与实际页码对应</b>',
+          notes: '页码错乱可能影响案件审理',
+          warn: '需签名/盖章',
+          files: [{ name: '证据目录.doc', url: '../../assets/materialFile/evidenceCatalog.doc' }]
+        },
+        { id: 7, category: '证据材料', details: '严格按照《证据目录》顺序编排', notes: '确保证据清晰可辨' },
+        { id: 8, category: '其他材料', details: '包括但不限于发票信息', notes: '' }
+      ]
+    }
+
+    function renderApplicantTypes() {
+      const group = document.getElementById('applicantGroup')
+      group.innerHTML = ''
+      state.caseTypeArr.forEach(item => {
+        const active = state.applicantType === item.value
+        const card = document.createElement('div')
+        card.className = `applicant-type-item${active ? ' active' : ''}`
+        card.innerHTML = `
+          <div class="applicant-card-content">
+            <div class="card-header">
+              <div class="icon-wrapper ${active ? 'active' : ''}"><i class="${item.icon}"></i></div>
+              ${active ? '<div class="check-icon"><i class="el-icon-circle-check"></i></div>' : ''}
+            </div>
+            <div class="card-title ${active ? 'active' : ''}">${item.label}</div>
+            <div class="card-desc">${item.desc}</div>
+          </div>
+        `
+        card.addEventListener('click', () => {
+          state.applicantType = item.value
+          renderApplicantTypes()
+        })
+        group.appendChild(card)
+      })
+    }
+
+    async function downloadWordFile(fileUrl, fileName) {
+      try {
+        const response = await fetch(fileUrl)
+        if (!response.ok) throw new Error(`请求失败：${response.status}`)
+        const blob = await response.blob()
+        const blobUrl = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = fileName
+        a.target = '_self'
+        a.style.display = 'none'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(blobUrl)
+      } catch (err) {
+        alert('文件下载失败')
+      }
+    }
+
+    function renderMaterials() {
+      const body = document.getElementById('materialsBody')
+      body.innerHTML = ''
+      state.materialsData.forEach(row => {
+        const tr = document.createElement('tr')
+        const filesHtml = row.files && row.files.length ? `
+          <span class="materials-category-link">${row.category}</span>
+          <div class="materials-popover">
+            <div class="materials-file-list">
+              ${row.files.map(file => `
+                <div class="materials-file-item">
+                  <span class="materials-file-name" title="${file.name}">${file.name}</span>
+                  <i class="el-icon-download action-icon" data-url="${file.url}" data-name="${file.name}"></i>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : row.category
+        tr.innerHTML = `
+          <td style="text-align:center;font-weight:bold;">${row.id}</td>
+          <td class="materials-category-cell">
+            ${filesHtml}
+            ${row.warn ? `<div class="materials-warn-text">${row.warn}</div>` : ''}
+          </td>
+          <td>${row.details}</td>
+          <td>${row.notes}</td>
+        `
+        body.appendChild(tr)
+      })
+      body.querySelectorAll('.action-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+          e.stopPropagation()
+          downloadWordFile(icon.dataset.url, icon.dataset.name)
+        })
+      })
+    }
+
+    document.getElementById('reselectBtn').addEventListener('click', () => {
+      alert('静态页面示例：这里可跳转到“选择收案机构”页面。')
+    })
+    document.getElementById('nextStepBtn').addEventListener('click', () => {
+      window.location.href = './Step2SmartExtraction.html'
+    })
+
+    renderApplicantTypes()
+    renderMaterials()
+  </script>
+</body>
+</html>

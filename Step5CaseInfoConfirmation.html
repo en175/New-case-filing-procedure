@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第五步：案件信息确认</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f8fafc;
+      color: #303133;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .hero {
+      background: #1e3a8a;
+      color: #fff;
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .hero-title { font-size: 24px; font-weight: 700; }
+    .hero-desc { margin-top: 6px; font-size: 13px; color: #dbeafe; }
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .card-header {
+      background: #f1f5f9;
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-icon i { font-size: 20px; color: #1e3a8a; }
+    .header-title { font-size: 18px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px; }
+    .header-desc { margin-top: 2px; color: #64748b; font-size: 13px; }
+    .card-body { padding: 18px; position: relative; }
+    .required-tag {
+      font-size: 12px;
+      background: #fef0f0;
+      color: #ef4444;
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+    .doc-list, .catalog-list, .evidence-list, .request-list { display: flex; flex-direction: column; gap: 12px; }
+    .doc-item, .catalog-item, .evidence-item, .request-item {
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+    }
+    .left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1f2937;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 520px;
+    }
+    .sub { color: #9ca3af; font-size: 13px; margin-top: 2px; }
+    .actions { display: flex; gap: 16px; }
+    .actions i { cursor: pointer; font-size: 18px; color: #9aa3b2; }
+    .actions i:hover { color: #3b82f6; }
+    .actions .danger:hover { color: #ef4444; }
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: #9ca3af;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .tips-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 18px;
+      background: #fff;
+    }
+    .tips-title {
+      font-weight: 800;
+      margin-bottom: 14px;
+      font-size: 16px;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .tip {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .tip-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+    .tip-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .tip-desc {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .fee-box {
+      background: #f8fbff;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #e6f0ff;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.6;
+    }
+    .fee-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .fee-desc {
+      font-size: 18px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .fee-link {
+      color: #2563eb;
+      text-decoration: none;
+      word-break: break-all;
+      font-size: 14px;
+    }
+    .fee-card {
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #edf2f7;
+      padding: 12px;
+    }
+    .fee-label {
+      color: #6b7280;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .fee-result {
+      color: #111827;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    .big { font-size: 20px; font-weight: 700; color: #111827; }
+    .btn {
+      border: 1px solid #dbe2ea;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-primary {
+      background: #1e3a8a;
+      border-color: #1e3a8a;
+      color: #fff;
+    }
+    .btn-dashed {
+      width: 100%;
+      border: 2px dashed #e2e8f0;
+      background: #f8fafc80;
+      color: #475569;
+      padding: 14px 0;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .btn-dashed:hover { border-color: #93c5fd; color: #2563eb; }
+    textarea, input {
+      width: 100%;
+      border: 1px solid #dbe2ea;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    .inline-form {
+      background: #eff6ff4d;
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid #dbeafe;
+    }
+    .request-form-wrap {
+      margin-top: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+      padding: 18px;
+    }
+    .request-form-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .request-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .field-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      margin: 14px 0 8px;
+    }
+    .field-required {
+      color: #ef4444;
+      margin-right: 4px;
+    }
+    .request-form-wrap textarea {
+      min-height: 140px;
+    }
+    .request-form-wrap .upload-area {
+      min-height: 132px;
+      padding: 16px;
+    }
+    .request-form-wrap .upload-icon-circle { width: 38px; height: 38px; font-size: 14px; }
+    .request-form-wrap .upload-main-text { font-size: 14px; }
+    .request-form-wrap .upload-sub-text { font-size: 12px; }
+    .request-form-wrap .upload-select-btn { font-size: 14px; padding: 6px 16px; border-radius: 10px; }
+    .request-form-wrap .upload-note { font-size: 12px; }
+    .request-form-wrap .name { font-size: 14px; }
+    .request-form-wrap .sub { font-size: 12px; }
+    .inline-form-row { display: grid; grid-template-columns: 200px 1fr; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .upload-area {
+      border: 2px dashed #d9dfe9;
+      border-radius: 16px;
+      min-height: 180px;
+      padding: 26px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .upload-area:hover {
+      border-color: #b7c7df;
+      background: #fafcff;
+    }
+    .upload-area input[type="file"] { display: none; }
+    .upload-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #edf4ff;
+      color: #2f6fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    .upload-main-text { font-size: 20px; color: #111827; font-weight: 600; line-height: 1.1; }
+    .upload-sub-text { font-size: 16px; color: #98a1b3; line-height: 1.1; }
+    .upload-select-btn {
+      border: none;
+      background: #153f95;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      padding: 8px 26px;
+      line-height: 1.2;
+      cursor: pointer;
+    }
+    .upload-select-btn:hover { opacity: 0.92; }
+    .upload-note { margin-top: 2px; color: #94a3b8; font-size: 12px; line-height: 1.5; }
+    .alert {
+      background: #eff6ff80;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .basis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .basis-item { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; }
+    .basis-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .basis-title { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .example { color: #2563eb; cursor: pointer; font-size: 13px; }
+    .example:hover { color: #1d4ed8; }
+    .basis-section .header-title { font-size: 20px; }
+    .basis-section .header-desc { font-size: 13px; }
+    .basis-section .basis-grid { gap: 14px; }
+    .basis-section .basis-item { padding: 14px; }
+    .basis-section .basis-top { margin-bottom: 8px; }
+    .basis-section .basis-title { font-size: 20px; line-height: 1.3; }
+    .basis-section .basis-title i { font-size: 16px; }
+    .basis-section .required-tag { font-size: 12px; }
+    .basis-section .example { font-size: 14px; font-weight: 600; }
+    .basis-section textarea { font-size: 14px; line-height: 1.6; min-height: 86px; }
+    .basis-section .upload-area { min-height: 160px; padding: 18px; }
+    .basis-section .upload-note { font-size: 12px; line-height: 1.5; }
+    .basis-section .upload-main-text { font-size: 16px; }
+    .basis-section .upload-sub-text { font-size: 13px; }
+    .basis-section .upload-select-btn { font-size: 14px; padding: 8px 18px; }
+    .basis-section .name { font-size: 14px; }
+    .basis-section .sub { font-size: 12px; }
+    .basis-section .actions i { font-size: 16px; }
+    .step-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .step-nav-btn {
+      min-width: 92px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .step-nav-btn.prev {
+      border: 1px solid #e5edf9;
+      background: #fff;
+      color: #8ea0bf;
+    }
+    .step-nav-btn.prev:hover {
+      border-color: #c6d7f3;
+      color: #6f86ad;
+    }
+    .step-nav-btn.next {
+      border: 1px solid #153f95;
+      background: #153f95;
+      color: #fff;
+    }
+    .step-nav-btn.next:hover { background: #1d4db1; border-color: #1d4db1; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <div class="hero-title">第五步：案件信息确认</div>
+      <div class="hero-desc">本页面内容由 AI 自动提取生成，可能存在错误，仅供您参考。请务必逐条仔细核对后再使用。</div>
+    </div>
+
+    <section class="card basis-section">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon"><i class="el-icon-document"></i></div>
+          <div><div class="header-title">仲裁申请书</div><div class="header-desc">展示已上传文档，只读</div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="applicationDocs"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon"><i class="el-icon-tickets"></i></div>
+          <div><div class="header-title">请求</div><div class="header-desc">多个请求可分项添加</div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="tips-box">
+            <div class="tips-title"><i class="el-icon-info"></i> 填写提示</div>
+            <div class="tips-grid">
+              <div class="tip">
+                <div class="tip-icon"><i class="el-icon-s-order"></i></div>
+                <div>
+                  <div class="tip-title">分项填写</div>
+                  <div class="tip-desc">仲裁申请应分项填写，多个仲裁请求的请点击增加请求按钮，按顺序分割填写各项仲裁请求</div>
+                </div>
+              </div>
+              <div class="tip">
+                <div class="tip-icon"><i class="el-icon-document-copy"></i></div>
+                <div>
+                  <div class="tip-title">金额计算</div>
+                  <div class="tip-desc">请尽量明确每项仲裁请求的金额，若请求金额计算暂无依据（如暂计违约金之日），请明确计算方式，并明确暂计至申请之日的具体金额。</div>
+                </div>
+              </div>
+              <div class="tip">
+                <div class="tip-icon"><i class="el-icon-folder-opened"></i></div>
+                <div>
+                  <div class="tip-title">仲裁费承担</div>
+                  <div class="tip-desc">申请人需预缴仲裁费，若请求仲裁费由被申请人承担，请在仲裁请求中明确。</div>
+                </div>
+              </div>
+              <div class="tip">
+                <div class="tip-icon"><i class="el-icon-user"></i></div>
+                <div>
+                  <div class="tip-title">多个申请人</div>
+                  <div class="tip-desc">多个被申请人的，若各申请项针对不同被申请人，请予以明确。</div>
+                </div>
+              </div>
+              <div class="tip">
+                <div class="tip-icon"><i class="el-icon-s-custom"></i></div>
+                <div>
+                  <div class="tip-title">争议金额核定</div>
+                  <div class="tip-desc">没有争议金额请求项本会立案部门根据争议所涉及权益的具体情况确定争议金额或者收费额，若计算结果与立案部门通过办案系统计算的结果有差异的，以立案部门的计算为准。</div>
+                </div>
+              </div>
+              <div class="tip">
+                <div class="tip-icon"><i class="el-icon-finished"></i></div>
+                <div>
+                  <div class="tip-title">标的一致性</div>
+                  <div class="tip-desc">请确保争议标的与仲裁申请书的一致；仲裁费用不属于案件标的。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fee-box">
+            <div class="fee-title"><i class="el-icon-collection-tag"></i> 仲裁费速算</div>
+            <div class="fee-desc">
+              以下计算结果为有争议金额请求项的计算结果，实际缴费金额以立案部门的计算为准。
+              本会不接受仲裁协议及签章页具体金额的。仲裁受理费按每项100元收取，仲裁处理费暂按受理费比例收取。
+              <a class="fee-link" href="https://www.gzjacn.cn/zcfs" target="_blank">https://www.gzjacn.cn/zcfs</a>
+            </div>
+            <div class="fee-card">
+              <div class="fee-label">有争议金额请求项合计</div>
+              <div><span class="big" id="totalAmount">0</span> 元</div>
+            </div>
+            <div class="fee-card">
+              <div class="fee-label">速算结果（该计算金额仅供参考，以实际缴费金额为准）</div>
+              <div class="fee-result" id="feeText"></div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;" id="requestList"></div>
+        <button class="btn-dashed" id="addRequestBtn"><i class="el-icon-plus"></i> 添加新请求</button>
+        <div id="requestInlineForm"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon"><i class="el-icon-edit-outline"></i></div>
+          <div><div class="header-title">事实和理由</div><div class="header-desc">请详细阐述争议经过及法律主张</div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <textarea id="reasonText" rows="10" placeholder="请输入事实和理由..."></textarea>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon"><i class="el-icon-s-cooperation"></i></div>
+          <div><div class="header-title">仲裁依据</div><div class="header-desc">请上传仲裁条款及合同签章页</div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="basis-grid">
+          <div class="basis-item">
+            <div class="basis-top">
+              <div class="basis-title"><i class="el-icon-key"></i> 仲裁条款约定 <span class="required-tag">必填</span></div>
+              <span class="example" id="showClauseExample"><i class="el-icon-view"></i> 查看示例</span>
+            </div>
+            <textarea id="clauseText" rows="4" placeholder="可直接填写仲裁条款文本，或上传 PDF"></textarea>
+            <div class="upload-area" style="margin-top:10px;" id="clauseUploadBox">
+              <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-main-text">点击或拖拽上传</div>
+              <div class="upload-sub-text">支持 PDF</div>
+              <button class="upload-select-btn" type="button" data-upload-trigger-for="clauseInput">选择文件</button>
+              <input id="clauseInput" type="file" accept=".pdf" multiple />
+              <div class="upload-note">支持 PDF，单个文件超过 50M 请分卷上传</div>
+            </div>
+            <div id="clauseFiles" style="margin-top:10px;"></div>
+          </div>
+          <div class="basis-item">
+            <div class="basis-top">
+              <div class="basis-title"><i class="el-icon-connection"></i> 合同签章页 <span class="required-tag">必填</span></div>
+              <span class="example" id="showSignExample"><i class="el-icon-view"></i> 查看示例</span>
+            </div>
+            <div class="upload-area" id="signUploadBox">
+              <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-main-text">点击或拖拽上传</div>
+              <div class="upload-sub-text">支持 PDF</div>
+              <button class="upload-select-btn" type="button" data-upload-trigger-for="signInput">选择文件</button>
+              <input id="signInput" type="file" accept=".pdf" multiple />
+              <div class="upload-note">支持 PDF，多份签章页可一次上传</div>
+            </div>
+            <div id="signFiles" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon"><i class="el-icon-folder"></i></div>
+          <div><div class="header-title">证据目录 <span class="required-tag">必填</span></div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div>
+            <div style="font-weight:600;margin-bottom:8px;">新增证据目录</div>
+            <div class="upload-area" id="catalogUploadBox">
+              <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-main-text">点击或拖拽上传</div>
+              <div class="upload-sub-text">支持 PDF</div>
+              <button class="upload-select-btn" type="button" data-upload-trigger-for="catalogInput">选择文件</button>
+              <input id="catalogInput" type="file" accept=".pdf" multiple />
+              <div class="upload-note">支持 PDF，多份目录可一次上传</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-weight:600;margin-bottom:8px;">目录列表 <span style="color:#94a3b8;font-weight:400;" id="catalogCount">当前共 0 份</span></div>
+            <div id="catalogList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon"><i class="el-icon-paperclip"></i></div>
+          <div><div class="header-title">证据</div><div class="header-desc">请按照证据目录内容填写</div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="alert">
+          上传要求：证据需清晰、完整、页码连续；请勿重复上传；建议使用 PDF 彩色扫描文件。
+        </div>
+        <div id="evidenceList"></div>
+        <button class="btn-dashed" id="addEvidenceBtn"><i class="el-icon-plus"></i> 添加新证据</button>
+        <div id="evidenceInlineForm"></div>
+      </div>
+    </section>
+
+    <!-- <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn" id="validateBtn">校验表单</button>
+      <button class="btn btn-primary" id="saveAllBtn">保存全部（本地）</button>
+    </div> -->
+    <div class="step-footer">
+      <button class="step-nav-btn prev" id="prevStepBtn">上一步</button>
+      <button class="step-nav-btn next" id="nextStepBtn">下一步</button>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      applicationDocs: [],
+      requests: [],
+      requestForm: { visible: false, itemMoney: '', content: '' },
+      evidenceForm: { visible: false, name: '', proveContent: '', files: [] },
+      reason: '',
+      clauseText: '',
+      clauseFiles: [],
+      signFiles: [],
+      catalogFiles: [],
+      evidences: []
+    }
+
+    function createFile(file) {
+      return { id: crypto.randomUUID(), name: file.name, size: file.size, file, objectURL: URL.createObjectURL(file) }
+    }
+    function formatSize(size) {
+      if (!size) return '0 B'
+      const k = 1024
+      const units = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(size) / Math.log(k))
+      return (size / Math.pow(k, i)).toFixed(2) + ' ' + units[i]
+    }
+    function numFormat(val) {
+      const n = Number(val) || 0
+      return n.toLocaleString('zh-CN')
+    }
+    function renderFileSimple(files, targetId) {
+      const el = document.getElementById(targetId)
+      if (!files.length) return el.innerHTML = '<div class="empty">暂无文件</div>'
+      el.innerHTML = `<div class="doc-list">${files.map(file => `
+        <div class="doc-item" data-id="${file.id}">
+          <div class="left">
+            <i class="el-icon-document" style="color:#ff4d4f;"></i>
+            <div><div class="name">${file.name}</div><div class="sub">${formatSize(file.size)}</div></div>
+          </div>
+          <div class="actions">
+            <i class="el-icon-view" data-act="preview"></i>
+            <i class="el-icon-download" data-act="download"></i>
+            <i class="el-icon-delete danger" data-act="delete"></i>
+          </div>
+        </div>
+      `).join('')}</div>`
+      el.querySelectorAll('.doc-item').forEach(row => {
+        const file = files.find(x => x.id === row.dataset.id)
+        row.querySelector('[data-act="preview"]').onclick = () => window.open(file.objectURL, '_blank')
+        row.querySelector('[data-act="download"]').onclick = () => {
+          const a = document.createElement('a'); a.href = file.objectURL; a.download = file.name; a.click()
+        }
+        row.querySelector('[data-act="delete"]').onclick = () => {
+          URL.revokeObjectURL(file.objectURL)
+          const idx = files.findIndex(x => x.id === file.id)
+          files.splice(idx, 1)
+          renderAll()
+        }
+      })
+    }
+    function renderRequests() {
+      const listEl = document.getElementById('requestList')
+      if (!state.requests.length) {
+        listEl.innerHTML = '<div class="empty">暂无请求</div>'
+      } else {
+        listEl.innerHTML = `<div class="request-list">${state.requests.map((r, i) => `
+          <div class="request-item" data-id="${r.id}">
+            <div style="min-width:0;flex:1;">
+              <div style="font-weight:700;color:#1e3a8a;">请求 ${i + 1} <span style="margin-left:8px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;padding:2px 6px;border-radius:4px;font-size:12px;">标的: ${numFormat(r.itemMoney)} 元</span></div>
+              <div style="margin-top:6px;color:#334155;white-space:pre-wrap;">${r.content}</div>
+            </div>
+            <div class="actions">
+              <i class="el-icon-edit" data-act="edit"></i>
+              <i class="el-icon-delete danger" data-act="delete"></i>
+            </div>
+          </div>`).join('')}</div>`
+      }
+      listEl.querySelectorAll('.request-item').forEach(row => {
+        const item = state.requests.find(x => x.id === row.dataset.id)
+        row.querySelector('[data-act="edit"]').onclick = () => editRequest(item.id)
+        row.querySelector('[data-act="delete"]').onclick = () => {
+          state.requests = state.requests.filter(x => x.id !== item.id)
+          renderAll()
+        }
+      })
+      const total = state.requests.reduce((sum, r) => sum + (Number(r.itemMoney) || 0), 0)
+      document.getElementById('totalAmount').textContent = numFormat(total)
+      const requestNum = state.requests.length
+      const fee = Math.max(total * 0.01, 0)
+      document.getElementById('feeText').textContent = `仲裁费${numFormat(fee + requestNum * 100)} = 受理费 + 按项收费(${requestNum}×100)`
+    }
+    function renderRequestInlineForm() {
+      const container = document.getElementById('requestInlineForm')
+      if (!state.requestForm.visible) {
+        container.innerHTML = ''
+        return
+      }
+      container.innerHTML = `
+        <div class="request-form-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="request-form-title">添加新请求</div>
+            <div class="request-form-actions" style="margin-top:0;">
+              <button class="btn" id="cancelRequestFormBtn">取消</button>
+              <button class="btn btn-primary" id="saveRequestFormBtn">保存</button>
+            </div>
+          </div>
+          <div class="field-label"><span class="field-required">*</span>争议标的金额 (元)</div>
+          <input id="requestMoneyInput" type="number" min="0" step="0.01" value="${state.requestForm.itemMoney}" />
+          <div class="field-label"><span class="field-required">*</span>请求内容</div>
+          <textarea id="requestContentInput" placeholder="请详细描述仲裁请求内容">${state.requestForm.content}</textarea>
+        </div>
+      `
+      const moneyInput = document.getElementById('requestMoneyInput')
+      const contentInput = document.getElementById('requestContentInput')
+      const cancelBtn = document.getElementById('cancelRequestFormBtn')
+      const saveBtn = document.getElementById('saveRequestFormBtn')
+      moneyInput.oninput = e => state.requestForm.itemMoney = e.target.value
+      contentInput.oninput = e => state.requestForm.content = e.target.value
+      cancelBtn.onclick = () => {
+        state.requestForm = { visible: false, itemMoney: '', content: '' }
+        renderAll()
+      }
+      saveBtn.onclick = () => {
+        const content = (state.requestForm.content || '').trim()
+        if (!content) return alert('请求内容不能为空')
+        state.requests.push({
+          id: crypto.randomUUID(),
+          itemMoney: Number(state.requestForm.itemMoney) || 0,
+          content
+        })
+        state.requestForm = { visible: false, itemMoney: '', content: '' }
+        renderAll()
+      }
+    }
+    function renderEvidenceInlineForm() {
+      const container = document.getElementById('evidenceInlineForm')
+      if (!state.evidenceForm.visible) {
+        container.innerHTML = ''
+        return
+      }
+      container.innerHTML = `
+        <div class="request-form-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="request-form-title">添加新证据</div>
+            <div class="request-form-actions" style="margin-top:0;">
+              <button class="btn" id="cancelEvidenceFormBtn">取消</button>
+              <button class="btn btn-primary" id="saveEvidenceFormBtn">保存</button>
+            </div>
+          </div>
+          <div class="field-label"><span class="field-required">*</span>证据名称</div>
+          <input id="evidenceNameInput" type="text" value="${state.evidenceForm.name}" placeholder="请输入证据名称，如：借款合同、转账凭证等" />
+          <div class="field-label"><span class="field-required">*</span>证明目的</div>
+          <textarea id="evidencePurposeInput" placeholder="详细描述该证据拟证明的事实、关键信息等">${state.evidenceForm.proveContent}</textarea>
+          <div class="field-label"><span class="field-required">*</span>上传证据</div>
+          <div class="upload-area" id="evidenceFormUploadBox">
+            <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+            <div class="upload-main-text">点击或拖拽上传</div>
+            <div class="upload-sub-text">支持 PDF</div>
+            <button class="upload-select-btn" type="button" data-upload-trigger-for="evidenceFormInput">选择文件</button>
+            <input id="evidenceFormInput" type="file" accept=".pdf" multiple />
+            <div class="upload-note">支持 PDF，可一次上传多份文件</div>
+          </div>
+          <div id="evidenceFormFileList" style="margin-top:10px;"></div>
+        </div>
+      `
+      const nameInput = document.getElementById('evidenceNameInput')
+      const purposeInput = document.getElementById('evidencePurposeInput')
+      const fileInput = document.getElementById('evidenceFormInput')
+      const listEl = document.getElementById('evidenceFormFileList')
+      const cancelBtn = document.getElementById('cancelEvidenceFormBtn')
+      const saveBtn = document.getElementById('saveEvidenceFormBtn')
+      const renderSelectedFiles = () => {
+        if (!state.evidenceForm.files.length) {
+          listEl.innerHTML = '<div class="empty">暂无已选文件</div>'
+          return
+        }
+        listEl.innerHTML = `<div class="doc-list">${state.evidenceForm.files.map(f => `
+          <div class="doc-item" data-id="${f.id}">
+            <div class="left">
+              <i class="el-icon-document" style="color:#ff4d4f;"></i>
+              <div><div class="name">${f.name}</div><div class="sub">${formatSize(f.size)}</div></div>
+            </div>
+            <div class="actions"><i class="el-icon-delete danger" data-act="delete"></i></div>
+          </div>
+        `).join('')}</div>`
+        listEl.querySelectorAll('.doc-item').forEach(row => {
+          const file = state.evidenceForm.files.find(x => x.id === row.dataset.id)
+          row.querySelector('[data-act="delete"]').onclick = () => {
+            URL.revokeObjectURL(file.objectURL)
+            state.evidenceForm.files = state.evidenceForm.files.filter(x => x.id !== file.id)
+            renderSelectedFiles()
+          }
+        })
+      }
+      nameInput.oninput = e => state.evidenceForm.name = e.target.value
+      purposeInput.oninput = e => state.evidenceForm.proveContent = e.target.value
+      fileInput.onchange = e => {
+        state.evidenceForm.files.push(...Array.from(e.target.files || []).map(createFile))
+        renderSelectedFiles()
+        e.target.value = ''
+      }
+      cancelBtn.onclick = () => {
+        state.evidenceForm.files.forEach(f => URL.revokeObjectURL(f.objectURL))
+        state.evidenceForm = { visible: false, name: '', proveContent: '', files: [] }
+        renderAll()
+      }
+      saveBtn.onclick = () => {
+        const name = (state.evidenceForm.name || '').trim()
+        const proveContent = (state.evidenceForm.proveContent || '').trim()
+        if (!name || !proveContent || !state.evidenceForm.files.length) return alert('请填写证据名称、证明目的并上传文件')
+        state.evidences.push({
+          id: crypto.randomUUID(),
+          name,
+          proveContent,
+          files: state.evidenceForm.files
+        })
+        state.evidenceForm = { visible: false, name: '', proveContent: '', files: [] }
+        renderAll()
+      }
+      bindStaticUploadBoxes()
+      renderSelectedFiles()
+    }
+    function promptRequest(init = { itemMoney: '', content: '' }) {
+      const money = prompt('请输入争议标的金额（元）', init.itemMoney)
+      if (money === null) return null
+      const content = prompt('请输入请求内容', init.content)
+      if (content === null) return null
+      return { itemMoney: Number(money) || 0, content: content.trim() }
+    }
+    function editRequest(id) {
+      const req = state.requests.find(x => x.id === id)
+      if (!req) return
+      const next = promptRequest(req)
+      if (!next || !next.content) return alert('请求内容不能为空')
+      req.itemMoney = next.itemMoney
+      req.content = next.content
+      renderAll()
+    }
+    function renderEvidences() {
+      const el = document.getElementById('evidenceList')
+      if (!state.evidences.length) {
+        el.innerHTML = '<div class="empty">暂无证据</div>'
+        return
+      }
+      el.innerHTML = `<div class="evidence-list">${state.evidences.map((e, i) => `
+        <div class="evidence-item" data-id="${e.id}">
+          <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+            <div style="min-width:0;flex:1;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:#1e3a8a;color:#fff;align-items:center;justify-content:center;font-weight:700;">${i + 1}</span>
+                <strong>${e.name || '未命名证据'}</strong>
+              </div>
+              <div style="margin-top:8px;background:#f8fafc;padding:10px;border-radius:8px;"><strong style="color:#2563eb;">证明目的：</strong>${e.proveContent || '-'}</div>
+              <div style="margin-top:8px;">${e.files.length ? e.files.map(f => `<div style="display:flex;justify-content:space-between;border:1px solid #f1f5f9;border-radius:8px;padding:8px;margin-top:6px;"><span>${f.name}</span><span>${formatSize(f.size)}</span></div>`).join('') : '<span style="color:#94a3b8">暂无证据文件</span>'}</div>
+            </div>
+            <div class="actions">
+              <i class="el-icon-edit" data-act="edit"></i>
+              <i class="el-icon-delete danger" data-act="delete"></i>
+            </div>
+          </div>
+        </div>`).join('')}</div>`
+      el.querySelectorAll('.evidence-item').forEach(row => {
+        const item = state.evidences.find(x => x.id === row.dataset.id)
+        row.querySelector('[data-act="edit"]').onclick = () => editEvidence(item.id)
+        row.querySelector('[data-act="delete"]').onclick = () => {
+          item.files.forEach(f => URL.revokeObjectURL(f.objectURL))
+          state.evidences = state.evidences.filter(x => x.id !== item.id)
+          renderAll()
+        }
+      })
+    }
+    function createEvidencePrompt(init = { name: '', proveContent: '' }) {
+      const name = prompt('请输入证据名称', init.name)
+      if (name === null) return null
+      const proveContent = prompt('请输入证明目的', init.proveContent)
+      if (proveContent === null) return null
+      return { name: name.trim(), proveContent: proveContent.trim() }
+    }
+    function editEvidence(id) {
+      const e = state.evidences.find(x => x.id === id)
+      const next = createEvidencePrompt(e)
+      if (!next || !next.name || !next.proveContent) return alert('证据名称与证明目的不能为空')
+      e.name = next.name
+      e.proveContent = next.proveContent
+      renderAll()
+    }
+    function renderCatalog() {
+      document.getElementById('catalogCount').textContent = `当前共 ${state.catalogFiles.length} 份`
+      const el = document.getElementById('catalogList')
+      if (!state.catalogFiles.length) return el.innerHTML = '<div class="empty">尚未上传证据目录</div>'
+      el.innerHTML = `<div class="catalog-list">${state.catalogFiles.map(f => `
+        <div class="catalog-item" data-id="${f.id}">
+          <div class="left"><i class="el-icon-document" style="color:#ff4d4f;"></i><div><div class="name">${f.name}</div><div class="sub">${formatSize(f.size)}</div></div></div>
+          <div class="actions"><i class="el-icon-view" data-act="preview"></i><i class="el-icon-download" data-act="download"></i><i class="el-icon-delete danger" data-act="delete"></i></div>
+        </div>`).join('')}</div>`
+      el.querySelectorAll('.catalog-item').forEach(row => {
+        const file = state.catalogFiles.find(x => x.id === row.dataset.id)
+        row.querySelector('[data-act="preview"]').onclick = () => window.open(file.objectURL, '_blank')
+        row.querySelector('[data-act="download"]').onclick = () => {
+          const a = document.createElement('a'); a.href = file.objectURL; a.download = file.name; a.click()
+        }
+        row.querySelector('[data-act="delete"]').onclick = () => {
+          URL.revokeObjectURL(file.objectURL)
+          state.catalogFiles = state.catalogFiles.filter(x => x.id !== file.id)
+          renderAll()
+        }
+      })
+    }
+    function renderAll() {
+      renderFileSimple(state.applicationDocs, 'applicationDocs')
+      renderRequests()
+      renderRequestInlineForm()
+      renderEvidenceInlineForm()
+      renderCatalog()
+      renderFileSimple(state.clauseFiles, 'clauseFiles')
+      renderFileSimple(state.signFiles, 'signFiles')
+      renderEvidences()
+      document.getElementById('reasonText').value = state.reason
+      document.getElementById('clauseText').value = state.clauseText
+    }
+    function validateAll(showMsg = true) {
+      if (!state.requests.length) return showMsg && alert('请至少添加一个仲裁请求'), false
+      if (state.requests.some(r => !r.content.trim())) return showMsg && alert('请求内容不能为空'), false
+      if (!state.reason.trim()) return showMsg && alert('请填写事实与理由'), false
+      if (!state.clauseText.trim() && !state.clauseFiles.length) return showMsg && alert('请填写或上传仲裁条款'), false
+      if (!state.signFiles.length) return showMsg && alert('请上传合同签章页'), false
+      if (!state.catalogFiles.length) return showMsg && alert('请上传证据目录'), false
+      if (!state.evidences.length) return showMsg && alert('请添加证据'), false
+      if (state.evidences.some(e => !e.name.trim() || !e.proveContent.trim() || !e.files.length)) return showMsg && alert('证据项请填写完整并上传文件'), false
+      return true
+    }
+    function bindStaticUploadBoxes() {
+      document.querySelectorAll('[data-upload-trigger-for]').forEach(btn => {
+        btn.onclick = e => {
+          e.stopPropagation()
+          const input = document.getElementById(btn.dataset.uploadTriggerFor)
+          if (input) input.click()
+        }
+      })
+      document.querySelectorAll('.upload-area').forEach(box => {
+        box.onclick = e => {
+          if (e.target.closest('[data-upload-trigger-for]')) return
+          const input = box.querySelector('input[type="file"]')
+          if (input) input.click()
+        }
+      })
+    }
+
+    document.getElementById('addRequestBtn').onclick = () => {
+      state.requestForm = { visible: true, itemMoney: '', content: '' }
+      renderAll()
+    }
+    document.getElementById('addEvidenceBtn').onclick = () => {
+      state.evidenceForm.files.forEach(f => URL.revokeObjectURL(f.objectURL))
+      state.evidenceForm = { visible: true, name: '', proveContent: '', files: [] }
+      renderAll()
+    }
+    document.getElementById('reasonText').oninput = e => state.reason = e.target.value
+    document.getElementById('clauseText').oninput = e => state.clauseText = e.target.value
+    document.getElementById('clauseInput').onchange = e => {
+      state.clauseFiles.push(...Array.from(e.target.files || []).map(createFile))
+      renderAll(); e.target.value = ''
+    }
+    document.getElementById('signInput').onchange = e => {
+      state.signFiles.push(...Array.from(e.target.files || []).map(createFile))
+      renderAll(); e.target.value = ''
+    }
+    document.getElementById('catalogInput').onchange = e => {
+      state.catalogFiles.push(...Array.from(e.target.files || []).map(createFile))
+      renderAll(); e.target.value = ''
+    }
+    // document.getElementById('validateBtn').onclick = () => validateAll(true)
+    // document.getElementById('saveAllBtn').onclick = () => {
+    //   if (!validateAll(true)) return
+    //   alert('校验通过，数据已在当前浏览器会话中保存（静态页不调用后端）')
+    // }
+    document.getElementById('prevStepBtn').onclick = () => {
+      window.location.href = './Step4RespondentConfirmation.html'
+    }
+    document.getElementById('nextStepBtn').onclick = () => {
+      window.location.href = './Step6DeliveryAddressConfirmation.html'
+    }
+    document.getElementById('showClauseExample').onclick = () => alert('示例图功能：可替换为本地图片预览')
+    document.getElementById('showSignExample').onclick = () => alert('示例图功能：可替换为本地图片预览')
+
+    bindStaticUploadBoxes()
+    const demoFile = (name, size = 523000) => ({ id: crypto.randomUUID(), name, size, objectURL: 'about:blank' })
+    state.applicationDocs = [demoFile('仲裁申请书示例.pdf')]
+    state.requests = [{ id: crypto.randomUUID(), itemMoney: 10000, content: '请求判令被申请人支付合同款 10,000 元。' }]
+    state.reason = '申请人与被申请人签订合同后，申请人已按约支付合同款。被申请人未按约履行主要义务，经多次沟通仍未解决，故申请仲裁要求被申请人承担相应责任。'
+    state.clauseText = '凡因本合同引起的或与本合同有关的任何争议，均提交广州仲裁委员会仲裁。'
+    state.signFiles = [demoFile('合同签章页示例.pdf', 328000)]
+    state.catalogFiles = [demoFile('证据目录示例.pdf', 120000)]
+    state.evidences = [{
+      id: crypto.randomUUID(),
+      name: '合同及付款凭证',
+      proveContent: '证明双方合同关系、付款金额及被申请人履约义务。',
+      files: [demoFile('合同及付款凭证示例.pdf', 860000)]
+    }]
+    renderAll()
+  </script>
+</body>
+</html>

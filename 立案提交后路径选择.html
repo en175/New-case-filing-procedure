@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>立案提交后路径选择</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+    :root {
+      --ink: #12213a;
+      --muted: #64748b;
+      --subtle: #8a9bb2;
+      --line: #dbe5f0;
+      --paper: #ffffff;
+      --wash: #f4f7fb;
+      --blue: #2563eb;
+      --blue-soft: #e9f1ff;
+      --teal: #14a293;
+      --teal-soft: #e8f8f5;
+      --amber: #f18716;
+      --amber-soft: #fff3e6;
+      --shadow: 0 24px 70px rgba(28, 43, 70, .13);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--wash);
+    }
+
+    body { overflow: hidden; }
+
+    .system-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 60px 1fr;
+      background:
+        radial-gradient(circle at 14% 20%, rgba(37, 99, 235, .08), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(20, 162, 147, .1), transparent 26%),
+        linear-gradient(180deg, #f8fbff 0%, #eef4f8 100%);
+    }
+
+    .system-topbar {
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #dbe3ee;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+      z-index: 5;
+    }
+
+    .brand,
+    .top-actions,
+    .score {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand { gap: 12px; }
+    .top-actions { gap: 18px; color: #13233a; font-weight: 900; }
+    .score { gap: 8px; color: #f59e0b; }
+
+    .flow-progress {
+      flex: 1;
+      max-width: 1040px;
+      margin: 0 22px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(112px, 1fr));
+      align-items: center;
+      gap: 7px;
+    }
+
+    .flow-step {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      left: calc(100% - 2px);
+      top: 50%;
+      width: 9px;
+      height: 2px;
+      background: #dbe4f0;
+      transform: translateY(-50%);
+    }
+
+    .flow-step:last-child::after { display: none; }
+
+    .flow-index {
+      width: 23px;
+      height: 23px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #2367e8;
+      font-size: 11px;
+      font-weight: 900;
+      animation: flowPulse 1.8s ease-in-out infinite;
+      flex: 0 0 auto;
+    }
+
+    .flow-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .flow-step.done { color: #0f766e; }
+    .flow-step.done::after { background: #38bdf8; }
+    .flow-step.done .flow-index {
+      color: #0f766e;
+      border-color: #99f6e4;
+      background: #ecfdf5;
+      animation: none;
+    }
+    .flow-step.active { color: #1d4ed8; }
+    .flow-step.active .flow-index {
+      color: #fff;
+      border-color: #2367e8;
+      background: #2367e8;
+      box-shadow: 0 0 0 6px rgba(35,103,232,.12);
+    }
+
+    @keyframes flowPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(35,103,232,.18); }
+      50% { box-shadow: 0 0 0 5px rgba(35,103,232,.08); }
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(145deg, #2367e8, #1746b3);
+      box-shadow: 0 10px 22px rgba(35,103,232,.22);
+      font-size: 20px;
+    }
+
+    .brand-org {
+      color: #6b7a90;
+      font-size: 12px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .brand-title {
+      margin-top: 3px;
+      color: #13233a;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .score-pill {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #2367e8, #4455e8);
+      font-weight: 900;
+      box-shadow: 0 12px 24px rgba(35,103,232,.24);
+    }
+
+    .medal {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 2px solid #d8e2ef;
+      display: grid;
+      place-items: center;
+      color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    .work-area {
+      position: relative;
+      min-height: 0;
+      padding: 30px 44px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(239, 244, 248, .1), rgba(20, 39, 51, .32)),
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,.82), transparent 28%),
+        radial-gradient(circle at 78% 20%, rgba(160, 190, 198, .62), transparent 36%),
+        linear-gradient(135deg, #e9eef3 0%, #b9cbd0 46%, #6f8791 100%);
+    }
+
+    .work-area::before {
+      content: "";
+      position: absolute;
+      inset: 22px 34px;
+      border-radius: 28px;
+      background:
+        linear-gradient(90deg, rgba(18, 33, 58, .045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(18, 33, 58, .04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at center, #000 0%, rgba(0,0,0,.82) 52%, transparent 78%);
+      pointer-events: none;
+    }
+
+    .choice-panel {
+      position: relative;
+      width: min(1280px, 100%);
+      min-height: 650px;
+      padding: 42px 44px 44px;
+      border-radius: 24px;
+      border: 1px solid rgba(219,229,240,.9);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.9)),
+        radial-gradient(circle at 50% 0%, rgba(37,99,235,.08), transparent 36%);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 32px;
+      overflow: hidden;
+    }
+
+    .choice-panel::after {
+      content: "";
+      position: absolute;
+      right: -88px;
+      top: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 999px;
+      border: 44px solid rgba(20, 162, 147, .08);
+      pointer-events: none;
+    }
+
+    .panel-head {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: 32px;
+      align-items: flex-end;
+      z-index: 1;
+    }
+
+    .title-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #2367e8;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .title-kicker::before,
+    .title-kicker::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: .42;
+    }
+
+    .panel-title {
+      margin: 12px 0 0;
+      font-size: 38px;
+      line-height: 1.18;
+      font-weight: 900;
+      letter-spacing: -.01em;
+    }
+
+    .panel-copy {
+      margin: 12px 0 0;
+      max-width: 700px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .case-chip {
+      flex: none;
+      min-width: 310px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid #dbe7f1;
+      background: #f8fbff;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, .06);
+    }
+
+    .case-chip span {
+      display: block;
+      color: var(--subtle);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .case-chip strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 17px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .head-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-link {
+      flex: none;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 14px;
+      border: 1px solid #d9e3f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #1d4ed8;
+      background: #f8fbff;
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .back-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(37,99,235,.1);
+    }
+
+    .card-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .choice-card {
+      height: 456px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      perspective: 1300px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .choice-card:focus-visible {
+      outline: 3px solid rgba(37,99,235,.28);
+      outline-offset: 5px;
+      border-radius: 22px;
+    }
+
+    .choice-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .78s cubic-bezier(.19, 1, .22, 1);
+    }
+
+    .choice-card:hover .choice-card-inner,
+    .choice-card:focus-within .choice-card-inner,
+    .choice-card:focus-visible .choice-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 22px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      border: 1px solid #dfe8f2;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 18px 42px rgba(30, 46, 76, .11);
+    }
+
+    .card-front {
+      padding: 28px 26px 24px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 22px;
+      background:
+        radial-gradient(circle at 16% 12%, var(--tone-soft), transparent 34%),
+        radial-gradient(circle at 94% 92%, color-mix(in srgb, var(--tone) 9%, transparent), transparent 36%),
+        linear-gradient(160deg, rgba(255,255,255,.98) 0%, color-mix(in srgb, var(--tone) 5%, white) 100%);
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .card-front::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 5px;
+      background: var(--tone);
+    }
+
+    .card-front::after {
+      content: attr(data-order);
+      position: absolute;
+      right: 24px;
+      top: 56px;
+      color: var(--tone);
+      opacity: .09;
+      font-size: 58px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    .choice-card:hover .card-face {
+      box-shadow: 0 26px 58px rgba(30, 46, 76, .16);
+    }
+
+    .card-back {
+      padding: 24px 24px 22px;
+      transform: rotateY(180deg);
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+      gap: 12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,253,255,.96)),
+        radial-gradient(circle at 14% 12%, var(--tone-soft), transparent 42%);
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 16px 30px rgba(23, 41, 72, .08);
+      font-size: 28px;
+    }
+
+    .card-index {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .card-title {
+      margin: 0;
+      max-width: 260px;
+      font-size: 30px;
+      line-height: 1.24;
+      letter-spacing: -.01em;
+      font-weight: 900;
+    }
+
+    .card-desc {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .scene-box {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid #e2eaf3;
+      background: #f8fbff;
+    }
+
+    .scene-label {
+      color: var(--subtle);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .scene-text {
+      margin-top: 7px;
+      color: #23344f;
+      font-size: 14px;
+      line-height: 1.65;
+      font-weight: 700;
+    }
+
+    .front-facts {
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .front-fact {
+      min-height: 66px;
+      padding: 11px 8px;
+      border-radius: 13px;
+      border: 1px solid #e4ebf4;
+      background: #fff;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .front-fact i {
+      color: var(--tone);
+      font-size: 14px;
+    }
+
+    .front-fact span {
+      color: #52667f;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .back-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 900;
+    }
+
+    .back-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .value-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .value-list li {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid #e2eaf3;
+      background: rgba(255,255,255,.88);
+    }
+
+    .value-list i {
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      font-size: 14px;
+    }
+
+    .value-list strong {
+      display: block;
+      margin-bottom: 2px;
+      color: #17243c;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .value-list span {
+      display: block;
+      color: #66788f;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .enter-link {
+      height: 46px;
+      border-radius: 15px;
+      border: 1px solid color-mix(in srgb, var(--tone) 34%, white);
+      color: #fff;
+      background: var(--tone);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 900;
+      box-shadow: 0 16px 30px color-mix(in srgb, var(--tone) 22%, transparent);
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    .enter-link:hover {
+      transform: translateY(-2px);
+      filter: saturate(1.08);
+      box-shadow: 0 20px 38px color-mix(in srgb, var(--tone) 28%, transparent);
+    }
+
+    .enter-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .choice-card[data-tone="quiz"] {
+      --tone: var(--blue);
+      --tone-soft: var(--blue-soft);
+    }
+
+    .choice-card[data-tone="defense"] {
+      --tone: var(--teal);
+      --tone-soft: var(--teal-soft);
+    }
+
+    .choice-card[data-tone="route"] {
+      --tone: var(--amber);
+      --tone-soft: var(--amber-soft);
+    }
+
+    @media (max-width: 1180px) {
+      body { overflow: auto; }
+      .system-page { min-height: 100vh; }
+      .work-area { padding: 20px 16px; overflow: visible; }
+      .choice-panel { min-height: 0; padding: 30px 20px; }
+      .panel-head { align-items: stretch; flex-direction: column; }
+      .head-actions { align-items: stretch; flex-direction: column; }
+      .case-chip { min-width: 0; }
+      .card-grid { grid-template-columns: 1fr; }
+      .choice-card { height: 430px; }
+      .system-topbar { height: auto; min-height: 86px; align-items: flex-start; padding: 10px 14px; }
+      .flow-progress { grid-template-columns: repeat(2, minmax(120px, 1fr)); margin: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="system-page">
+    <header class="system-topbar">
+      <div class="brand">
+        <div class="brand-mark"><i class="fas fa-scale-balanced"></i></div>
+        <div>
+          <div class="brand-org">广州仲裁委</div>
+          <div class="brand-title">立案服务部</div>
+        </div>
+      </div>
+      <nav class="flow-progress" aria-label="立案全流程进度">
+        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">AI对话辅助立案</span></div>
+        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">案件评估报告</span></div>
+        <div class="flow-step active"><span class="flow-index">3</span><span class="flow-label">后续路径选择</span></div>
+        <div class="flow-step"><span class="flow-index">4</span><span class="flow-label">完成立案</span></div>
+      </nav>
+      <div class="top-actions" aria-label="用户状态">
+        <div class="score"><i class="fas fa-star"></i><span>10</span></div>
+        <button class="score-pill" type="button">获取积分</button>
+        <div class="medal"><i class="fas fa-medal"></i></div>
+      </div>
+    </header>
+
+    <main class="work-area">
+      <section class="choice-panel" aria-label="提交后路径选择">
+        <div class="panel-head">
+          <div>
+            <h1 class="panel-title">请选择后续办理路径</h1>
+          </div>
+          <div class="head-actions">
+            <a class="back-link" href="./立案bot.html"><i class="fas fa-arrow-left"></i>返回案件评估报告</a>
+            <aside class="case-chip">
+              <span>当前案件类型</span>
+              <strong>教育培训服务合同退费纠纷</strong>
+            </aside>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <article class="choice-card" data-tone="quiz" tabindex="0" aria-label="案件信息问答评估">
+            <div class="choice-card-inner">
+              <div class="card-face card-front" data-order="01">
+                <div class="card-meta">
+                  <div class="card-icon"><i class="fas fa-list-check"></i></div>
+                </div>
+                <div>
+                  <h2 class="card-title">快速完成案情问答</h2>
+                  <p class="card-desc">通过互动问答与视频讲解，帮助你梳理合同、履行、退款和证据要点。</p>
+                </div>
+              </div>
+              <div class="card-face card-back">
+                <div>
+                  <h3 class="back-title">问答+普法小视频，辅助完成案情核对</h3>
+                  <p class="back-copy">系统会用通俗问题+小视频带您梳理合同、付款、上课记录、退款沟通和销售承诺，最后引导您选择调解或完成本轮问答。</p>
+                </div>
+                <ul class="value-list">
+                  <li><i class="fas fa-comments"></i><div><strong>不用自己判断法律重点</strong><span>系统把专业问题拆成您能直接回答的事实问题。</span></div></li>
+                  <li><i class="fas fa-diagram-project"></i><div><strong>先发现材料缺口</strong><span>帮助您看清合同、课时、付款和沟通记录是否够完整。</span></div></li>
+                  <li><i class="fas fa-handshake"></i><div><strong>问答后可直接选择调解</strong><span>信息越完整，越便于判断是否先用调解降低沟通成本。</span></div></li>
+                </ul>
+                <div class="enter-actions">
+                  <a class="enter-link" href="./游戏化问答.html" data-enter="quiz">选择并进入问答 <i class="fas fa-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="choice-card" data-tone="defense" tabindex="0" aria-label="AI模拟对方抗辩">
+            <div class="choice-card-inner">
+              <div class="card-face card-front" data-order="02">
+                <div class="card-meta">
+                  <div class="card-icon"><i class="fas fa-comments"></i></div>
+                </div>
+                <div>
+                  <h2 class="card-title">AI模拟·提前看看对方会怎么说</h2>
+                  <p class="card-desc">提前听一听对方可能如何回应您的退款主张。</p>
+                </div>
+              </div>
+              <div class="card-face card-back">
+                <div>
+                  <h3 class="back-title">换到对方立场，看争议会怎么展开</h3>
+                  <p class="back-copy">系统会直接扮演培训机构一方，围绕课程是否提供、退款条款、证据材料和协商空间进行回应。</p>
+                </div>
+                <ul class="value-list">
+                  <li><i class="fas fa-shield-halved"></i><div><strong>提前感受对抗点</strong><span>看看对方可能从哪些角度不同意全额退款。</span></div></li>
+                  <li><i class="fas fa-folder-open"></i><div><strong>反查证据是否够用</strong><span>如果对方否认承诺或服务问题，您能否拿出连续材料。</span></div></li>
+                  <li><i class="fas fa-scale-balanced"></i><div><strong>帮助调整预期</strong><span>判断继续坚持全额退款，还是先争取可履行的协商方案。</span></div></li>
+                </ul>
+                <div class="enter-actions">
+                  <a class="enter-link" href="./抗辩机器人.html" data-enter="defense">选择并进入模拟 <i class="fas fa-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="choice-card" data-tone="route" tabindex="0" aria-label="了解调解仲裁路径">
+            <div class="choice-card-inner">
+              <div class="card-face card-front" data-order="03">
+                <div class="card-meta">
+                  <div class="card-icon"><i class="fas fa-route"></i></div>
+                </div>
+                <div>
+                  <h2 class="card-title">调解/仲裁，哪种方式更适合你</h2>
+                  <p class="card-desc">用一页图解看懂调解与仲裁的区别，帮助你选择更合适的处理方式。</p>
+                </div>
+              </div>
+              <div class="card-face card-back">
+                <div>
+                  <h3 class="back-title">先理解两条路的区别，再做选择</h3>
+                  <p class="back-copy">系统会把调解和仲裁放在同一个页面对比，说明大概周期、办理节点和结果形式，帮助您降低选择成本。</p>
+                </div>
+                <ul class="value-list">
+                  <li><i class="fas fa-chart-line"></i><div><strong>对比周期和压力</strong><span>直观看到调解更快、更灵活，仲裁更正式、准备要求更高。</span></div></li>
+                  <li><i class="fas fa-map-location-dot"></i><div><strong>同屏看两条路径</strong><span>不用来回切页面，就能理解两种方式的办理节点。</span></div></li>
+                  <li><i class="fas fa-arrow-pointer"></i><div><strong>选择后进入路径说明</strong><span>看清调解与仲裁的办理节点后，再决定是否优先选择调解。</span></div></li>
+                </ul>
+                <div class="enter-actions">
+                  <a class="enter-link" href="./案件路径图.html" data-enter="map">选择并查看路径 <i class="fas fa-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'filingDemoCompletedPaths';
+
+    function markCompleted(path) {
+      try {
+        const completed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        completed[path] = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+      } catch (error) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ [path]: true }));
+      }
+    }
+
+    document.querySelectorAll('[data-enter]').forEach((link) => {
+      link.addEventListener('click', () => markCompleted(link.dataset.enter));
+    });
+  </script>
+</body>
+</html>

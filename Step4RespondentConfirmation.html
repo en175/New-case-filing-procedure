@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第四步：被申请人信息</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f8fafc;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .container {
+      max-width: 1500px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 20px;
+    }
+    .hero {
+      background: #1e3a8a;
+      color: #fff;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+    }
+    .hero-title { font-size: 24px; font-weight: 700; }
+    .hero-desc { margin-top: 6px; color: #cbd5e1; font-size: 13px; line-height: 1.5; }
+    .tab-content {
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
+    }
+    .section-title {
+      font-size: 20px;
+      line-height: 28px;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 24px;
+      border-radius: 2px;
+      background: #1e3a8a;
+    }
+    .form-list { display: flex; flex-direction: column; gap: 16px; }
+    .form-card {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #eef2f7;
+      transition: box-shadow .2s;
+    }
+    .form-card:hover { box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a; }
+    .form-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid #ebeef5;
+      background: #fbfcfd;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .avatar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2eefe;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .header-title { font-weight: 700; font-size: 18px; color: #303133; }
+    .header-tag {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #606266;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .btn-text {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+    }
+    .delete-btn { color: #f56c6c; }
+    .delete-btn:hover { color: #f78989; background: #fff5f5; }
+    .expand-btn { color: #2563eb; background: #ecf5ff; }
+    .expand-btn:hover { background: #d9ecff; }
+    .form-card-body { padding: 16px; background: #fff; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 13px; color: #64748b; }
+    .field input, .field select, .field textarea {
+      border: 1px solid #dbe2ea;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+      width: 100%;
+    }
+    .field textarea { min-height: 72px; resize: vertical; }
+    .sub-title {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 8px 0;
+      padding: 10px 12px 10px 18px;
+      background: #f8fafc;
+      border-radius: 8px;
+      position: relative;
+    }
+    .sub-title::before {
+      content: "";
+      width: 6px;
+      height: 18px;
+      border-radius: 999px;
+      background: #2563eb;
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .array-row { display: flex; flex-direction: column; gap: 8px; }
+    .array-item {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .array-item input { flex: 1; }
+    .tiny-btn {
+      border: 1px solid #dbe2ea;
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #475569;
+    }
+    .tiny-btn:hover { border-color: #93c5fd; color: #2563eb; }
+    .array-add-btn {
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: left;
+      padding: 0;
+      width: fit-content;
+    }
+    .array-add-btn:disabled { color: #9ca3af; cursor: not-allowed; }
+    .hint { font-size: 12px; color: #6b7280; line-height: 1.5; }
+    .radio-line { display: flex; gap: 16px; align-items: center; min-height: 38px; }
+    .tag-wrap {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #1574f9;
+      background: #e7f5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag i { cursor: pointer; }
+    .upload-panel {
+      grid-column: 1 / -1;
+      background: #fff;
+      border: 1px solid #eef3fa;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .upload-field-title {
+      font-size: 13px;
+      color: #334155;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .upload-dropzone {
+      width: 100%;
+      border: 2px dashed #d9dfe9;
+      border-radius: 16px;
+      background: #fff;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .2s;
+      padding: 24px;
+    }
+    .upload-dropzone:hover {
+      border-color: #b7c7df;
+      background: #fafcff;
+    }
+    .upload-inner { text-align: center; }
+    .upload-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      background: #edf4ff;
+      color: #2f6fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .upload-title {
+      font-size: 20px;
+      color: #111827;
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .upload-subtitle {
+      font-size: 16px;
+      color: #98a1b3;
+      margin-bottom: 14px;
+    }
+    .upload-btn {
+      border: none;
+      background: #153f95;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      padding: 8px 26px;
+      cursor: pointer;
+    }
+    .upload-btn:hover { opacity: 0.92; }
+    .upload-file-list {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .upload-file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: #fff;
+      gap: 10px;
+    }
+    .file-meta {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+    .file-size { font-size: 13px; color: #9ca3af; }
+    .file-actions { display: flex; gap: 16px; }
+    .file-actions i { font-size: 18px; color: #9aa3b2; cursor: pointer; }
+    .file-actions i:hover { color: #3b82f6; }
+    .file-actions .danger:hover { color: #ef4444; }
+    .upload-file-list.images {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .upload-image-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 6px;
+      background: #fff;
+    }
+    .upload-image-preview {
+      width: 100%;
+      height: 106px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f8fafc;
+      border: 1px solid #eef2f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .upload-image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .upload-image-name {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #475569;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .upload-image-actions {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      color: #94a3b8;
+    }
+    .upload-image-actions i { cursor: pointer; font-size: 14px; }
+    .upload-image-actions i:hover { color: #3b82f6; }
+    .upload-image-actions .danger:hover { color: #ef4444; }
+    .add-btn-wrapper {
+      margin-top: 16px;
+      border: 2px dashed #cbd5e1;
+      background: #f0f0f0;
+      border-radius: 12px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 18px;
+      transition: all .2s;
+    }
+    .add-btn-wrapper:hover { border-color: #1e3a8a; background: #fff; color: #1e3a8a; }
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      margin-right: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .save-wrap { display: flex; justify-content: center; margin-top: 10px; }
+    .primary-btn {
+      border: 1px solid #1e3a8a;
+      background: #1e3a8a;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .step-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .step-nav-btn {
+      min-width: 92px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .step-nav-btn.prev {
+      border: 1px solid #e5edf9;
+      background: #fff;
+      color: #8ea0bf;
+    }
+    .step-nav-btn.prev:hover {
+      border-color: #c6d7f3;
+      color: #6f86ad;
+    }
+    .step-nav-btn.next {
+      border: 1px solid #153f95;
+      background: #153f95;
+      color: #fff;
+    }
+    .step-nav-btn.next:hover { background: #1d4db1; border-color: #1d4db1; }
+    /* @media (max-width: 1200px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .upload-grid { grid-template-columns: 1fr; }
+      .upload-title { font-size: 16px; }
+      .upload-subtitle { font-size: 14px; }
+      .upload-btn { font-size: 16px; }
+      .upload-file-list { grid-template-columns: 1fr; }
+      .upload-file-list.images { grid-template-columns: 1fr; }
+    } */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-title">第四步：被申请人信息</div>
+      <div class="hero-desc">本页面内容由 AI 自动提取生成，可能存在错误，仅供您参考。请务必逐条仔细核对后再使用。</div>
+    </div>
+    <div class="tab-content">
+      <div class="section-title">被申请人信息</div>
+      <div class="form-list" id="respondentList"></div>
+      <div class="add-btn-wrapper" id="addRespondentBtn"><div class="btn-icon"><i class="el-icon-plus"></i></div>添加被申请人</div>
+      <div class="save-wrap"><button class="primary-btn" id="saveRespondentBtn">保存被申请人</button></div>
+    </div>
+    <div class="step-footer">
+      <button class="step-nav-btn prev" id="prevStepBtn">上一步</button>
+      <button class="step-nav-btn next" id="nextStepBtn">下一步</button>
+    </div>
+  </div>
+
+  <script>
+    const LIMITS = { phonesCountMax: 3, emailsCountMax: 3, addressesCountMax: 3, industryMax: 6 }
+    const nationList = ['中国', '中国香港', '中国澳门', '中国台湾', '美国', '新加坡', '英国', '日本']
+    const idCardTypeList = ['中国居民身份证', '护照', '港澳居民来往内地通行证', '人口信息查询单']
+    const partyAttrOptions = ['自然人', '企业', '非法人组织', '个体工商户']
+    const orgIdentityTypes = ['多证合一营业执照', '组织机构代码证', '事业单位法人证书']
+    const yesNoOptions = ['有', '无']
+    const identityExpireOptions = [{ label: '已过期', value: 1 }, { label: '未过期', value: 0 }]
+    const registrationMap = {
+      r1: { name: '企业法人', children: ['有限责任公司', '股份有限公司', '国有企业'] },
+      r2: { name: '个体工商', children: ['个体工商户', '个人独资企业'] },
+      r3: { name: '社会组织', children: ['社会团体', '基金会'] }
+    }
+    const industryMap = {
+      i1: { name: '信息技术', children: ['软件开发', '互联网服务', '人工智能'] },
+      i2: { name: '建筑工程', children: ['建筑施工', '工程咨询', '设计服务'] },
+      i3: { name: '商贸服务', children: ['批发零售', '物流运输', '商务服务'] }
+    }
+    const respondentProfiles = [
+      { id: 'rp1', nature: '自然人', nationality: '中国', name: '被申请人甲', idCardType: '中国居民身份证', idCardNo: '440101199201011234', hasPhoneType: '有', mobileList: ['13500000000'], emailList: ['resp-a@example.com'], address: ['深圳市南山区科技园'], agreenDeliveryAddressType: '有', agreenDeliveryAddress: ['深圳市南山区科技园'], otherAddressType: '无', otherAddress: [''] },
+      { id: 'rp2', nature: '企业', nationality: '中国', orgName: '某工程有限公司', identityType: '多证合一营业执照', identityNo: '91440101MA5XXXXX9Y', hasPhoneType: '有', mobileList: ['020-88889999'], emailList: ['company@example.com'], deptAddress: ['广州市海珠区示例路88号'], registrationFType: 'r1', registrationSType: '有限责任公司', corporationName: '王五', corporationPosition: '法人', corporationNationality: '中国', corporationIdCardType: '中国居民身份证', corporationIdCardNo: '440101198808081212', corporationTelephone: '13600000000', corporationEmail: 'corp@example.com', corporationAddress: '广州市海珠区示例路88号' }
+    ]
+    const imageUploadFields = new Set(['idFrontFiles', 'idBackFiles', 'legalIdFrontFiles', 'legalIdBackFiles'])
+
+    function uid() {
+      return `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+    }
+    function createFileRecord(file) {
+      return { id: uid(), name: file.name, size: file.size, type: file.type, raw: file, objectURL: URL.createObjectURL(file) }
+    }
+    function formatSize(size) {
+      if (!size) return '0 B'
+      const k = 1024
+      const units = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(size) / Math.log(k))
+      return `${(size / Math.pow(k, i)).toFixed(2)} ${units[i]}`
+    }
+    function esc(str = '') {
+      return String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]))
+    }
+    function previewFile(file) {
+      if (!file || !file.objectURL) return
+      window.open(file.objectURL, '_blank')
+    }
+    function downloadFile(file) {
+      if (!file || !file.objectURL) return
+      const a = document.createElement('a')
+      a.href = file.objectURL
+      a.download = file.name
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+    function createRespondent() {
+      return {
+        id: uid(),
+        expanded: true,
+        saved: false,
+        quickFillId: '',
+        nature: '自然人',
+        nationality: '中国',
+        name: '',
+        idCardType: '中国居民身份证',
+        idCardNo: '',
+        hasPhoneType: '有',
+        mobileList: [''],
+        emailList: [''],
+        address: [''],
+        otherAddressType: '有',
+        otherAddress: [''],
+        agreenDeliveryAddressType: '有',
+        agreenDeliveryAddress: [''],
+        otherProofFiles: [],
+        identityExpire: 0,
+        idFrontFiles: [],
+        idBackFiles: [],
+        idQueryFiles: [],
+        orgName: '',
+        identityType: '多证合一营业执照',
+        identityNo: '',
+        deptAddress: [''],
+        registrationFType: '',
+        registrationSType: '',
+        industryFirst: '',
+        industrySelected: '',
+        industryClassification: [],
+        bizLicenses: [],
+        corporationNationality: '中国',
+        corporationName: '',
+        corporationPosition: '',
+        corporationIdCardType: '中国居民身份证',
+        corporationIdCardNo: '',
+        corporationTelephone: '',
+        corporationEmail: '',
+        corporationAddress: '',
+        legalIdFrontFiles: [],
+        legalIdBackFiles: [],
+        legalProofFiles: []
+      }
+    }
+    const state = { respondents: [createRespondent()] }
+
+    function getItem(id) { return state.respondents.find(x => x.id === id) }
+    function getRegistrationSecondOptions(item) {
+      const cfg = registrationMap[item.registrationFType]
+      return cfg ? cfg.children : []
+    }
+    function getIndustrySecondOptions(item) {
+      const cfg = industryMap[item.industryFirst]
+      return cfg ? cfg.children : []
+    }
+    function renderSelectOptions(list, value) {
+      return list.map(item => `<option value="${esc(item)}" ${item === value ? 'selected' : ''}>${esc(item)}</option>`).join('')
+    }
+    function renderQuickFillSelect(selected, nature) {
+      const filtered = respondentProfiles.filter(p => p.nature === nature)
+      return `<select data-field="quickFillId"><option value="">请选择</option>${filtered.map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${esc(p.name || p.orgName)}（静态）</option>`).join('')}</select>`
+    }
+    function renderArrayField(item, field, label, placeholder, max = 3) {
+      const arr = item[field] || ['']
+      return `
+        <div class="field full">
+          <label>${label}</label>
+          <div class="array-row">
+            ${arr.map((v, i) => `
+              <div class="array-item">
+                <input data-array-field="${field}" data-array-index="${i}" value="${esc(v)}" placeholder="${esc(placeholder)}" />
+                ${arr.length > 1 ? `<button class="tiny-btn" data-array-remove="${field}" data-array-index="${i}">删除</button>` : ''}
+              </div>
+            `).join('')}
+            <button class="array-add-btn" data-array-add="${field}" ${arr.length >= max ? 'disabled' : ''}>+ 添加</button>
+          </div>
+        </div>`
+    }
+    function renderUploadField(itemId, field, title, extHint, files) {
+      const isImageField = imageUploadFields.has(field)
+      const hintText = isImageField ? '支持 jpg、jpeg、png，最大50M' : extHint
+      const safeFiles = Array.isArray(files) ? files : []
+      const filesHtml = safeFiles.length ? (isImageField ? `
+        <div class="upload-file-list images">
+          ${safeFiles.map(f => `
+            <div class="upload-image-item">
+              <div class="upload-image-preview"><img src="${f.objectURL}" alt="${esc(f.name)}" /></div>
+              <div class="upload-image-name" title="${esc(f.name)}">${esc(f.name)}</div>
+              <div class="upload-image-actions">
+                <i class="el-icon-view" data-file-action="preview" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-download" data-file-action="download" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-delete danger" data-file-action="remove" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div class="upload-file-list">
+          ${safeFiles.map(f => `
+            <div class="upload-file-item">
+              <div class="file-meta">
+                <i class="el-icon-document" style="color:#3b82f6;"></i>
+                <div style="min-width:0;flex:1;">
+                  <div class="file-name" title="${esc(f.name)}">${esc(f.name)}</div>
+                  <div class="file-size">${formatSize(f.size)}</div>
+                </div>
+              </div>
+              <div class="file-actions">
+                <i class="el-icon-view" data-file-action="preview" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-download" data-file-action="download" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-delete danger" data-file-action="remove" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `) : ''
+      return `
+        <div>
+          <div class="upload-field-title">${title}</div>
+          <div class="upload-dropzone" data-upload-dropzone data-id="${itemId}" data-field="${field}">
+            <div class="upload-inner">
+              <div class="upload-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-title">点击或拖拽上传</div>
+              <div class="upload-subtitle">${hintText}</div>
+              <button type="button" class="upload-btn" data-upload-trigger data-id="${itemId}" data-field="${field}">选择文件</button>
+              <input type="file" data-upload-input data-id="${itemId}" data-field="${field}" style="display:none;" accept="${isImageField ? '.jpg,.jpeg,.png' : '.pdf'}" multiple />
+            </div>
+          </div>
+          ${filesHtml}
+        </div>`
+    }
+
+    function renderRespondentBody(item) {
+      const isNatural = item.nature === '自然人'
+      const showPhone = item.hasPhoneType === '有'
+      const showOtherAddress = item.otherAddressType === '有'
+      const showAgreenAddress = item.agreenDeliveryAddressType === '有'
+      const isPopulation = item.idCardType === '人口信息查询单'
+      const registrationFirst = Object.keys(registrationMap).map(k => ({ value: k, label: registrationMap[k].name }))
+      const industryFirst = Object.keys(industryMap).map(k => ({ value: k, label: industryMap[k].name }))
+      const registrationSecond = getRegistrationSecondOptions(item)
+      const industrySecond = getIndustrySecondOptions(item)
+      return `
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="sub-title">基本信息</div>
+            <div class="field full"><label>快速填写信息</label>${renderQuickFillSelect(item.quickFillId, item.nature)}</div>
+            <div class="field"><label>被申请人属性</label><select data-field="nature">${renderSelectOptions(partyAttrOptions, item.nature)}</select></div>
+            <div class="field"><label>国籍/地区</label><select data-field="nationality">${renderSelectOptions(nationList, item.nationality)}</select></div>
+            ${isNatural ? `
+              <div class="field"><label>姓名</label><input data-field="name" value="${esc(item.name)}" placeholder="请输入姓名" /></div>
+              <div class="field"><label>证件类型</label><select data-field="idCardType">${renderSelectOptions(idCardTypeList, item.idCardType)}</select></div>
+              <div class="field"><label>证件号</label><input data-field="idCardNo" value="${esc(item.idCardNo)}" placeholder="请输入证件号" /></div>
+              ${renderArrayField(item, 'address', '法定地址（可添加多条）', '请输入法定地址')}
+            ` : `
+              <div class="field"><label>企业名称</label><input data-field="orgName" value="${esc(item.orgName)}" placeholder="请输入企业名称" /></div>
+              <div class="field"><label>企业证件类型</label><select data-field="identityType">${renderSelectOptions(orgIdentityTypes, item.identityType)}</select></div>
+              <div class="field"><label>企业证件号码</label><input data-field="identityNo" value="${esc(item.identityNo)}" placeholder="请输入企业证件号码" /></div>
+              ${renderArrayField(item, 'deptAddress', '注册地址（可添加多条）', '请输入注册地址')}
+            `}
+
+            <div class="sub-title">联系方式</div>
+            <div class="field full">
+              <label>有无电话</label>
+              <div class="radio-line">
+                ${yesNoOptions.map(opt => `<label><input type="radio" name="phone_${item.id}" data-field="hasPhoneType" value="${opt}" ${item.hasPhoneType === opt ? 'checked' : ''} /> ${opt}</label>`).join('')}
+              </div>
+            </div>
+            ${showPhone ? renderArrayField(item, 'mobileList', isNatural ? '手机号（可添加多条）' : '联系电话（可添加多条）', '请输入联系电话') : `<div class="field full"><div class="hint">本人已确认无法查询被申请人电话</div></div>`}
+            ${renderArrayField(item, 'emailList', '联系邮箱（可添加多条）', '请输入邮箱')}
+
+            ${!isNatural ? `
+              <div class="field"><label>登记注册类型（一级）</label>
+                <select data-field="registrationFType">
+                  <option value="">请选择一级分类</option>
+                  ${registrationFirst.map(x => `<option value="${x.value}" ${x.value === item.registrationFType ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field"><label>登记注册类型（二级）</label>
+                <select data-field="registrationSType">
+                  <option value="">请选择二级分类</option>
+                  ${registrationSecond.map(x => `<option value="${esc(x)}" ${x === item.registrationSType ? 'selected' : ''}>${esc(x)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field"><label>行业分类（一级）</label>
+                <select data-field="industryFirst">
+                  <option value="">请选择一级分类</option>
+                  ${industryFirst.map(x => `<option value="${x.value}" ${x.value === item.industryFirst ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field"><label>行业分类（二级）</label>
+                <div style="display:flex;gap:8px;">
+                  <select data-field="industrySelected" style="flex:1;">
+                    <option value="">请选择二级分类</option>
+                    ${industrySecond.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('')}
+                  </select>
+                  <button class="tiny-btn" data-action="addIndustry">添加</button>
+                </div>
+                <div class="hint">行业分类可多选，最多6个</div>
+                <div class="tag-wrap">${item.industryClassification.map((tag, i) => `<span class="tag">${esc(tag)}<i class="el-icon-close" data-action="removeIndustry" data-industry-index="${i}"></i></span>`).join('')}</div>
+              </div>
+            ` : ''}
+
+            <div class="field full"><label>合同约定地址</label>
+              <div class="radio-line">${yesNoOptions.map(opt => `<label><input type="radio" name="agree_${item.id}" data-field="agreenDeliveryAddressType" value="${opt}" ${item.agreenDeliveryAddressType === opt ? 'checked' : ''} /> ${opt}</label>`).join('')}</div>
+            </div>
+            ${showAgreenAddress ? renderArrayField(item, 'agreenDeliveryAddress', '合同约定地址明细（可添加多条）', '请输入合同约定地址') : ''}
+
+            <div class="field full"><label>其他地址</label>
+              <div class="radio-line">${yesNoOptions.map(opt => `<label><input type="radio" name="other_${item.id}" data-field="otherAddressType" value="${opt}" ${item.otherAddressType === opt ? 'checked' : ''} /> ${opt}</label>`).join('')}</div>
+            </div>
+            ${showOtherAddress ? renderArrayField(item, 'otherAddress', '其他地址明细（可添加多条）', '请输入其他地址') : ''}
+            ${showOtherAddress ? `
+              <div class="field full">
+                <label>其他地址依据说明附件</label>
+                <div class="hint">文件类型：.pdf，最大50M</div>
+                ${renderUploadField(item.id, 'otherProofFiles', '其他地址依据说明附件', '支持 PDF', item.otherProofFiles)}
+              </div>
+            ` : ''}
+
+            ${isNatural ? `
+              <div class="field full">
+                <label>身份证有效期</label>
+                <div class="radio-line">${identityExpireOptions.map(op => `<label><input type="radio" name="expire_${item.id}" data-field="identityExpire" value="${op.value}" ${Number(item.identityExpire) === op.value ? 'checked' : ''} /> ${op.label}</label>`).join('')}</div>
+              </div>
+              <div class="sub-title">证件上传</div>
+              <div class="upload-panel">
+                <div class="upload-grid">
+                  ${isPopulation ? renderUploadField(item.id, 'idQueryFiles', '人口信息查询单', '支持 PDF', item.idQueryFiles) : renderUploadField(item.id, 'idFrontFiles', '身份证人像面', '支持 jpg、jpeg、png', item.idFrontFiles)}
+                  ${isPopulation ? renderUploadField(item.id, 'idBackFiles', '身份证国徽面（可选）', '支持 jpg、jpeg、png', item.idBackFiles) : renderUploadField(item.id, 'idBackFiles', '身份证国徽面', '支持 jpg、jpeg、png', item.idBackFiles)}
+                </div>
+              </div>
+            ` : `
+              <div class="sub-title">证件上传</div>
+              <div class="upload-panel">
+                <div class="upload-grid">
+                  ${renderUploadField(item.id, 'bizLicenses', '企业证件（营业执照）', '支持 PDF', item.bizLicenses)}
+                </div>
+              </div>
+              <div class="sub-title">企业法人代表人信息</div>
+              <div class="field"><label>法人国籍/地区</label><select data-field="corporationNationality">${renderSelectOptions(nationList, item.corporationNationality)}</select></div>
+              <div class="field"><label>法人姓名</label><input data-field="corporationName" value="${esc(item.corporationName)}" placeholder="请输入法人姓名" /></div>
+              <div class="field"><label>法人职务</label><input data-field="corporationPosition" value="${esc(item.corporationPosition)}" placeholder="请输入法人职务" /></div>
+              <div class="field"><label>法人证件类型</label><select data-field="corporationIdCardType">${renderSelectOptions(idCardTypeList.filter(x => x !== '人口信息查询单'), item.corporationIdCardType)}</select></div>
+              <div class="field"><label>法人证件号码</label><input data-field="corporationIdCardNo" value="${esc(item.corporationIdCardNo)}" placeholder="请输入法人证件号码" /></div>
+              <div class="field"><label>联系邮箱</label><input data-field="corporationEmail" value="${esc(item.corporationEmail)}" placeholder="请输入联系邮箱" /></div>
+              <div class="field"><label>手机号码</label><input data-field="corporationTelephone" value="${esc(item.corporationTelephone)}" placeholder="请输入法人手机号码" /></div>
+              <div class="field full"><label>法定地址</label><input data-field="corporationAddress" value="${esc(item.corporationAddress)}" placeholder="请输入法定地址（身份证、户籍地址）" /></div>
+              <div class="upload-panel">
+                <div class="upload-grid">
+                  ${renderUploadField(item.id, 'legalIdFrontFiles', '法人身份证人像面', '支持 jpg、jpeg、png', item.legalIdFrontFiles)}
+                  ${renderUploadField(item.id, 'legalIdBackFiles', '法人身份证国徽面', '支持 jpg、jpeg、png', item.legalIdBackFiles)}
+                  ${renderUploadField(item.id, 'legalProofFiles', '法人身份证明书', '支持 PDF', item.legalProofFiles)}
+                </div>
+              </div>
+            `}
+          </div>
+        </div>`
+    }
+
+    function renderCard(item, idx) {
+      return `
+        <div class="form-card" data-id="${item.id}">
+          <div class="form-card-header">
+            <div class="header-left">
+              <div class="avatar-icon"><i class="el-icon-user"></i></div>
+              <div>
+                <div class="header-title">被申请人 ${idx + 1}</div>
+                <div class="header-tag">${esc(item.nature || '自然人')}</div>
+              </div>
+            </div>
+            <div class="header-right">
+              <button class="btn-text delete-btn" data-action="delete"><i class="el-icon-delete"></i>删除</button>
+              <button class="btn-text expand-btn" data-action="toggle"><i class="${item.expanded ? 'el-icon-arrow-up' : 'el-icon-arrow-down'}"></i>${item.expanded ? '收起' : '展开'}</button>
+            </div>
+          </div>
+          ${item.expanded ? renderRespondentBody(item) : ''}
+        </div>`
+    }
+
+    function render() {
+      document.getElementById('respondentList').innerHTML = state.respondents.map((item, idx) => renderCard(item, idx)).join('')
+      bindEvents()
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.form-card').forEach(card => {
+        const item = getItem(card.dataset.id)
+        card.querySelector('[data-action="delete"]').onclick = () => {
+          if (state.respondents.length <= 1) return
+          state.respondents = state.respondents.filter(x => x.id !== item.id)
+          render()
+        }
+        card.querySelector('[data-action="toggle"]').onclick = () => {
+          item.expanded = !item.expanded
+          render()
+        }
+
+        card.querySelectorAll('[data-field]:not([data-upload-input])').forEach(el => {
+          const field = el.dataset.field
+          const isRadio = el.type === 'radio'
+          if (isRadio) {
+            el.onchange = () => {
+              if (!el.checked) return
+              item[field] = field === 'identityExpire' ? Number(el.value) : el.value
+              item.saved = false
+              render()
+            }
+            return
+          }
+          el.onchange = () => {
+            item[field] = el.value
+            item.saved = false
+            if (field === 'nature') {
+              const keep = { id: item.id, expanded: true, saved: false }
+              Object.assign(item, createRespondent(), keep, { nature: item.nature, nationality: '中国' })
+              render()
+              return
+            }
+            if (field === 'registrationFType') {
+              item.registrationSType = ''
+              render()
+              return
+            }
+            if (field === 'industryFirst') {
+              item.industrySelected = ''
+              render()
+              return
+            }
+            if (field === 'idCardType' && item.idCardType === '人口信息查询单') {
+              item.identityExpire = 0
+              render()
+              return
+            }
+          }
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.oninput = () => { item[field] = el.value; item.saved = false }
+          }
+        })
+
+        card.querySelectorAll('[data-array-add]').forEach(btn => {
+          const field = btn.dataset.arrayAdd
+          btn.onclick = () => {
+            const arr = item[field] || (item[field] = [''])
+            const max = field.includes('email') ? LIMITS.emailsCountMax : LIMITS.addressesCountMax
+            if (arr.length >= max) return
+            arr.push('')
+            item.saved = false
+            render()
+          }
+        })
+        card.querySelectorAll('[data-array-remove]').forEach(btn => {
+          const field = btn.dataset.arrayRemove
+          const idx = Number(btn.dataset.arrayIndex)
+          btn.onclick = () => {
+            const arr = item[field]
+            if (!arr || arr.length <= 1) return
+            arr.splice(idx, 1)
+            item.saved = false
+            render()
+          }
+        })
+        card.querySelectorAll('[data-array-field][data-array-index]').forEach(input => {
+          input.oninput = () => {
+            const field = input.dataset.arrayField
+            const idx = Number(input.dataset.arrayIndex)
+            item[field][idx] = input.value
+            item.saved = false
+          }
+        })
+
+        card.querySelectorAll('[data-action="addIndustry"]').forEach(btn => {
+          btn.onclick = e => {
+            e.preventDefault()
+            const value = item.industrySelected
+            if (!value) return
+            if (item.industryClassification.includes(value)) return
+            if (item.industryClassification.length >= LIMITS.industryMax) return
+            item.industryClassification.push(value)
+            item.industrySelected = ''
+            render()
+          }
+        })
+        card.querySelectorAll('[data-action="removeIndustry"]').forEach(icon => {
+          icon.onclick = () => {
+            const idx = Number(icon.dataset.industryIndex)
+            item.industryClassification.splice(idx, 1)
+            render()
+          }
+        })
+
+        card.querySelectorAll('[data-upload-trigger]').forEach(btn => {
+          btn.onclick = e => {
+            e.stopPropagation()
+            const input = card.querySelector(`[data-upload-input][data-field="${btn.dataset.field}"]`)
+            if (input) input.click()
+          }
+        })
+        card.querySelectorAll('[data-upload-dropzone]').forEach(zone => {
+          zone.onclick = e => {
+            if (e.target.closest('[data-upload-trigger]')) return
+            const input = card.querySelector(`[data-upload-input][data-field="${zone.dataset.field}"]`)
+            if (input) input.click()
+          }
+        })
+        card.querySelectorAll('[data-upload-input]').forEach(input => {
+          input.onchange = e => {
+            const field = input.dataset.field
+            const files = Array.from(e.target.files || []).map(createFileRecord)
+            if (!Array.isArray(item[field])) item[field] = []
+            item[field].push(...files)
+            item.saved = false
+            input.value = ''
+            render()
+          }
+        })
+      })
+
+      document.querySelectorAll('[data-file-action]').forEach(icon => {
+        icon.onclick = e => {
+          e.stopPropagation()
+          const item = getItem(icon.dataset.id)
+          if (!item) return
+          const field = icon.dataset.field
+          const fileList = Array.isArray(item[field]) ? item[field] : []
+          const file = fileList.find(f => f.id === icon.dataset.fileId)
+          if (!file) return
+          const action = icon.dataset.fileAction
+          if (action === 'preview') previewFile(file)
+          if (action === 'download') downloadFile(file)
+          if (action === 'remove') {
+            if (file.objectURL) URL.revokeObjectURL(file.objectURL)
+            item[field] = fileList.filter(f => f.id !== file.id)
+            item.saved = false
+            render()
+          }
+        }
+      })
+    }
+
+    function applyQuickFill(item) {
+      if (!item.quickFillId) return
+      const data = respondentProfiles.find(p => p.id === item.quickFillId)
+      if (!data) return
+      const keep = { id: item.id, expanded: true, saved: false }
+      Object.assign(item, createRespondent(), keep, JSON.parse(JSON.stringify(data)))
+      if (!item.mobileList || !item.mobileList.length) item.mobileList = ['']
+      if (!item.emailList || !item.emailList.length) item.emailList = ['']
+      if (!item.address || !item.address.length) item.address = ['']
+      if (!item.deptAddress || !item.deptAddress.length) item.deptAddress = ['']
+      if (!item.otherAddress || !item.otherAddress.length) item.otherAddress = ['']
+      if (!item.agreenDeliveryAddress || !item.agreenDeliveryAddress.length) item.agreenDeliveryAddress = ['']
+    }
+
+    document.addEventListener('change', e => {
+      const target = e.target
+      if (!target.matches('select[data-field="quickFillId"]')) return
+      const card = target.closest('.form-card')
+      if (!card) return
+      const item = getItem(card.dataset.id)
+      item.quickFillId = target.value
+      applyQuickFill(item)
+      render()
+    })
+
+    document.getElementById('addRespondentBtn').onclick = () => {
+      state.respondents.push(createRespondent())
+      render()
+    }
+    document.getElementById('saveRespondentBtn').onclick = () => {
+      state.respondents.forEach(a => a.saved = true)
+      alert('被申请人保存成功（静态页，本地保存）')
+      render()
+    }
+    document.getElementById('prevStepBtn').onclick = () => {
+      window.location.href = './Step3PartyConfirmation.html'
+    }
+    document.getElementById('nextStepBtn').onclick = () => {
+      window.location.href = './Step5CaseInfoConfirmation.html'
+    }
+
+    render()
+  </script>
+</body>
+</html>

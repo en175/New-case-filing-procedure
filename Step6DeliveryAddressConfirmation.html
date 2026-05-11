@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第六步：送达地址确认</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f8fafc;
+      color: #303133;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .hero {
+      background: #1e3a8a;
+      color: #fff;
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .hero-title { font-size: 16px; font-weight: 700; }
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .card-header {
+      background: #f1f5f9;
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-icon i { font-size: 20px; color: #1e3a8a; }
+    .header-title { font-size: 16px; font-weight: 700; color: #111827; }
+    .card-body { padding: 18px; }
+    .btn {
+      border: 1px solid #dbe2ea;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-primary {
+      background: #1e3a8a;
+      border-color: #1e3a8a;
+      color: #fff;
+    }
+    .btn-text {
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .radio-group { display: flex; gap: 16px; margin-bottom: 16px; }
+    .radio {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .radio.active { border-color: #1677ff; background: #f8fafc; }
+    .recommend {
+      background: #e6f7ff;
+      color: #1890ff;
+      font-size: 12px;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+    .tips {
+      border-radius: 12px;
+      border: 1px solid #dbe5f2;
+      background: #fff;
+      padding: 14px;
+      margin-bottom: 16px;
+      margin-top: 16px;
+    }
+    .tips h4 {
+      margin: 0 0 12px 0;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+    }
+    .tip-item { font-size: 13px; color: #64748b; line-height: 1.65; margin-bottom: 6px; }
+    .delivery-tips {
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin-bottom: 18px;
+    }
+    .delivery-tips h4 {
+      margin-bottom: 16px;
+      color: #0f2e74;
+    }
+    .delivery-tips h4 i { color: #1f4ea3; }
+    .delivery-tips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 48px;
+    }
+    .delivery-tip-card {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 6px 6px 8px;
+      border-radius: 14px;
+    }
+    .delivery-tip-card.emphasis {
+      background: #f8fbff;
+      border: 1px solid #eff4ff;
+      padding: 12px 14px;
+    }
+    .delivery-tip-card.empty {
+      visibility: hidden;
+    }
+    .delivery-tip-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      background: #edf5ff;
+      color: #2563eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      flex: none;
+    }
+    .delivery-tip-content h5 {
+      margin: 2px 0 6px 0;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    .delivery-tip-content p {
+      margin: 0;
+      color: #5f78a8;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .address-section {
+      padding: 20px;
+      background: #f8fafc;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bar {
+      width: 4px;
+      height: 16px;
+      border-radius: 999px;
+      background: #1e3a8a;
+    }
+    .bar.red { background: #b91c1c; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 13px; color: #64748b; }
+    .field input, .field select {
+      border: 1px solid #dbe2ea;
+      border-radius: 8px;
+      padding: 8px 10px;
+      width: 100%;
+      font-size: 14px;
+    }
+    .chips-wrap {
+      border: 1px solid #dbe2ea;
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 12px;
+    }
+    .chip i { cursor: pointer; }
+    .summary {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .summary-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 10px;
+    }
+    .summary-title { font-size: 16px; font-weight: 700; color: #1e293b; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .add-btn {
+      width: 100%;
+      border: 2px dashed #e2e8f0;
+      color: #475569;
+      padding: 14px 0;
+      border-radius: 12px;
+      background: #f8fafc80;
+      cursor: pointer;
+      margin-top: 12px;
+      font-size: 16px;
+    }
+    .add-btn:hover { border-color: #93c5fd; color: #2563eb; }
+    .upload-box {
+      border: 2px dashed #d9dfe9;
+      border-radius: 16px;
+      min-height: 180px;
+      padding: 26px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .upload-box:hover {
+      border-color: #b7c7df;
+      background: #fafcff;
+    }
+    .upload-box input[type="file"] { display: none; }
+    .upload-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #edf4ff;
+      color: #2f6fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .upload-main-text { font-size: 16px; color: #111827; font-weight: 600; line-height: 1.1; }
+    .upload-sub-text { font-size: 16px; color: #98a1b3; line-height: 1.1; }
+    .upload-select-btn {
+      border: none;
+      background: #153f95;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      padding: 8px 26px;
+      line-height: 1.2;
+      cursor: pointer;
+    }
+    .upload-select-btn:hover { opacity: 0.92; }
+    .upload-note { margin-top: 2px; color: #94a3b8; font-size: 12px; line-height: 1.5; }
+    .file-line {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 10px;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px 12px;
+      line-height: 1.6;
+    }
+    .note {
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      border-radius: 8px;
+      padding: 10px;
+      line-height: 1.65;
+      color: #1e3a8a;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+    .invoice-note {
+      border: 1px solid #d9e9ff;
+      background: #f3f8ff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #3861a8;
+      margin-bottom: 14px;
+    }
+    .invoice-note-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #31599c;
+      margin-bottom: 4px;
+    }
+    .invoice-note-title i { color: #2b5db7; }
+    .invoice-note-list {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .invoice-type-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .invoice-type-option {
+      border: 1px solid #dbe2ea;
+      border-radius: 8px;
+      padding: 8px 14px;
+      min-width: 148px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #1f2937;
+      font-size: 14px;
+      background: #fff;
+    }
+    .invoice-type-option.active {
+      border-color: #1677ff;
+      color: #1457c5;
+      box-shadow: 0 0 0 1px #dbeafe inset;
+    }
+    .invoice-type-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid #cfd8e3;
+      position: relative;
+      flex: none;
+      background: #fff;
+    }
+    .invoice-type-option.active .invoice-type-dot {
+      border-color: #1677ff;
+    }
+    .invoice-type-option.active .invoice-type-dot::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #1677ff;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+    }
+    .required-mark {
+      color: #ef4444;
+      margin-right: 4px;
+    }
+    .field-hint {
+      font-size: 12px;
+      color: #a0aab8;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+    .step-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .step-nav-btn {
+      min-width: 92px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .step-nav-btn.prev {
+      border: 1px solid #e5edf9;
+      background: #fff;
+      color: #8ea0bf;
+    }
+    .step-nav-btn.prev:hover {
+      border-color: #c6d7f3;
+      color: #6f86ad;
+    }
+    .step-nav-btn.next {
+      border: 1px solid #153f95;
+      background: #153f95;
+      color: #fff;
+    }
+    .step-nav-btn.next:hover { background: #1d4db1; border-color: #1d4db1; }
+    .step-next-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .step-submit-tip {
+      font-size: 12px;
+      color: #7c8aa5;
+      line-height: 1;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero"><div class="hero-title">第六步：送达地址确认</div></div>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left"><div class="header-icon"><i class="el-icon-document"></i></div><div class="header-title">送达地址确认书</div></div>
+        <button class="btn btn-primary" id="generateBtn"><i class="el-icon-magic-stick"></i> 生成送达地址确认书</button>
+      </div>
+      <div class="card-body">
+        <div class="radio-group">
+          <div class="radio active" data-delivery="1"><i class="el-icon-message"></i>电子送达 <span class="recommend">建议优先选择</span></div>
+          <div class="radio" data-delivery="2"><i class="el-icon-postcard"></i>传统送达</div>
+        </div>
+        <div class="tips delivery-tips" id="electronicTips">
+          <h4><i class="el-icon-info"></i> 送达提示</h4>
+          <div class="delivery-tips-grid">
+            <div class="delivery-tip-card">
+              <span class="delivery-tip-icon"><i class="el-icon-location-outline"></i></span>
+              <div class="delivery-tip-content">
+                <h5>地址准确性</h5>
+                <p>请准确提供通信号码、电子邮箱、平台账号和邮寄地址，变更后应及时通知仲裁机构。</p>
+              </div>
+            </div>
+            <div class="delivery-tip-card">
+              <span class="delivery-tip-icon"><i class="el-icon-document"></i></span>
+              <div class="delivery-tip-content">
+                <h5>文书范围</h5>
+                <p>仲裁机构可通过电子方式向当事人送达仲裁申请书、证据材料、通知及结案文书等。</p>
+              </div>
+            </div>
+            <div class="delivery-tip-card emphasis">
+              <span class="delivery-tip-icon"><i class="el-icon-user"></i></span>
+              <div class="delivery-tip-content">
+                <h5>法律效力</h5>
+                <p>电子送达与其他送达方式具有同等法律效力，以最先完成送达时间为准。</p>
+              </div>
+            </div>
+            <div class="delivery-tip-card">
+              <span class="delivery-tip-icon"><i class="el-icon-mobile-phone"></i></span>
+              <div class="delivery-tip-content">
+                <h5>保持畅通</h5>
+                <p>请保持手机和邮箱畅通，及时查收文书；因个人原因未查阅的，由当事人自行承担后果。</p>
+              </div>
+            </div>
+            <div class="delivery-tip-card">
+              <span class="delivery-tip-icon"><i class="el-icon-notebook-2"></i></span>
+              <div class="delivery-tip-content">
+                <h5>规则依据</h5>
+                <p>电子送达方式参照《仲裁规则》（2026年版）第六章第56条执行。</p>
+              </div>
+            </div>
+            <div class="delivery-tip-card empty"></div>
+          </div>
+        </div>
+
+        <div class="address-section">
+          <div class="section-head">
+            <div class="section-title"><span class="bar"></span>我方送达地址</div>
+            <div id="myActionBtns"></div>
+          </div>
+          <div id="myAddressBox"></div>
+        </div>
+
+        <div class="tips" id="oppositeTips">
+          <h4><i class="el-icon-info"></i> 对方地址提示</h4>
+          <div class="tip-item">请尽量准确提供被申请人的营业地、住所地、通讯地址和联系方式。</div>
+          <div class="tip-item">地址信息不准确可能影响送达效力并导致后续风险。</div>
+        </div>
+
+        <div class="address-section">
+          <div class="section-head"><div class="section-title"><span class="bar red"></span>对方送达地址</div></div>
+          <div id="oppositeList"></div>
+          <button class="add-btn" id="addOppositeBtn"><i class="el-icon-plus"></i> 添加对方送达地址</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="header-left"><div class="header-icon"><i class="el-icon-document"></i></div><div class="header-title">开票信息确认书</div></div>
+      </div>
+      <div class="card-body">
+        <div class="invoice-note">
+          <div class="invoice-note-title"><i class="el-icon-info"></i> 注意事项</div>
+          <ol class="invoice-note-list">
+            <li>请确保发票信息真实、准确、完整。</li>
+            <li>缴费成功可下载收据，结案后开具正式发票。</li>
+          </ol>
+        </div>
+        <div class="field">
+          <label><span class="required-mark">*</span>发票类型</label>
+          <div class="invoice-type-group">
+            <div class="invoice-type-option active" data-invoice-type="1"><span class="invoice-type-dot"></span>增值税普通发票</div>
+            <div class="invoice-type-option" data-invoice-type="2"><span class="invoice-type-dot"></span>增值税专用发票</div>
+          </div>
+          <select id="invoiceType" style="display:none;">
+            <option value="1">增值税普通发票</option>
+            <option value="2">增值税专用发票</option>
+          </select>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label><span class="required-mark">*</span>当事人姓名/单位名称</label>
+            <select id="invoiceName">
+              <option value="">请选择已添加的申请人</option>
+            </select>
+          </div>
+          <div class="field">
+            <label><span class="required-mark">*</span>纳税人识别号（税号）</label>
+            <input id="invoiceTaxId" placeholder="请输入税号，个人可填“无”" />
+            <div class="field-hint">如为单位，请填写税号；如为个人则无需税号，请写“无”</div>
+          </div>
+          <div class="field">
+            <label>注册地址</label>
+            <input id="invoiceAddress" placeholder="请输入注册地址" />
+          </div>
+          <div class="field">
+            <label><span class="required-mark">*</span>联系电话</label>
+            <input id="invoicePhone" placeholder="请输入联系电话" />
+          </div>
+          <div class="field">
+            <label>联系邮箱</label>
+            <input id="invoiceEmail" placeholder="请输入联系邮箱" />
+          </div>
+          <div class="field">
+            <label>开户银行</label>
+            <input id="invoiceBankName" placeholder="单位填写，个人可填“无”" />
+            <div class="field-hint">如为单位，请填写开户银行名称；如为个人无需填写，请写“无”</div>
+          </div>
+          <div class="field">
+            <label>银行账户</label>
+            <input id="invoiceBankAccount" placeholder="单位填写，个人可填“无”" />
+            <div class="field-hint">如为单位，请填写开户银行账号；如为个人无需填写，请写“无”</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn" id="validateBtn">校验</button>
+      <button class="btn btn-primary" id="saveBtn">保存全部（本地）</button>
+    </div> -->
+    <div class="step-footer">
+      <button class="step-nav-btn prev" id="prevStepBtn">上一步</button>
+      <div class="step-next-wrap">
+        <button class="step-nav-btn next" id="nextStepBtn">提交</button>
+        <div class="step-submit-tip">网上立案仅限工作日才能提交</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const myDeliveryProfiles = [
+      {
+        litigantName: '申请人A（本人）',
+        litigantAddressOptions: ['广州市天河区示例路1号', '广州市天河区体育西路100号'],
+        myPhoneOptions: ['13800000000', '13900000000'],
+        myEmailOptions: ['demo@example.com', 'service@example.com']
+      },
+      {
+        litigantName: '广州某科技有限公司（本单位）',
+        litigantAddressOptions: ['广州市黄埔区科学大道88号', '广州市黄埔区科汇一路99号'],
+        myPhoneOptions: ['020-88886666', '020-66668888'],
+        myEmailOptions: ['corp@example.com', 'legal@example.com']
+      }
+    ]
+    const oppositeProfiles = [
+      {
+        respondentName: '被申请人甲公司',
+        phones: ['020-77775555', '020-77776666'],
+        emails: ['alpha@respondent.com', 'service@respondent.com'],
+        respondentLegalAddress: ['深圳市南山区科技园一路18号', '深圳市南山区高新南七道20号'],
+        respondentDeliveryAddress: ['深圳市福田区深南大道6008号', '深圳市罗湖区人民南路2002号'],
+        respondentOtherAddress: ['深圳市龙华区民治大道66号', '深圳市宝安区创业二路10号']
+      },
+      {
+        respondentName: '被申请人乙个人',
+        phones: ['13600001111', '13700002222'],
+        emails: ['personb@example.com', 'personb_work@example.com'],
+        respondentLegalAddress: ['佛山市禅城区季华路88号', '佛山市南海区桂城街道39号'],
+        respondentDeliveryAddress: ['佛山市顺德区大良街道20号', '佛山市三水区西南街道66号'],
+        respondentOtherAddress: ['中山市东区中山路101号', '珠海市香洲区情侣中路9号']
+      }
+    ]
+    const invoiceProfiles = [
+      {
+        name: '申请人A（本人）',
+        invoiceType: '1',
+        taxId: '无',
+        address: '广州市天河区示例路1号',
+        phone: '13800000000',
+        email: 'demo@example.com',
+        bankName: '无',
+        bankAccount: '无'
+      },
+      {
+        name: '广州某科技有限公司（本单位）',
+        invoiceType: '2',
+        taxId: '91440101MA5XXXXX9X',
+        address: '广州市黄埔区科学大道88号',
+        phone: '020-88886666',
+        email: 'corp@example.com',
+        bankName: '中国银行广州科学城支行',
+        bankAccount: '440012341234567890'
+      }
+    ]
+    const defaultMy = () => ({
+      litigantName: '',
+      recipientName: '',
+      litigantAddress: '',
+      myPhone: '',
+      myEmail: '',
+      files: []
+    })
+    const defaultOpp = () => ({
+      id: crypto.randomUUID(),
+      respondentName: '',
+      phone: '',
+      email: '',
+      respondentLegalAddress: '',
+      respondentDeliveryAddress: '',
+      respondentOtherAddress: '',
+      files: []
+    })
+    const state = {
+      deliveryType: 1,
+      myAddressEditing: true,
+      myAddress: defaultMy(),
+      myAddressSaved: null,
+      oppositeAddresses: [],
+      oppositeEditingId: null,
+      oppositeForm: defaultOpp()
+    }
+
+    function createFile(file) {
+      return { id: crypto.randomUUID(), name: file.name, size: file.size, objectURL: URL.createObjectURL(file), file }
+    }
+    function formatSize(size) {
+      if (!size) return '0 B'
+      const k = 1024, units = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(size) / Math.log(k))
+      return (size / Math.pow(k, i)).toFixed(2) + ' ' + units[i]
+    }
+    function normalize(list) {
+      return (list || []).map(v => (v || '').trim()).filter(Boolean)
+    }
+    function renderSelectOptions(list, value, placeholder = '请选择') {
+      const options = (list || []).map(v => `<option value="${v}" ${v === value ? 'selected' : ''}>${v}</option>`).join('')
+      return `<option value="">${placeholder}</option>${options}`
+    }
+    function getMyProfile(name) {
+      return myDeliveryProfiles.find(item => item.litigantName === name)
+    }
+    function getOppProfile(name) {
+      return oppositeProfiles.find(item => item.respondentName === name)
+    }
+    function hydrateMyAddressByLitigant(force = false) {
+      const profile = getMyProfile(state.myAddress.litigantName)
+      if (!profile) return
+      if (force || !profile.litigantAddressOptions.includes(state.myAddress.litigantAddress)) state.myAddress.litigantAddress = profile.litigantAddressOptions[0] || ''
+      if (force || !profile.myPhoneOptions.includes(state.myAddress.myPhone)) state.myAddress.myPhone = profile.myPhoneOptions[0] || ''
+      if (force || !profile.myEmailOptions.includes(state.myAddress.myEmail)) state.myAddress.myEmail = profile.myEmailOptions[0] || ''
+    }
+    function hydrateOppByRespondent(target, force = false) {
+      const profile = getOppProfile(target.respondentName)
+      if (!profile) return
+      if (force || !profile.phones.includes(target.phone)) target.phone = profile.phones[0] || ''
+      if (force || !profile.emails.includes(target.email)) target.email = profile.emails[0] || ''
+      if (force || !profile.respondentLegalAddress.includes(target.respondentLegalAddress)) target.respondentLegalAddress = profile.respondentLegalAddress[0] || ''
+      if (force || !profile.respondentDeliveryAddress.includes(target.respondentDeliveryAddress)) target.respondentDeliveryAddress = profile.respondentDeliveryAddress[0] || ''
+      if (force || !profile.respondentOtherAddress.includes(target.respondentOtherAddress)) target.respondentOtherAddress = profile.respondentOtherAddress[0] || ''
+    }
+    function syncInvoiceTypeVisual() {
+      const invoiceType = document.getElementById('invoiceType')
+      if (!invoiceType) return
+      const selected = invoiceType.value
+      document.querySelectorAll('[data-invoice-type]').forEach(item => {
+        item.classList.toggle('active', item.dataset.invoiceType === selected)
+      })
+    }
+    function fillInvoiceByName(name) {
+      const profile = invoiceProfiles.find(item => item.name === name)
+      if (!profile) return
+      document.getElementById('invoiceType').value = profile.invoiceType
+      document.getElementById('invoiceTaxId').value = profile.taxId
+      document.getElementById('invoiceAddress').value = profile.address
+      document.getElementById('invoicePhone').value = profile.phone
+      document.getElementById('invoiceEmail').value = profile.email
+      document.getElementById('invoiceBankName').value = profile.bankName
+      document.getElementById('invoiceBankAccount').value = profile.bankAccount
+      syncInvoiceTypeVisual()
+    }
+    function initInvoiceNameOptions() {
+      const invoiceName = document.getElementById('invoiceName')
+      if (!invoiceName) return
+      const current = invoiceName.value
+      const optionHtml = ['<option value="">请选择已添加的申请人</option>', ...invoiceProfiles.map(item => `<option value="${item.name}">${item.name}</option>`)].join('')
+      invoiceName.innerHTML = optionHtml
+      if (current && invoiceProfiles.some(item => item.name === current)) invoiceName.value = current
+    }
+    function renderUploadZone(inputHtml, noteText) {
+      return `
+      <div class="upload-box" data-upload-zone>
+        <div class="upload-icon-circle"><i class="el-icon-upload2"></i></div>
+        <div class="upload-main-text">点击或拖拽上传</div>
+        <div class="upload-sub-text">支持 PDF</div>
+        <button type="button" class="upload-select-btn" data-upload-trigger>选择文件</button>
+        ${inputHtml}
+        <div class="upload-note">${noteText}</div>
+      </div>`
+    }
+    function renderMyAddressForm() {
+      const d = state.myAddress
+      const profile = getMyProfile(d.litigantName)
+      return `
+      <div class="grid">
+        <div class="field"><label>本人/本单位确认</label><select id="my_litigantName">${renderSelectOptions(myDeliveryProfiles.map(item => item.litigantName), d.litigantName)}</select></div>
+        <div class="field"><label>收件人</label><input id="my_recipientName" value="${d.recipientName}" /></div>
+        <div class="field full"><label>收件地址</label><select id="my_litigantAddress">${renderSelectOptions(profile ? profile.litigantAddressOptions : [], d.litigantAddress)}</select></div>
+        <div class="field"><label>联系电话</label><select id="my_phone">${renderSelectOptions(profile ? profile.myPhoneOptions : [], d.myPhone)}</select></div>
+        <div class="field"><label>联系邮箱</label><select id="my_email">${renderSelectOptions(profile ? profile.myEmailOptions : [], d.myEmail)}</select></div>
+        <div class="field full"><label>送达地址确认书</label>${renderUploadZone('<input id="my_fileInput" type="file" accept=".pdf" multiple />', '支持 PDF，多份确认书可一次上传')}<div class="file-line">${d.files.map(f => `${f.name} (${formatSize(f.size)})`).join('；') || '未上传'}</div></div>
+      </div>`
+    }
+    function renderMyAddressSummary() {
+      const d = state.myAddressSaved || defaultMy()
+      return `
+      <div class="summary">
+        <div class="summary-head"><div class="summary-title">${d.litigantName || '-'}</div><div>收件人：${d.recipientName || '-'}</div></div>
+        <div class="summary-grid">
+          <div>收件地址：${d.litigantAddress || '-'}</div>
+          <div>联系电话：${d.myPhone || '-'}</div>
+          <div>联系邮箱：${d.myEmail || '-'}</div>
+          <div>送达地址确认书：${d.files.map(f => f.name).join('；') || '-'}</div>
+        </div>
+      </div>`
+    }
+    function renderOppositeForm(item, isEdit) {
+      const f = item
+      const profile = getOppProfile(f.respondentName)
+      return `
+      <div class="summary" data-edit-id="${f.id}">
+        <div class="summary-head"><div class="summary-title">${isEdit ? '编辑对方送达地址' : '添加对方送达地址'}</div>
+        <div><button class="btn" data-op-cancel>取消</button> <button class="btn btn-primary" data-op-save>保存</button></div></div>
+        <div class="grid">
+          <div class="field full"><label>对方当事人名称</label><select data-op-field="respondentName">${renderSelectOptions(oppositeProfiles.map(item => item.respondentName), f.respondentName)}</select></div>
+          <div class="field"><label>联系电话</label><select data-op-field="phone">${renderSelectOptions(profile ? profile.phones : [], f.phone)}</select></div>
+          <div class="field"><label>联系邮箱</label><select data-op-field="email">${renderSelectOptions(profile ? profile.emails : [], f.email)}</select></div>
+          <div class="field full"><label>法定地址</label><select data-op-field="respondentLegalAddress">${renderSelectOptions(profile ? profile.respondentLegalAddress : [], f.respondentLegalAddress)}</select></div>
+          <div class="field full"><label>合同约定地址</label><select data-op-field="respondentDeliveryAddress">${renderSelectOptions(profile ? profile.respondentDeliveryAddress : [], f.respondentDeliveryAddress)}</select></div>
+          <div class="field full"><label>其他地址</label><select data-op-field="respondentOtherAddress">${renderSelectOptions(profile ? profile.respondentOtherAddress : [], f.respondentOtherAddress)}</select></div>
+          <div class="field full"><label>送达地址确认书</label>${renderUploadZone('<input data-op-file type="file" accept=".pdf" multiple />', '支持 PDF，多份确认书可一次上传')}<div class="file-line">${f.files.map(x => x.name).join('；') || '未上传'}</div></div>
+        </div>
+      </div>`
+    }
+    function renderOppositeSummary(item) {
+      return `
+      <div class="summary" data-id="${item.id}">
+        <div class="summary-head">
+          <div class="summary-title">${item.respondentName || '-'}</div>
+          <div>
+            <button class="btn-text" data-op-edit><i class="el-icon-edit"></i> 编辑</button>
+            <button class="btn-text" style="color:#ef4444;" data-op-delete><i class="el-icon-delete"></i> 删除</button>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div>联系电话：${item.phone || '-'}</div>
+          <div>联系邮箱：${item.email || '-'}</div>
+          <div>法定地址：${item.respondentLegalAddress || '-'}</div>
+          <div>合同约定地址：${item.respondentDeliveryAddress || '-'}</div>
+          <div>其他地址：${item.respondentOtherAddress || '-'}</div>
+          <div>送达地址确认书：${(item.files || []).map(f => f.name).join('；') || '-'}</div>
+        </div>
+      </div>`
+    }
+
+    function render() {
+      document.querySelectorAll('.radio').forEach(r => {
+        r.classList.toggle('active', Number(r.dataset.delivery) === state.deliveryType)
+      })
+      document.getElementById('electronicTips').style.display = state.deliveryType === 1 ? 'block' : 'none'
+
+      const actionBox = document.getElementById('myActionBtns')
+      if (state.myAddressEditing || !state.myAddressSaved) {
+        actionBox.innerHTML = `<button class="btn" id="myCancelBtn" ${!state.myAddressSaved ? 'style="display:none;"' : ''}>取消</button> <button class="btn btn-primary" id="mySaveBtn">保存</button>`
+      } else {
+        actionBox.innerHTML = `<button class="btn-text" id="myEditBtn"><i class="el-icon-edit"></i> 编辑</button>`
+      }
+
+      document.getElementById('myAddressBox').innerHTML = state.myAddressEditing || !state.myAddressSaved ? renderMyAddressForm() : renderMyAddressSummary()
+
+      const opList = document.getElementById('oppositeList')
+      let html = ''
+      state.oppositeAddresses.forEach(item => {
+        if (state.oppositeEditingId === item.id) html += renderOppositeForm(item, true)
+        else html += renderOppositeSummary(item)
+      })
+      if (state.oppositeEditingId === '__new__') html += renderOppositeForm(state.oppositeForm, false)
+      opList.innerHTML = html || '<div class="summary">暂无对方送达地址</div>'
+      document.getElementById('addOppositeBtn').style.display = state.oppositeEditingId ? 'none' : 'block'
+      bindEvents()
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.radio').forEach(r => r.onclick = () => {
+        state.deliveryType = Number(r.dataset.delivery); render()
+      })
+      syncInvoiceTypeVisual()
+      document.querySelectorAll('[data-invoice-type]').forEach(item => item.onclick = () => {
+        document.getElementById('invoiceType').value = item.dataset.invoiceType
+        syncInvoiceTypeVisual()
+      })
+      const invoiceName = document.getElementById('invoiceName')
+      if (invoiceName) invoiceName.onchange = e => fillInvoiceByName(e.target.value)
+      const myEditBtn = document.getElementById('myEditBtn')
+      if (myEditBtn) myEditBtn.onclick = () => { state.myAddressEditing = true; state.myAddress = JSON.parse(JSON.stringify(state.myAddressSaved)); render() }
+      const myCancelBtn = document.getElementById('myCancelBtn')
+      if (myCancelBtn) myCancelBtn.onclick = () => { state.myAddressEditing = false; render() }
+      const mySaveBtn = document.getElementById('mySaveBtn')
+      if (mySaveBtn) mySaveBtn.onclick = () => {
+        state.myAddress.litigantName = document.getElementById('my_litigantName').value.trim()
+        state.myAddress.recipientName = document.getElementById('my_recipientName').value.trim()
+        state.myAddress.litigantAddress = document.getElementById('my_litigantAddress').value.trim()
+        state.myAddress.myPhone = document.getElementById('my_phone').value.trim()
+        state.myAddress.myEmail = document.getElementById('my_email').value.trim()
+        if (!state.myAddress.litigantName || !state.myAddress.recipientName || !state.myAddress.litigantAddress) return alert('请填写完整我方送达地址信息')
+        if (!state.myAddress.myPhone || !state.myAddress.myEmail) return alert('请填写联系电话和联系邮箱')
+        state.myAddressSaved = JSON.parse(JSON.stringify(state.myAddress))
+        state.myAddressEditing = false
+        render()
+      }
+      const myFileInput = document.getElementById('my_fileInput')
+      if (myFileInput) myFileInput.onchange = e => {
+        state.myAddress.files.push(...Array.from(e.target.files || []).map(createFile)); render()
+      }
+      document.querySelectorAll('[data-upload-trigger]').forEach(btn => btn.onclick = e => {
+        e.stopPropagation()
+        const input = btn.parentElement.querySelector('input[type="file"]')
+        if (input) input.click()
+      })
+      document.querySelectorAll('[data-upload-zone]').forEach(zone => zone.onclick = e => {
+        if (e.target.closest('[data-upload-trigger]')) return
+        const input = zone.querySelector('input[type="file"]')
+        if (input) input.click()
+      })
+      const myLitigantName = document.getElementById('my_litigantName')
+      if (myLitigantName) myLitigantName.onchange = e => {
+        state.myAddress.litigantName = e.target.value
+        hydrateMyAddressByLitigant(true)
+        render()
+      }
+
+      document.querySelectorAll('[data-op-edit]').forEach(btn => btn.onclick = () => {
+        const id = btn.closest('[data-id]').dataset.id
+        state.oppositeEditingId = id
+        render()
+      })
+      document.querySelectorAll('[data-op-delete]').forEach(btn => btn.onclick = () => {
+        const id = btn.closest('[data-id]').dataset.id
+        state.oppositeAddresses = state.oppositeAddresses.filter(x => x.id !== id)
+        render()
+      })
+      document.getElementById('addOppositeBtn').onclick = () => {
+        // if (!state.myAddressSaved) return alert('请先保存我方送达地址')
+        state.oppositeForm = defaultOpp()
+        state.oppositeForm.respondentName = oppositeProfiles[0]?.respondentName || ''
+        hydrateOppByRespondent(state.oppositeForm, true)
+        state.oppositeEditingId = '__new__'
+        render()
+      }
+      document.querySelectorAll('[data-op-cancel]').forEach(btn => btn.onclick = () => {
+        state.oppositeEditingId = null
+        render()
+      })
+      document.querySelectorAll('[data-op-file]').forEach(input => input.onchange = e => {
+        const target = state.oppositeEditingId === '__new__' ? state.oppositeForm : state.oppositeAddresses.find(x => x.id === state.oppositeEditingId)
+        target.files.push(...Array.from(e.target.files || []).map(createFile))
+        render()
+      })
+      document.querySelectorAll('[data-op-field]').forEach(input => input.onchange = e => {
+        const target = state.oppositeEditingId === '__new__' ? state.oppositeForm : state.oppositeAddresses.find(x => x.id === state.oppositeEditingId)
+        target[input.dataset.opField] = e.target.value
+        if (input.dataset.opField === 'respondentName') {
+          hydrateOppByRespondent(target, true)
+        }
+        render()
+      })
+      document.querySelectorAll('[data-op-save]').forEach(btn => btn.onclick = () => {
+        const target = state.oppositeEditingId === '__new__' ? state.oppositeForm : state.oppositeAddresses.find(x => x.id === state.oppositeEditingId)
+        if (!target.respondentName.trim()) return alert('请填写对方当事人名称')
+        if (!target.phone || !target.respondentLegalAddress) return alert('请至少选择电话和法定地址')
+        if (state.oppositeEditingId === '__new__') state.oppositeAddresses.push(JSON.parse(JSON.stringify(target)))
+        state.oppositeEditingId = null
+        render()
+      })
+    }
+
+    function validateAll(showMsg = true) {
+      if (!state.myAddressSaved) return showMsg && alert('请先保存我方送达地址'), false
+      if (!state.oppositeAddresses.length) return showMsg && alert('请至少添加一条对方送达地址'), false
+      const invoiceName = document.getElementById('invoiceName').value.trim()
+      const invoiceTaxId = document.getElementById('invoiceTaxId').value.trim()
+      const invoicePhone = document.getElementById('invoicePhone').value.trim()
+      if (!invoiceName || !invoiceTaxId || !invoicePhone) return showMsg && alert('请完整填写开票核心信息'), false
+      return true
+    }
+
+    document.getElementById('generateBtn').onclick = () => {
+      if (!state.myAddressSaved || !state.oppositeAddresses.length) return alert('请先填写并保存送达信息')
+      alert('已生成送达地址确认书（静态页示例）')
+    }
+    // document.getElementById('validateBtn').onclick = () => validateAll(true)
+    // document.getElementById('saveBtn').onclick = () => {
+    //   if (!validateAll(true)) return
+    //   alert('校验通过，表单已本地保存（静态页不调用后端）')
+    // }
+    document.getElementById('prevStepBtn').onclick = () => {
+      window.location.href = './Step5CaseInfoConfirmation.html'
+    }
+    document.getElementById('nextStepBtn').onclick = () => {
+      window.location.href = './立案申请.v2(3).html'
+    }
+
+    state.myAddress = {
+      litigantName: '申请人A（本人）',
+      recipientName: '张三',
+      litigantAddress: '广州市天河区示例路1号',
+      myPhone: '13800000000',
+      myEmail: 'demo@example.com',
+      files: []
+    }
+    hydrateMyAddressByLitigant(false)
+    initInvoiceNameOptions()
+    state.myAddressSaved = JSON.parse(JSON.stringify(state.myAddress))
+    state.myAddressEditing = false
+    const demoOpp = defaultOpp()
+    demoOpp.respondentName = oppositeProfiles[0].respondentName
+    hydrateOppByRespondent(demoOpp, true)
+    state.oppositeAddresses = [demoOpp]
+    fillInvoiceByName(invoiceProfiles[0].name)
+    syncInvoiceTypeVisual()
+    render()
+  </script>
+</body>
+</html>

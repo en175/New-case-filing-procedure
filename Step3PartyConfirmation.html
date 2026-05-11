@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第三步：申请人信息</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f8fafc;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .container {
+      max-width: 1500px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 20px;
+    }
+    .hero {
+      background: #1e3a8a;
+      color: #fff;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+    }
+    .hero-title { font-size: 24px; font-weight: 700; }
+    .hero-desc { margin-top: 6px; color: #cbd5e1; font-size: 13px; line-height: 1.5; }
+    .tab-content {
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
+    }
+    .section-container { margin-bottom: 28px; }
+    .section-title {
+      font-size: 20px;
+      line-height: 28px;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 24px;
+      border-radius: 2px;
+      background: #d4b106;
+    }
+    .form-list { display: flex; flex-direction: column; gap: 16px; }
+    .form-card {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #eef2f7;
+      transition: box-shadow .2s;
+    }
+    .form-card:hover { box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a; }
+    .form-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid #ebeef5;
+      background: #fbfcfd;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .avatar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2eefe;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .agent-avator-icon {
+      color: #d4af37;
+      background: #fef9c3;
+    }
+    .header-title { font-weight: 700; font-size: 18px; color: #303133; }
+    .header-tag {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #606266;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .btn-text {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+    }
+    .delete-btn { color: #f56c6c; }
+    .delete-btn:hover { color: #f78989; background: #fff5f5; }
+    .expand-btn { color: #2563eb; background: #ecf5ff; }
+    .expand-btn:hover { background: #d9ecff; }
+    .form-card-body { padding: 16px; background: #fff; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 13px; color: #64748b; }
+    .field input, .field select, .field textarea {
+      border: 1px solid #dbe2ea;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+      width: 100%;
+    }
+    .field textarea { resize: vertical; min-height: 70px; }
+    .required-star { color: #ef4444; margin-right: 4px; }
+    .sub-title {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 8px 0;
+      padding: 10px 12px 10px 18px;
+      background: #f8fafc;
+      border-radius: 8px;
+      position: relative;
+    }
+    .sub-title::before {
+      content: "";
+      width: 6px;
+      height: 18px;
+      border-radius: 999px;
+      background: #2563eb;
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .power-options {
+      display: flex;
+      gap: 26px;
+      align-items: center;
+      margin-top: 2px;
+    }
+    .power-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #111827;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .power-option input { display: none; }
+    .power-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid #d6deea;
+      background: #fff;
+      position: relative;
+      flex: none;
+    }
+    .power-option.active .power-dot {
+      border-color: #1677ff;
+      box-shadow: 0 0 0 1px #dbeafe inset;
+    }
+    .power-option.active .power-dot::after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #1677ff;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+    }
+    .special-auth-box {
+      border: 1px solid #1677ff;
+      border-radius: 10px;
+      min-height: 52px;
+      background: #fff;
+      padding: 8px 42px 8px 8px;
+      position: relative;
+    }
+    .special-auth-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #c2cfdf;
+      font-size: 18px;
+      pointer-events: none;
+    }
+    .special-auth-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .auth-chip {
+      border: 1px solid #e4e8ef;
+      border-radius: 18px;
+      padding: 2px 8px 2px 10px;
+      min-height: 30px;
+      background: #f2f4f7;
+      color: #8b9bb1;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .auth-chip input { display: none; }
+    .auth-chip i {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #d4dbe6;
+      color: #6b7280;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .auth-chip.active {
+      background: #eef2f7;
+      border-color: #d9e1ec;
+      color: #7d8ca3;
+    }
+    .array-row { display: flex; flex-direction: column; gap: 8px; }
+    .array-item {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .array-item input { flex: 1; }
+    .tiny-btn {
+      border: 1px solid #dbe2ea;
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #475569;
+    }
+    .tiny-btn:hover { border-color: #93c5fd; color: #2563eb; }
+    .array-add-btn {
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: left;
+      padding: 0;
+      width: fit-content;
+    }
+    .array-add-btn:disabled { color: #9ca3af; cursor: not-allowed; }
+    .hint { font-size: 12px; color: #6b7280; line-height: 1.5; }
+    .tag-wrap {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #1574f9;
+      background: #e7f5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag i { cursor: pointer; }
+    .upload-panel {
+      grid-column: 1 / -1;
+      background: #fff;
+      border: 1px solid #eef3fa;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .upload-field-title {
+      font-size: 13px;
+      color: #334155;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .upload-dropzone {
+      width: 100%;
+      border: 2px dashed #d9dfe9;
+      border-radius: 16px;
+      background: #fff;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .2s;
+      padding: 24px;
+    }
+    .upload-dropzone:hover {
+      border-color: #b7c7df;
+      background: #fafcff;
+    }
+    .upload-inner {
+      text-align: center;
+    }
+    .upload-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      background: #edf4ff;
+      color: #2f6fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .upload-title {
+      font-size: 20px;
+      color: #111827;
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .upload-subtitle {
+      font-size: 16px;
+      color: #98a1b3;
+      margin-bottom: 14px;
+    }
+    .upload-btn {
+      border: none;
+      background: #153f95;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      padding: 8px 26px;
+      cursor: pointer;
+    }
+    .upload-btn:hover { opacity: 0.92; }
+    .upload-file-list {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .upload-file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: #fff;
+      gap: 10px;
+    }
+    .file-meta {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+    .file-size { font-size: 13px; color: #9ca3af; }
+    .file-actions { display: flex; gap: 16px; }
+    .file-actions i { font-size: 18px; color: #9aa3b2; cursor: pointer; }
+    .file-actions i:hover { color: #3b82f6; }
+    .file-actions .danger:hover { color: #ef4444; }
+    .upload-file-list.images {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .upload-image-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 6px;
+      background: #fff;
+    }
+    .upload-image-preview {
+      width: 100%;
+      height: 106px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f8fafc;
+      border: 1px solid #eef2f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .upload-image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .upload-image-name {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #475569;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .upload-image-actions {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      color: #94a3b8;
+    }
+    .upload-image-actions i { cursor: pointer; font-size: 14px; }
+    .upload-image-actions i:hover { color: #3b82f6; }
+    .upload-image-actions .danger:hover { color: #ef4444; }
+    .add-btn-wrapper {
+      margin-top: 16px;
+      border: 2px dashed #cbd5e1;
+      background: #f0f0f0;
+      border-radius: 12px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 18px;
+      transition: all .2s;
+    }
+    .add-btn-wrapper:hover { border-color: #1e3a8a; background: #fff; color: #1e3a8a; }
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      margin-right: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .save-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .primary-btn {
+      border: 1px solid #1e3a8a;
+      background: #1e3a8a;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .save-tip { font-size: 12px; color: #6b7280; }
+    .step-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .step-nav-btn {
+      min-width: 92px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .step-nav-btn.prev {
+      border: 1px solid #e5edf9;
+      background: #fff;
+      color: #8ea0bf;
+    }
+    .step-nav-btn.prev:hover {
+      border-color: #c6d7f3;
+      color: #6f86ad;
+    }
+    .step-nav-btn.next {
+      border: 1px solid #153f95;
+      background: #153f95;
+      color: #fff;
+    }
+    .step-nav-btn.next:hover { background: #1d4db1; border-color: #1d4db1; }
+    /* @media (max-width: 1200px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .upload-grid { grid-template-columns: 1fr; }
+      .upload-title { font-size: 16px; }
+      .upload-subtitle { font-size: 14px; }
+      .upload-btn { font-size: 16px; }
+      .upload-file-list { grid-template-columns: 1fr; }
+      .upload-file-list.images { grid-template-columns: 1fr; }
+    } */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-title">第三步：申请人信息</div>
+      <div class="hero-desc">本页面内容由 AI 自动提取生成，可能存在错误，仅供您参考。请务必逐条仔细核对后再使用。</div>
+    </div>
+    <div class="tab-content">
+      <div class="section-container">
+        <div class="section-title">申请人信息</div>
+        <div class="form-list" id="applicantList"></div>
+        <div class="add-btn-wrapper" id="addApplicantBtn"><div class="btn-icon"><i class="el-icon-plus"></i></div>添加申请人</div>
+        <div class="save-wrap">
+          <button class="primary-btn" id="saveApplicantBtn">保存申请人</button>
+          <span class="save-tip">如需添加代理人，请先“保存申请人”</span>
+        </div>
+      </div>
+      <div class="section-container">
+        <div class="section-title">代理人信息</div>
+        <div class="form-list" id="agentList"></div>
+        <div class="add-btn-wrapper" id="addAgentBtn"><div class="btn-icon"><i class="el-icon-plus"></i></div>添加代理人</div>
+        <div class="save-wrap"><button class="primary-btn" id="saveAgentBtn">保存代理人</button></div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="step-nav-btn prev" id="prevStepBtn">上一步</button>
+      <button class="step-nav-btn next" id="nextStepBtn">下一步</button>
+    </div>
+  </div>
+
+  <script>
+    const LIMITS = { phonesCountMax: 3, emailsCountMax: 3, addressesCountMax: 3, industryMax: 6 }
+    const nationList = ['中国', '中国香港', '中国澳门', '中国台湾', '美国', '新加坡', '英国', '日本']
+    const idCardTypeList = ['中国居民身份证', '护照', '港澳居民来往内地通行证', '统一社会信用代码']
+    const partyAttrOptions = ['自然人', '企业', '非法人组织', '个体工商户']
+    const orgIdentityTypes = ['多证合一营业执照', '组织机构代码证', '事业单位法人证书']
+    const agentTypeOptions = ['律师', '公民（员工代理）', '公民（近亲属代理）', '公民（社区推荐）']
+    const specialAuthOptions = ['代为提起仲裁请求', '代为参加庭审、进行质证、辩论', '代为签收法律文书', '代为主张、变更、放弃仲裁请求', '代为和解、调解']
+    const registrationMap = {
+      r1: { name: '企业法人', children: ['有限责任公司', '股份有限公司', '国有企业'] },
+      r2: { name: '个体工商', children: ['个体工商户', '个人独资企业'] },
+      r3: { name: '社会组织', children: ['社会团体', '基金会'] }
+    }
+    const industryMap = {
+      i1: { name: '信息技术', children: ['软件开发', '互联网服务', '人工智能'] },
+      i2: { name: '建筑工程', children: ['建筑施工', '工程咨询', '设计服务'] },
+      i3: { name: '商贸服务', children: ['批发零售', '物流运输', '商务服务'] }
+    }
+    const applicantProfiles = [
+      { id: 'ap1', name: '张三', nature: '自然人', nationality: '中国', idCardType: '中国居民身份证', idCardNo: '440101199001011234', mobileList: ['13800000000'], emailList: ['zhangsan@example.com'], address: ['广州市天河区体育西路100号'], otherAddress: ['广州市天河区体育西路100号'] },
+      { id: 'ap2', name: '广州某科技有限公司', nature: '企业', nationality: '中国', orgName: '广州某科技有限公司', identityType: '多证合一营业执照', identityNo: '91440101MA5XXXXX9X', deptAddress: ['广州市黄埔区科学大道88号'], mobileList: ['020-88886666'], emailList: ['service@demo.com'], corporationName: '李四', corporationPosition: '法定代表人', corporationNationality: '中国', corporationIdCardType: '中国居民身份证', corporationIdCardNo: '440101198909091234', corporationTelephone: '13900000000', corporationEmail: 'legal@demo.com', otherAddress: ['广州市黄埔区科学大道88号'] }
+    ]
+    const agentProfiles = [
+      { id: 'ag1', type: '律师', name: '王律师', nationality: '中国', company: '广东示例律师事务所', lawyerNo: '440120001234', identityType: '中国居民身份证', identityNo: '440101198808081234', mobileList: ['13600000000'], emailList: ['lawyer@example.com'], contactAddress: '广州市越秀区中山路1号', principals: [] },
+      { id: 'ag2', type: '公民（员工代理）', name: '赵员工', nationality: '中国', company: '广州某科技有限公司', identityType: '中国居民身份证', identityNo: '440101199505051234', mobileList: ['13700000000'], emailList: ['employee@example.com'], contactAddress: '广州市天河区科韵路12号', principals: [] }
+    ]
+    const imageUploadFields = new Set(['idFrontFiles', 'idBackFiles', 'legalIdFrontFiles', 'legalIdBackFiles', 'idCardFileList', 'relativesRelationshipFileList'])
+
+    function uid() {
+      return `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+    }
+    function createFileRecord(file) {
+      return { id: uid(), name: file.name, size: file.size, type: file.type, raw: file, objectURL: URL.createObjectURL(file) }
+    }
+    function formatSize(size) {
+      if (!size) return '0 B'
+      const k = 1024
+      const units = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(size) / Math.log(k))
+      return `${(size / Math.pow(k, i)).toFixed(2)} ${units[i]}`
+    }
+    function esc(str = '') {
+      return String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]))
+    }
+    function previewFile(file) {
+      if (!file || !file.objectURL) return
+      window.open(file.objectURL, '_blank')
+    }
+    function downloadFile(file) {
+      if (!file || !file.objectURL) return
+      const a = document.createElement('a')
+      a.href = file.objectURL
+      a.download = file.name
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+    function createApplicant() {
+      return {
+        id: uid(),
+        expanded: true,
+        saved: false,
+        quickFillId: '',
+        nature: '自然人',
+        nationality: '中国',
+        name: '',
+        idCardType: '中国居民身份证',
+        idCardNo: '',
+        orgName: '',
+        identityType: '多证合一营业执照',
+        identityNo: '',
+        mobileList: [''],
+        emailList: [''],
+        address: [''],
+        deptAddress: [''],
+        otherAddressType: '有',
+        otherAddress: [''],
+        registrationFType: '',
+        registrationSType: '',
+        industryFirst: '',
+        industrySelected: '',
+        industryClassification: [],
+        corporationNationality: '中国',
+        corporationName: '',
+        corporationPosition: '',
+        corporationIdCardType: '中国居民身份证',
+        corporationIdCardNo: '',
+        corporationTelephone: '',
+        corporationEmail: '',
+        idFrontFiles: [],
+        idBackFiles: [],
+        bizLicenses: [],
+        legalIdFrontFiles: [],
+        legalIdBackFiles: [],
+        legalProofFiles: []
+      }
+    }
+    function createAgent() {
+      return {
+        id: uid(),
+        expanded: true,
+        saved: false,
+        quickFillId: '',
+        type: '律师',
+        nationality: '中国',
+        name: '',
+        lawyerNo: '',
+        company: '',
+        identityType: '中国居民身份证',
+        identityNo: '',
+        principalRelationship: '',
+        recommendedUnit: '',
+        mobileList: [''],
+        emailList: [''],
+        contactAddress: '',
+        power: '特别授权',
+        powerDetail: [...specialAuthOptions],
+        principals: [],
+        authLetterFileList: [],
+        letterFileList: [],
+        lawyerFileList: [],
+        idCardFileList: [],
+        companyCertificateFileList: [],
+        relativesRelationshipFileList: [],
+        recommendationFileList: []
+      }
+    }
+
+    const state = {
+      applicants: [createApplicant()],
+      agents: []
+    }
+
+    function renderSelectOptions(list, value) {
+      return list.map(item => `<option value="${esc(item)}" ${item === value ? 'selected' : ''}>${esc(item)}</option>`).join('')
+    }
+    function renderQuickFillSelect(profiles, selected, kind, natureOrType) {
+      const filtered = profiles.filter(p => kind === 'applicant' ? p.nature === natureOrType : p.type === natureOrType || !p.type)
+      return `<select data-field="quickFillId"><option value="">请选择</option>${filtered.map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${esc(p.name)}（静态）</option>`).join('')}</select>`
+    }
+    function renderArrayField(item, field, label, placeholder, max = 3) {
+      const arr = item[field] || ['']
+      return `
+        <div class="field full">
+          <label>${label}</label>
+          <div class="array-row">
+            ${arr.map((v, i) => `
+              <div class="array-item">
+                <input data-array-field="${field}" data-array-index="${i}" value="${esc(v)}" placeholder="${esc(placeholder)}" />
+                ${arr.length > 1 ? `<button class="tiny-btn" data-array-remove="${field}" data-array-index="${i}">删除</button>` : ''}
+              </div>
+            `).join('')}
+            <button class="array-add-btn" data-array-add="${field}" ${arr.length >= max ? 'disabled' : ''}>+ 添加</button>
+          </div>
+        </div>`
+    }
+    function renderUploadField(kind, itemId, field, title, extHint, files) {
+      const isImageField = imageUploadFields.has(field)
+      const hintText = isImageField ? '支持 jpg、jpeg、png，最大50M' : extHint
+      const safeFiles = Array.isArray(files) ? files : []
+      const filesHtml = safeFiles.length ? (isImageField ? `
+        <div class="upload-file-list images">
+          ${safeFiles.map(f => `
+            <div class="upload-image-item">
+              <div class="upload-image-preview">
+                <img src="${f.objectURL}" alt="${esc(f.name)}" />
+              </div>
+              <div class="upload-image-name" title="${esc(f.name)}">${esc(f.name)}</div>
+              <div class="upload-image-actions">
+                <i class="el-icon-view" data-file-action="preview" data-kind="${kind}" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-download" data-file-action="download" data-kind="${kind}" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-delete danger" data-file-action="remove" data-kind="${kind}" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div class="upload-file-list docs">
+          ${safeFiles.map(f => `
+            <div class="upload-file-item">
+              <div class="file-meta">
+                <i class="el-icon-document" style="color:#3b82f6;"></i>
+                <div style="min-width:0;flex:1;">
+                  <div class="file-name" title="${esc(f.name)}">${esc(f.name)}</div>
+                  <div class="file-size">${formatSize(f.size)}</div>
+                </div>
+              </div>
+              <div class="file-actions">
+                <i class="el-icon-view" data-file-action="preview" data-kind="${kind}" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-download" data-file-action="download" data-kind="${kind}" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+                <i class="el-icon-delete danger" data-file-action="remove" data-kind="${kind}" data-id="${itemId}" data-field="${field}" data-file-id="${f.id}"></i>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `) : ''
+      return `
+        <div>
+          <div class="upload-field-title">${title}</div>
+          <div class="upload-dropzone" data-upload-dropzone data-kind="${kind}" data-id="${itemId}" data-field="${field}">
+            <div class="upload-inner">
+              <div class="upload-circle"><i class="el-icon-upload2"></i></div>
+              <div class="upload-title">点击或拖拽上传</div>
+              <div class="upload-subtitle">${hintText}</div>
+              <button type="button" class="upload-btn" data-upload-trigger data-kind="${kind}" data-id="${itemId}" data-field="${field}">选择文件</button>
+              <input type="file" data-upload-input data-kind="${kind}" data-id="${itemId}" data-field="${field}" style="display:none;" accept="${isImageField ? '.jpg,.jpeg,.png' : '.pdf'}" multiple />
+            </div>
+          </div>
+          ${filesHtml}
+        </div>`
+    }
+    function getRegistrationSecondOptions(item) {
+      const cfg = registrationMap[item.registrationFType]
+      return cfg ? cfg.children : []
+    }
+    function getIndustrySecondOptions(item) {
+      const cfg = industryMap[item.industryFirst]
+      return cfg ? cfg.children : []
+    }
+    function getItem(kind, id) {
+      return (kind === 'applicant' ? state.applicants : state.agents).find(x => x.id === id)
+    }
+
+    function renderApplicantBody(item) {
+      const isNatural = item.nature === '自然人'
+      const registrationFirst = Object.keys(registrationMap).map(k => ({ value: k, label: registrationMap[k].name }))
+      const industryFirst = Object.keys(industryMap).map(k => ({ value: k, label: industryMap[k].name }))
+      const registrationSecond = getRegistrationSecondOptions(item)
+      const industrySecond = getIndustrySecondOptions(item)
+      return `
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="sub-title">基本信息</div>
+            <div class="field full">
+              <label>快速填写信息</label>
+              ${renderQuickFillSelect(applicantProfiles, item.quickFillId, 'applicant', item.nature)}
+            </div>
+            <div class="field">
+              <label>申请人属性</label>
+              <select data-field="nature">${renderSelectOptions(partyAttrOptions, item.nature)}</select>
+            </div>
+            <div class="field">
+              <label>国籍/地区</label>
+              <select data-field="nationality">${renderSelectOptions(nationList, item.nationality)}</select>
+            </div>
+            ${isNatural ? `
+              <div class="field"><label>姓名</label><input data-field="name" value="${esc(item.name)}" placeholder="请输入姓名" /></div>
+              <div class="field"><label>证件类型</label><select data-field="idCardType">${renderSelectOptions(idCardTypeList, item.idCardType)}</select></div>
+              <div class="field"><label>证件号</label><input data-field="idCardNo" value="${esc(item.idCardNo)}" placeholder="请输入证件号" /></div>
+              ${renderArrayField(item, 'address', '法定地址（可添加多条）', '请输入法定地址')}
+              <div class="sub-title">联系方式</div>
+              ${renderArrayField(item, 'mobileList', '手机号（可添加多条）', '请输入手机号')}
+              ${renderArrayField(item, 'emailList', '联系邮箱（可添加多条）', '请输入邮箱')}
+              <div class="field">
+                <label>送达地址</label>
+                <select data-field="otherAddressType">${renderSelectOptions(['有', '无'], item.otherAddressType)}</select>
+              </div>
+              ${item.otherAddressType === '有' ? renderArrayField(item, 'otherAddress', '送达地址明细（可添加多条）', '请输入送达地址') : ''}
+              <div class="sub-title">证件上传</div>
+              <div class="upload-panel">
+                <div class="upload-grid">
+                  ${renderUploadField('applicant', item.id, 'idFrontFiles', '身份证人像面', '支持 PDF', item.idFrontFiles)}
+                  ${renderUploadField('applicant', item.id, 'idBackFiles', '身份证国徽面', '支持 PDF', item.idBackFiles)}
+                </div>
+              </div>
+            ` : `
+              <div class="field"><label>企业名称</label><input data-field="orgName" value="${esc(item.orgName)}" placeholder="请输入企业名称" /></div>
+              <div class="field"><label>企业证件类型</label><select data-field="identityType">${renderSelectOptions(orgIdentityTypes, item.identityType)}</select></div>
+              <div class="field"><label>企业证件号码</label><input data-field="identityNo" value="${esc(item.identityNo)}" placeholder="请输入企业证件号码" /></div>
+              ${renderArrayField(item, 'deptAddress', '注册地址（可添加多条）', '请输入注册地址')}
+              ${renderArrayField(item, 'mobileList', '联系电话（可添加多条）', '请输入联系电话')}
+              ${renderArrayField(item, 'emailList', '联系邮箱（可添加多条）', '请输入邮箱')}
+              <div class="field">
+                <label>登记注册类型（一级）</label>
+                <select data-field="registrationFType">
+                  <option value="">请选择一级分类</option>
+                  ${registrationFirst.map(x => `<option value="${x.value}" ${x.value === item.registrationFType ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field">
+                <label>登记注册类型（二级）</label>
+                <select data-field="registrationSType">
+                  <option value="">请选择二级分类</option>
+                  ${registrationSecond.map(x => `<option value="${esc(x)}" ${x === item.registrationSType ? 'selected' : ''}>${esc(x)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field">
+                <label>行业分类（一级）</label>
+                <select data-field="industryFirst">
+                  <option value="">请选择一级分类</option>
+                  ${industryFirst.map(x => `<option value="${x.value}" ${x.value === item.industryFirst ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field">
+                <label>行业分类（二级）</label>
+                <div style="display:flex;gap:8px;">
+                  <select data-field="industrySelected" style="flex:1;">
+                    <option value="">请选择二级分类</option>
+                    ${industrySecond.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('')}
+                  </select>
+                  <button class="tiny-btn" data-action="addIndustry">添加</button>
+                </div>
+                <div class="hint">行业分类可多选，最多6个</div>
+                <div class="tag-wrap">${item.industryClassification.map((tag, i) => `<span class="tag">${esc(tag)}<i class="el-icon-close" data-action="removeIndustry" data-industry-index="${i}"></i></span>`).join('')}</div>
+              </div>
+              <div class="field">
+                <label>送达地址</label>
+                <select data-field="otherAddressType">${renderSelectOptions(['有', '无'], item.otherAddressType)}</select>
+              </div>
+              ${item.otherAddressType === '有' ? renderArrayField(item, 'otherAddress', '送达地址明细（可添加多条）', '请输入送达地址') : ''}
+              <div class="sub-title">证件上传</div>
+              <div class="upload-panel">
+                <div class="upload-grid">
+                  ${renderUploadField('applicant', item.id, 'bizLicenses', '企业证件（营业执照）', '支持 PDF', item.bizLicenses)}
+                </div>
+              </div>
+              <div class="sub-title">企业法人代表信息</div>
+              <div class="field"><label>法定代表人国籍/地区</label><select data-field="corporationNationality">${renderSelectOptions(nationList, item.corporationNationality)}</select></div>
+              <div class="field"><label>法定代表人姓名</label><input data-field="corporationName" value="${esc(item.corporationName)}" placeholder="请输入法定代表人姓名" /></div>
+              <div class="field"><label>法定代表人职务</label><input data-field="corporationPosition" value="${esc(item.corporationPosition)}" placeholder="请输入法定代表人职务" /></div>
+              <div class="field"><label>法定代表人证件类型</label><select data-field="corporationIdCardType">${renderSelectOptions(idCardTypeList, item.corporationIdCardType)}</select></div>
+              <div class="field"><label>法定代表人证件号码</label><input data-field="corporationIdCardNo" value="${esc(item.corporationIdCardNo)}" placeholder="请输入法定代表人证件号码" /></div>
+              <div class="field"><label>联系邮箱</label><input data-field="corporationEmail" value="${esc(item.corporationEmail)}" placeholder="请输入联系邮箱" /></div>
+              <div class="field"><label>手机号码</label><input data-field="corporationTelephone" value="${esc(item.corporationTelephone)}" placeholder="请输入手机号码" /></div>
+              <div class="upload-panel">
+                <div class="upload-grid">
+                  ${renderUploadField('applicant', item.id, 'legalIdFrontFiles', '法定代表人身份证人像面', '支持 PDF', item.legalIdFrontFiles)}
+                  ${renderUploadField('applicant', item.id, 'legalIdBackFiles', '法定代表人身份证国徽面', '支持 PDF', item.legalIdBackFiles)}
+                  ${renderUploadField('applicant', item.id, 'legalProofFiles', '法定代表人身份证明书', '支持 PDF', item.legalProofFiles)}
+                </div>
+              </div>
+            `}
+          </div>
+        </div>`
+    }
+
+    function renderAgentBody(item) {
+      const showLawyer = item.type === '律师'
+      const showEmployee = item.type === '公民（员工代理）'
+      const showRelative = item.type === '公民（近亲属代理）'
+      const showCommunity = !showLawyer && !showEmployee && !showRelative
+      const principalOptions = state.applicants.filter(a => a.saved && (a.name || a.orgName)).map(a => ({ value: a.id, label: a.name || a.orgName }))
+      return `
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="sub-title">基本信息</div>
+            <div class="field full">
+              <label>快速填写信息</label>
+              ${renderQuickFillSelect(agentProfiles, item.quickFillId, 'agent', item.type)}
+            </div>
+            <div class="field"><label>代理人类型</label><select data-field="type">${renderSelectOptions(agentTypeOptions, item.type)}</select></div>
+            <div class="field"><label>国籍/地区</label><select data-field="nationality">${renderSelectOptions(nationList, item.nationality)}</select></div>
+            <div class="field"><label>代理人姓名</label><input data-field="name" value="${esc(item.name)}" placeholder="请输入代理人姓名" /></div>
+            ${showLawyer ? `<div class="field"><label>律师证号</label><input data-field="lawyerNo" value="${esc(item.lawyerNo)}" placeholder="请输入律师证号" /></div>` : ''}
+            <div class="field"><label>工作单位</label><input data-field="company" value="${esc(item.company)}" placeholder="请输入工作单位" /></div>
+            <div class="field"><label>证件类型</label><select data-field="identityType">${renderSelectOptions(idCardTypeList, item.identityType)}</select></div>
+            <div class="field full"><label>证件号码</label><input data-field="identityNo" value="${esc(item.identityNo)}" placeholder="请输入证件号码" /></div>
+            ${showRelative ? `<div class="field"><label>与委托人关系</label><input data-field="principalRelationship" value="${esc(item.principalRelationship)}" placeholder="请输入与委托人关系" /></div>` : ''}
+            ${showCommunity ? `<div class="field"><label>推荐单位</label><input data-field="recommendedUnit" value="${esc(item.recommendedUnit)}" placeholder="请输入推荐单位" /></div>` : ''}
+            <div class="sub-title">联系方式</div>
+            ${renderArrayField(item, 'mobileList', '手机号（可添加多条）', '请输入手机号')}
+            ${renderArrayField(item, 'emailList', '联系邮箱（可添加多条）', '请输入邮箱')}
+            <div class="field full"><label>联系地址</label><input data-field="contactAddress" value="${esc(item.contactAddress)}" placeholder="请输入联系地址" /></div>
+            <div class="sub-title">代理权限</div>
+            <div class="field full">
+              <label><span class="required-star">*</span>代理权限</label>
+              <div class="power-options">
+                <label class="power-option ${item.power === '一般授权' ? 'active' : ''}">
+                  <input type="radio" name="power_${item.id}" data-agent-power value="一般授权" ${item.power === '一般授权' ? 'checked' : ''} />
+                  <span class="power-dot"></span>
+                  <span>一般授权</span>
+                </label>
+                <label class="power-option ${item.power === '特别授权' ? 'active' : ''}">
+                  <input type="radio" name="power_${item.id}" data-agent-power value="特别授权" ${item.power === '特别授权' ? 'checked' : ''} />
+                  <span class="power-dot"></span>
+                  <span>特别授权</span>
+                </label>
+              </div>
+            </div>
+            ${item.power === '特别授权' ? `
+              <div class="field full">
+                <label>特别授权事项（可多选）</label>
+                <div class="special-auth-box">
+                  <div class="special-auth-tags">
+                  ${specialAuthOptions.map(opt => `
+                    <label class="auth-chip ${item.powerDetail.includes(opt) ? 'active' : ''}">
+                      <input type="checkbox" data-special-auth="${esc(opt)}" ${item.powerDetail.includes(opt) ? 'checked' : ''} />
+                      <span>${esc(opt)}</span>
+                      <i class="el-icon-close"></i>
+                    </label>
+                  `).join('')}
+                  </div>
+                  <i class="el-icon-arrow-down special-auth-arrow"></i>
+                </div>
+              </div>
+            ` : ''}
+            <div class="field full">
+              <label>委托人（申请人）</label>
+              <select data-field="principals" multiple style="min-height:110px;">
+                ${principalOptions.map(p => `<option value="${p.value}" ${item.principals.includes(p.value) ? 'selected' : ''}>${esc(p.label)}</option>`).join('')}
+              </select>
+              <div class="hint">仅显示已保存的申请人</div>
+            </div>
+            <div class="sub-title">证明材料</div>
+            <div class="upload-panel">
+              <div class="upload-grid">
+                ${(showLawyer || showEmployee || showRelative) ? renderUploadField('agent', item.id, 'authLetterFileList', '授权委托书', '支持 PDF', item.authLetterFileList) : ''}
+                ${showLawyer ? renderUploadField('agent', item.id, 'letterFileList', '所函', '支持 PDF', item.letterFileList) : ''}
+                ${showLawyer ? renderUploadField('agent', item.id, 'lawyerFileList', '律师证复印件', '支持 PDF', item.lawyerFileList) : ''}
+                ${showEmployee ? renderUploadField('agent', item.id, 'idCardFileList', '身份证复印件', '支持 PDF', item.idCardFileList) : ''}
+                ${showEmployee ? renderUploadField('agent', item.id, 'companyCertificateFileList', '工作证明（劳动合同/员工证明/社保）', '支持 PDF', item.companyCertificateFileList) : ''}
+                ${showRelative ? renderUploadField('agent', item.id, 'idCardFileList', '身份证复印件', '支持 PDF', item.idCardFileList) : ''}
+                ${showRelative ? renderUploadField('agent', item.id, 'relativesRelationshipFileList', '亲属证明（结婚证/户口本等）', '支持 PDF', item.relativesRelationshipFileList) : ''}
+                ${showCommunity ? renderUploadField('agent', item.id, 'recommendationFileList', '推荐信附件', '支持 PDF', item.recommendationFileList) : ''}
+                ${showCommunity ? renderUploadField('agent', item.id, 'idCardFileList', '身份证复印件', '支持 PDF', item.idCardFileList) : ''}
+              </div>
+            </div>
+          </div>
+        </div>`
+    }
+
+    function renderCard(item, idx, kind) {
+      const isAgent = kind === 'agent'
+      const role = isAgent ? '代理人' : '申请人'
+      const avatorClass = isAgent ? 'avatar-icon agent-avator-icon' : 'avatar-icon'
+      const tagText = isAgent ? item.type : item.nature
+      return `
+        <div class="form-card" data-kind="${kind}" data-id="${item.id}">
+          <div class="form-card-header">
+            <div class="header-left">
+              <div class="${avatorClass}"><i class="el-icon-user"></i></div>
+              <div>
+                <div class="header-title">${role} ${idx + 1}</div>
+                <div class="header-tag">${esc(tagText)}</div>
+              </div>
+            </div>
+            <div class="header-right">
+              <button class="btn-text delete-btn" data-action="delete"><i class="el-icon-delete"></i>删除</button>
+              <button class="btn-text expand-btn" data-action="toggle"><i class="${item.expanded ? 'el-icon-arrow-up' : 'el-icon-arrow-down'}"></i>${item.expanded ? '收起' : '展开'}</button>
+            </div>
+          </div>
+          ${item.expanded ? (isAgent ? renderAgentBody(item) : renderApplicantBody(item)) : ''}
+        </div>`
+    }
+
+    function render() {
+      document.getElementById('applicantList').innerHTML = state.applicants.map((item, idx) => renderCard(item, idx, 'applicant')).join('')
+      document.getElementById('agentList').innerHTML = state.agents.map((item, idx) => renderCard(item, idx, 'agent')).join('')
+      bindCardEvents()
+    }
+
+    function bindCardEvents() {
+      document.querySelectorAll('.form-card').forEach(card => {
+        const kind = card.dataset.kind
+        const item = getItem(kind, card.dataset.id)
+        card.querySelector('[data-action="delete"]').onclick = () => {
+          const list = kind === 'applicant' ? state.applicants : state.agents
+          if (kind === 'applicant' && list.length <= 1) return alert('至少保留一个申请人')
+          const idx = list.findIndex(x => x.id === item.id)
+          list.splice(idx, 1)
+          render()
+        }
+        card.querySelector('[data-action="toggle"]').onclick = () => {
+          item.expanded = !item.expanded
+          render()
+        }
+
+        card.querySelectorAll('[data-field]:not([data-upload-input])').forEach(el => {
+          const field = el.dataset.field
+          if (field === 'principals') {
+            el.onchange = () => {
+              item.principals = Array.from(el.selectedOptions).map(op => op.value)
+              item.saved = false
+            }
+            return
+          }
+          el.onchange = () => {
+            item[field] = el.value
+            item.saved = false
+            if (kind === 'applicant' && field === 'nature') {
+              const keep = { id: item.id, expanded: true, saved: false }
+              Object.assign(item, createApplicant(), keep, { nature: item.nature, nationality: '中国' })
+              render()
+              return
+            }
+            if (kind === 'agent' && field === 'type') {
+              const keep = { id: item.id, expanded: true, saved: false }
+              Object.assign(item, createAgent(), keep, { type: item.type })
+              render()
+              return
+            }
+            if (kind === 'applicant' && field === 'registrationFType') {
+              item.registrationSType = ''
+              render()
+              return
+            }
+            if (kind === 'applicant' && field === 'industryFirst') {
+              item.industrySelected = ''
+              render()
+              return
+            }
+            if (kind === 'agent' && field === 'power') {
+              render()
+              return
+            }
+          }
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.oninput = () => { item[field] = el.value; item.saved = false }
+          }
+        })
+
+        card.querySelectorAll('[data-array-input]').forEach(el => {
+          const field = el.dataset.arrayField
+          const index = Number(el.dataset.arrayIndex)
+          el.oninput = () => {
+            item[field][index] = el.value
+            item.saved = false
+          }
+        })
+        card.querySelectorAll('[data-array-add]').forEach(btn => {
+          const field = btn.dataset.arrayAdd
+          btn.onclick = () => {
+            const arr = item[field] || (item[field] = [''])
+            const max = field.includes('email') ? LIMITS.emailsCountMax : LIMITS.addressesCountMax
+            if (arr.length >= max) return
+            arr.push('')
+            item.saved = false
+            render()
+          }
+        })
+        card.querySelectorAll('[data-array-remove]').forEach(btn => {
+          const field = btn.dataset.arrayRemove
+          const index = Number(btn.dataset.arrayIndex)
+          btn.onclick = () => {
+            const arr = item[field]
+            if (!arr || arr.length <= 1) return
+            arr.splice(index, 1)
+            item.saved = false
+            render()
+          }
+        })
+        card.querySelectorAll('[data-action="addIndustry"]').forEach(btn => {
+          btn.onclick = e => {
+            e.preventDefault()
+            const value = item.industrySelected
+            if (!value) return
+            if (item.industryClassification.includes(value)) return
+            if (item.industryClassification.length >= LIMITS.industryMax) return alert('最多只能选择6个行业分类')
+            item.industryClassification.push(value)
+            item.industrySelected = ''
+            render()
+          }
+        })
+        card.querySelectorAll('[data-action="removeIndustry"]').forEach(icon => {
+          icon.onclick = () => {
+            const idx = Number(icon.dataset.industryIndex)
+            item.industryClassification.splice(idx, 1)
+            render()
+          }
+        })
+        card.querySelectorAll('[data-special-auth]').forEach(ck => {
+          ck.onchange = () => {
+            const val = ck.dataset.specialAuth
+            if (ck.checked) {
+              if (!item.powerDetail.includes(val)) item.powerDetail.push(val)
+            } else {
+              item.powerDetail = item.powerDetail.filter(x => x !== val)
+            }
+            item.saved = false
+            render()
+          }
+        })
+        card.querySelectorAll('[data-agent-power]').forEach(radio => {
+          radio.onchange = () => {
+            item.power = radio.value
+            item.saved = false
+            if (item.power === '一般授权') item.powerDetail = []
+            if (item.power === '特别授权' && !item.powerDetail.length) item.powerDetail = [...specialAuthOptions]
+            render()
+          }
+        })
+        card.querySelectorAll('[data-upload-trigger]').forEach(btn => {
+          btn.onclick = e => {
+            e.stopPropagation()
+            const input = card.querySelector(`[data-upload-input][data-field="${btn.dataset.field}"]`)
+            if (input) input.click()
+          }
+        })
+        card.querySelectorAll('[data-upload-dropzone]').forEach(zone => {
+          zone.onclick = e => {
+            if (e.target.closest('[data-upload-trigger]')) return
+            const input = card.querySelector(`[data-upload-input][data-field="${zone.dataset.field}"]`)
+            if (input) input.click()
+          }
+        })
+        card.querySelectorAll('[data-upload-input]').forEach(input => {
+          input.onchange = e => {
+            const field = input.dataset.field
+            const files = Array.from(e.target.files || []).map(createFileRecord)
+            const currentItem = getItem(input.dataset.kind, input.dataset.id)
+            if (!currentItem) return
+            if (!Array.isArray(currentItem[field])) currentItem[field] = []
+            currentItem[field].push(...files)
+            currentItem.saved = false
+            input.value = ''
+            render()
+          }
+        })
+      })
+
+      document.querySelectorAll('[data-file-action]').forEach(icon => {
+        icon.onclick = e => {
+          e.stopPropagation()
+          const kind = icon.dataset.kind
+          const item = getItem(kind, icon.dataset.id)
+          if (!item) return
+          const field = icon.dataset.field
+          const fileList = Array.isArray(item[field]) ? item[field] : []
+          const file = fileList.find(f => f.id === icon.dataset.fileId)
+          if (!file) return
+          const action = icon.dataset.fileAction
+          if (action === 'preview') previewFile(file)
+          if (action === 'download') downloadFile(file)
+          if (action === 'remove') {
+            if (file.objectURL) URL.revokeObjectURL(file.objectURL)
+            item[field] = fileList.filter(f => f.id !== file.id)
+            item.saved = false
+            render()
+          }
+        }
+      })
+    }
+
+    function applyQuickFillApplicant(item) {
+      if (!item.quickFillId) return
+      const data = applicantProfiles.find(p => p.id === item.quickFillId)
+      if (!data) return
+      const keep = { id: item.id, expanded: true, saved: false }
+      const next = createApplicant()
+      Object.assign(item, next, keep, JSON.parse(JSON.stringify(data)))
+      if (!item.mobileList || !item.mobileList.length) item.mobileList = ['']
+      if (!item.emailList || !item.emailList.length) item.emailList = ['']
+      if (!item.otherAddress || !item.otherAddress.length) item.otherAddress = ['']
+    }
+    function applyQuickFillAgent(item) {
+      if (!item.quickFillId) return
+      const data = agentProfiles.find(p => p.id === item.quickFillId)
+      if (!data) return
+      const keep = { id: item.id, expanded: true, saved: false }
+      const next = createAgent()
+      Object.assign(item, next, keep, JSON.parse(JSON.stringify(data)))
+      item.principals = state.applicants.filter(a => a.saved).map(a => a.id)
+      if (!item.mobileList || !item.mobileList.length) item.mobileList = ['']
+      if (!item.emailList || !item.emailList.length) item.emailList = ['']
+    }
+
+    document.addEventListener('change', e => {
+      const target = e.target
+      if (!target.matches('select[data-field="quickFillId"]')) return
+      const card = target.closest('.form-card')
+      if (!card) return
+      const kind = card.dataset.kind
+      const item = getItem(kind, card.dataset.id)
+      item.quickFillId = target.value
+      if (kind === 'applicant') applyQuickFillApplicant(item)
+      else applyQuickFillAgent(item)
+      render()
+    })
+
+    document.addEventListener('input', e => {
+      const target = e.target
+      if (!target.matches('[data-array-field][data-array-index]')) return
+      const card = target.closest('.form-card')
+      const item = getItem(card.dataset.kind, card.dataset.id)
+      const field = target.dataset.arrayField
+      const idx = Number(target.dataset.arrayIndex)
+      item[field][idx] = target.value
+      item.saved = false
+    })
+
+    document.getElementById('addApplicantBtn').onclick = () => {
+      state.applicants.push(createApplicant())
+      render()
+    }
+    document.getElementById('addAgentBtn').onclick = () => {
+      state.agents.push(createAgent())
+      render()
+    }
+    document.getElementById('saveApplicantBtn').onclick = () => {
+      state.applicants.forEach(a => a.saved = true)
+      alert('申请人保存成功（静态页，本地保存）')
+      render()
+    }
+    document.getElementById('saveAgentBtn').onclick = () => {
+      state.agents.forEach(a => a.saved = true)
+      alert('代理人保存成功（静态页，本地保存）')
+      render()
+    }
+    document.getElementById('prevStepBtn').onclick = () => {
+      window.location.href = './Step2SmartExtraction.html'
+    }
+    document.getElementById('nextStepBtn').onclick = () => {
+      window.location.href = './Step4RespondentConfirmation.html'
+    }
+
+    render()
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="AI assistant logo">
+  <defs>
+    <linearGradient id="bg" x1="42" y1="28" x2="218" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7FBFF"/>
+      <stop offset=".44" stop-color="#DDEBFF"/>
+      <stop offset="1" stop-color="#ABC5FF"/>
+    </linearGradient>
+    <linearGradient id="core" x1="74" y1="55" x2="184" y2="196" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#62A8FF"/>
+      <stop offset=".48" stop-color="#316CFF"/>
+      <stop offset="1" stop-color="#1739B7"/>
+    </linearGradient>
+    <linearGradient id="line" x1="68" y1="80" x2="188" y2="184" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DDF7FF"/>
+      <stop offset=".55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#B8C8FF"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1E4ED8" flood-opacity=".25"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0F172A" flood-opacity=".16"/>
+    </filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" rx="72" fill="url(#bg)"/>
+  <path d="M60 78c0-18.8 15.2-34 34-34h68c18.8 0 34 15.2 34 34v62c0 18.8-15.2 34-34 34h-21.2l-38.4 28.8c-7.9 5.9-19.2.3-19.2-9.6V174H94c-18.8 0-34-15.2-34-34V78Z" fill="url(#core)" filter="url(#shadow)"/>
+  <path d="M78 82c0-11 9-20 20-20h60c11 0 20 9 20 20v52c0 11-9 20-20 20h-60c-11 0-20-9-20-20V82Z" fill="rgba(255,255,255,.11)" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
+  <g fill="none" stroke="url(#line)" stroke-width="8" stroke-linecap="round" filter="url(#glow)">
+    <path d="M91 119c9.2-20.5 20.9-31 35-31s25.8 10.5 35 31"/>
+    <path d="M94 121c9 15.3 19.7 23 32 23s23-7.7 32-23"/>
+    <path d="M126 88v56"/>
+  </g>
+  <g fill="#FFFFFF">
+    <circle cx="102" cy="112" r="7"/>
+    <circle cx="150" cy="112" r="7"/>
+  </g>
+  <g stroke="#9EEBFF" stroke-width="5" stroke-linecap="round">
+    <path d="M48 100H31"/>
+    <path d="M48 132H31"/>
+    <path d="M208 100h17"/>
+    <path d="M208 132h17"/>
+    <path d="M102 35V20"/>
+    <path d="M154 35V20"/>
+  </g>
+  <circle cx="58" cy="55" r="5" fill="#FFFFFF" opacity=".86"/>
+  <circle cx="201" cy="190" r="7" fill="#FFFFFF" opacity=".58"/>
+  <circle cx="214" cy="67" r="4" fill="#4A7DFF" opacity=".38"/>
+</svg>
