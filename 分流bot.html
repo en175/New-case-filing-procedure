@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能立案助手</title>
+    <link rel="icon" href="data:,">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./assets/filing-bot/filing-bot.css">
+    <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+</head>
+<body class="h-screen w-screen bg-gray-100">
+<div id="app" class="relative h-full w-full overflow-hidden">
+    <div class="hud-bar">
+        <div class="flex items-center">
+            <div class="mr-3">
+                <img src="./广仲logo.png" class="hud-logo-img" alt="广州仲裁委">
+            </div>
+            <div>
+                <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">广州仲裁委</div>
+                <div class="font-bold text-slate-800 leading-tight">立案服务部</div>
+            </div>
+        </div>
+
+        <div class="filing-hud-progress" aria-label="立案全流程进度">
+            <div class="filing-hud-step done">
+                <span class="filing-hud-index"><i class="fas fa-check text-[11px]"></i></span>
+                <span class="filing-hud-label">资料提交</span>
+            </div>
+            <div class="filing-hud-step active">
+                <span class="filing-hud-index">2</span>
+                <span class="filing-hud-label">智能分流</span>
+            </div>
+            <div class="filing-hud-step">
+                <span class="filing-hud-index">3</span>
+                <span class="filing-hud-label">继续立案</span>
+            </div>
+            <div class="filing-hud-step">
+                <span class="filing-hud-index">4</span>
+                <span class="filing-hud-label">后续路径</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <div class="score-display">
+                <i class="fas fa-star mr-2 text-yellow-400"></i>
+                <span class="score-value">0</span>
+            </div>
+            <button class="score-cta" type="button">获取积分</button>
+        </div>
+    </div>
+
+    <div class="map-container map-blur">
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500"></div>
+    </div>
+
+    <div class="absolute inset-0 z-30 flex items-start justify-center bg-black/35 backdrop-blur-sm px-10 pb-10 pt-[86px] ai-demo-overlay">
+        <main class="diversion-stage">
+            <section class="ai-consult-card diversion-card animate__animated animate__fadeInUp">
+                <div class="ai-consult-header">
+                    <div class="ai-prototype-brand">
+                        <div class="ai-logo-wrap">
+                            <img src="./ai-assistant-logo.svg" alt="AI智能助手">
+                        </div>
+                        <div>
+                            <h2 class="ai-consult-title">AI智能立案助手</h2>
+                            <p class="ai-consult-desc">围绕申请书请求、事实依据和管辖条款，辅助判断更适合先调解还是仲裁</p>
+                        </div>
+                    </div>
+                    <div class="ai-model-badge">
+                        <span>已接入 DeepSeek V4 Pro</span>
+                    </div>
+                    <button @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking || resultReady">
+                        <i class="fas fa-forward-step"></i>
+                        演示下一步
+                    </button>
+                </div>
+
+                <div class="ai-prototype-panel diversion-panel">
+                    <div class="ai-scroll-content custom-scrollbar" ref="chatScroll">
+                        <div class="ai-chat-body">
+                            <div v-for="message in messages" :key="message.id" class="ai-message-row" :class="message.role">
+                                <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
+                                    <div class="ai-role-avatar"><img src="./ai-assistant-logo.svg" alt="AI智能助手"></div>
+                                </div>
+                                <div class="ai-bubble" v-html="message.content"></div>
+                            </div>
+                            <div v-if="aiIsThinking" class="ai-message-row">
+                                <div class="ai-avatar ai-bot-mark compact">
+                                    <div class="ai-role-avatar"><img src="./ai-assistant-logo.svg" alt="AI智能助手"></div>
+                                </div>
+                                <div class="ai-bubble">
+                                    <span class="ai-thinking"><span></span><span></span><span></span></span>
+                                </div>
+                            </div>
+                            <div v-if="resultReady" class="diversion-result">
+                                <div class="result-kicker">本轮结果</div>
+                                <h3>建议优先尝试调解，同时保留仲裁路径</h3>
+                                <p>本案目前表现为教育培训合同退款争议，金额清晰、核心事实集中、双方仍有围绕退款金额和履行安排协商的空间。若先进入调解，有机会在较短周期内降低沟通成本；如对方拒绝或方案无法接受，再转入仲裁路径。</p>
+                                <div class="result-points">
+                                    <div><strong>适合调解的原因</strong><span>争议焦点集中，退款金额和履行情况可通过方案磋商处理。</span></div>
+                                    <div><strong>需要保留的仲裁准备</strong><span>继续保留仲裁条款、合同、付款凭证、沟通记录和证据目录。</span></div>
+                                    <div><strong>下一步建议</strong><span>先启动调解邀约；若对方不同意或未按协议履行，再进入仲裁程序。</span></div>
+                                </div>
+                                <div class="result-actions">
+                                    <button class="result-btn arbitration" @click="chooseArbitration">
+                                        <i class="fas fa-route"></i>
+                                        选择仲裁
+                                    </button>
+                                    <button class="result-btn mediation" @click="chooseMediation">
+                                        <i class="fas fa-handshake"></i>
+                                        选择调解
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-input-area">
+                        <div class="ai-input-shell">
+                            <textarea v-model="inputText" @keydown.enter.exact.prevent="sendMessage" :placeholder="currentPlaceholder"></textarea>
+                            <div class="ai-input-options">
+                                <button @click="sendMessage" class="ai-send-btn" aria-label="发送">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div class="ai-upload-rule">
+                                <strong>当前引导：</strong>{{ currentGuide }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="ai-side-tools diversion-tools">
+                <div class="ai-side-title">辅助工具</div>
+                <div class="ai-preset-grid">
+                    <a class="ai-preset-card featured" href="./游戏化问答.html">
+                        <div class="ai-preset-icon"><i class="fas fa-list-check"></i></div>
+                        <div class="ai-preset-title">游戏化答题</div>
+                        <div class="ai-preset-desc">通过通俗问答快速梳理纠纷事实、合同履行、退款沟通和证据缺口。</div>
+                    </a>
+                    <a class="ai-preset-card" href="./抗辩机器人.html">
+                        <div class="ai-preset-icon"><i class="fas fa-comments"></i></div>
+                        <div class="ai-preset-title">AI抗辩模拟</div>
+                        <div class="ai-preset-desc">提前模拟对方可能如何回应您的退款、违约或证据主张。</div>
+                    </a>
+                    <a class="ai-preset-card" href="./案件路径图.html">
+                        <div class="ai-preset-icon"><i class="fas fa-scale-balanced"></i></div>
+                        <div class="ai-preset-title">仲裁/调解路径</div>
+                        <div class="ai-preset-desc">对比调解与仲裁的办理节奏、适用场景和后续选择。</div>
+                    </a>
+                </div>
+            </aside>
+        </main>
+    </div>
+    <div class="diversion-confirm-mask" v-if="showMediationConfirm" role="dialog" aria-modal="true">
+        <div class="diversion-confirm-card">
+            <div class="diversion-confirm-icon"><i class="fas fa-handshake"></i></div>
+            <h2>确认参与调解？</h2>
+            <p>您的案件将优先进入调解意向登记和沟通环节；调解以双方自愿为前提，若对方不同意或调解不成，仍可保留仲裁路径。</p>
+            <div class="diversion-confirm-btns">
+                <button class="diversion-confirm-cancel" type="button" @click="cancelMediation">再想想</button>
+                <button class="diversion-confirm-ok" type="button" @click="confirmMediation">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="./assets/filing-bot/diversion-bot-app.js"></script>
+<script src="./assets/demo-shell/demo-nav.js"></script>
+</body>
+</html>

@@ -74,42 +74,44 @@
 
     .flow-progress {
       flex: 1;
-      max-width: 1040px;
-      margin: 0 22px;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(112px, 1fr));
-      align-items: center;
-      gap: 7px;
+      max-width: 650px;
+      margin: 0 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
     }
 
     .flow-step {
       position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 6px;
-      min-width: 0;
+      gap: 5px;
+      min-width: 118px;
       color: #64748b;
       font-size: 11px;
       font-weight: 900;
       white-space: nowrap;
+      text-align: center;
     }
 
     .flow-step::after {
       content: "";
       position: absolute;
-      left: calc(100% - 2px);
-      top: 50%;
-      width: 9px;
+      left: calc(50% + 18px);
+      right: calc(-50% + 18px);
+      top: 12px;
       height: 2px;
       background: #dbe4f0;
-      transform: translateY(-50%);
     }
 
     .flow-step:last-child::after { display: none; }
 
     .flow-index {
-      width: 23px;
-      height: 23px;
+      position: relative;
+      z-index: 1;
+      width: 26px;
+      height: 26px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
@@ -129,11 +131,11 @@
     }
 
     .flow-step.done { color: #0f766e; }
-    .flow-step.done::after { background: #38bdf8; }
+    .flow-step.done::after { background: #16a34a; }
     .flow-step.done .flow-index {
-      color: #0f766e;
-      border-color: #99f6e4;
-      background: #ecfdf5;
+      color: #fff;
+      border-color: #16a34a;
+      background: #16a34a;
       animation: none;
     }
     .flow-step.active { color: #1d4ed8; }
@@ -664,6 +666,7 @@
       .flow-progress { grid-template-columns: repeat(2, minmax(120px, 1fr)); margin: 0 12px; }
     }
   </style>
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
 </head>
 <body>
   <div class="system-page">
@@ -672,14 +675,14 @@
         <div class="brand-mark"><i class="fas fa-scale-balanced"></i></div>
         <div>
           <div class="brand-org">广州仲裁委</div>
-          <div class="brand-title">立案服务部</div>
+          <div class="brand-title">调解服务部</div>
         </div>
       </div>
       <nav class="flow-progress" aria-label="立案全流程进度">
-        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">AI对话辅助立案</span></div>
-        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">案件评估报告</span></div>
-        <div class="flow-step active"><span class="flow-index">3</span><span class="flow-label">后续路径选择</span></div>
-        <div class="flow-step"><span class="flow-index">4</span><span class="flow-label">完成立案</span></div>
+        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">资料提交</span></div>
+        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">答题关卡</span></div>
+        <div class="flow-step active"><span class="flow-index">3</span><span class="flow-label">评估报告</span></div>
+        <div class="flow-step"><span class="flow-index">4</span><span class="flow-label">后续路径</span></div>
       </nav>
       <div class="top-actions" aria-label="用户状态">
         <div class="score"><i class="fas fa-star"></i><span>10</span></div>
@@ -810,5 +813,6 @@
       link.addEventListener('click', () => markCompleted(link.dataset.enter));
     });
   </script>
+  <script src="./assets/demo-shell/demo-nav.js"></script>
 </body>
 </html>
