@@ -5,9 +5,9 @@
       items: [
         { key: 'index', short: '1', title: '第一步', desc: '申请书准备方式', href: './index.html' },
         { key: 'step2', short: '2', title: '材料提取', desc: 'AI 解析核对', href: './Step2SmartExtraction.html' },
-        { key: 'diversion', short: '3', title: '案件分流', desc: '先调解或仲裁', href: './分流bot.html' },
-        { key: 'filing', short: '4', title: '继续立案', desc: 'AI 填写申请', href: './立案bot.html' },
-        { key: 'report', short: '5', title: '评估报告', desc: '风险与路径建议', href: './立案bot.html?demoStage=report', openReport: true }
+        { key: 'diversion', short: '3', title: '调解与撤案引导', desc: '路径确认', href: './调解&撤案引导bot.html' },
+        { key: 'filing', short: '4', title: '智能立案助手', desc: '生成申请书', href: './申请书bot.html' },
+        { key: 'report', short: '5', title: '评估报告', desc: '风险与路径建议', href: './申请书bot.html?demoStage=report', openReport: true }
       ]
     },
     {
@@ -24,8 +24,8 @@
   const pageKeyByFile = {
     'index.html': 'index',
     'Step2SmartExtraction.html': 'step2',
-    '分流bot.html': 'diversion',
-    '立案bot.html': 'filing',
+    '调解&撤案引导bot.html': 'diversion',
+    '申请书bot.html': 'filing',
     '立案提交后路径选择.html': 'followup',
     '游戏化问答.html': 'qa',
     '抗辩机器人.html': 'defense',
@@ -35,7 +35,7 @@
   function currentPageKey() {
     const file = decodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
     const query = new URLSearchParams(window.location.search);
-    if (file === '立案bot.html' && query.get('demoStage') === 'report') return 'report';
+    if (file === '申请书bot.html' && query.get('demoStage') === 'report') return 'report';
     return pageKeyByFile[file] || '';
   }
 

@@ -1015,7 +1015,7 @@
     function returnAuxReport(source) {
       if (localStorage.getItem('filingDemoAuxReturn') === 'report') {
         localStorage.setItem('filingDemoOpenReport', 'auxTool');
-        window.location.href = './立案bot.html?fromAux=' + source;
+        window.location.href = './申请书bot.html?fromAux=' + source;
         return true;
       }
       return false;

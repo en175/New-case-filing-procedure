@@ -6,7 +6,12 @@ createApp({
         const inputText = ref('');
         const aiIsThinking = ref(false);
         const resultReady = ref(false);
-        const showMediationConfirm = ref(false);
+        const confirmModal = ref({
+            show: false,
+            type: '',
+            title: '',
+            message: ''
+        });
         const chatScroll = ref(null);
         const stepIndex = ref(0);
         let messageId = 0;
@@ -112,12 +117,23 @@ createApp({
             sendMessage();
         };
 
-        const chooseMediation = () => {
-            showMediationConfirm.value = true;
+        const showConfirmModal = (type) => {
+            confirmModal.value.type = type;
+            if (type === 'mediation') {
+                confirmModal.value.title = '确认选择调解？';
+                confirmModal.value.message = '您的案件将优先进入调解意向登记和沟通环节；调解以双方自愿为前提，若对方不同意或调解不成，仍可保留仲裁路径。';
+            } else if (type === 'withdraw') {
+                confirmModal.value.title = '确认撤回案件？';
+                confirmModal.value.message = '是否撤回本案件的仲裁立案申请，撤回后本案件将移入草稿箱。';
+            } else if (type === 'arbitration') {
+                confirmModal.value.title = '联系客服仲裁？';
+                confirmModal.value.message = '是否确认联系客服进行仲裁，确认后三个工作日内会有工作人员与您联系。';
+            }
+            confirmModal.value.show = true;
         };
 
-        const cancelMediation = () => {
-            showMediationConfirm.value = false;
+        const closeConfirmModal = () => {
+            confirmModal.value.show = false;
         };
 
         const confirmMediation = () => {
@@ -137,6 +153,35 @@ createApp({
             window.location.href = './立案提交后路径选择.html';
         };
 
+        const confirmWithdraw = () => {
+            try {
+                const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
+                completed.withdraw = true;
+                localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(completed));
+                localStorage.setItem('filingDemoSelectedRoute', 'withdraw');
+            } catch (error) {}
+            confirmModal.value.type = 'withdrawDone';
+            confirmModal.value.title = '已撤回案件';
+            confirmModal.value.message = '已为您撤回案件，可返回“草稿”查看。';
+        };
+
+        const executeConfirmAction = () => {
+            const type = confirmModal.value.type;
+            if (type === 'mediation') {
+                closeConfirmModal();
+                confirmMediation();
+                return;
+            }
+            if (type === 'arbitration') {
+                closeConfirmModal();
+                chooseArbitration();
+                return;
+            }
+            if (type === 'withdraw') {
+                confirmWithdraw();
+            }
+        };
+
         addAssistant('<div class="ai-reply-lead">您好，欢迎来到广州仲裁委员会，请问我能为您做什么？</div>');
 
         return {
@@ -144,16 +189,16 @@ createApp({
             inputText,
             aiIsThinking,
             resultReady,
-            showMediationConfirm,
+            confirmModal,
             chatScroll,
             currentGuide,
             currentPlaceholder,
             sendMessage,
             playDemoNextStep,
-            chooseMediation,
+            showConfirmModal,
             chooseArbitration,
-            cancelMediation,
-            confirmMediation
+            closeConfirmModal,
+            executeConfirmAction
         };
     }
 }).mount('#app');

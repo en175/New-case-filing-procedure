@@ -243,6 +243,19 @@
       border-bottom: 1px dashed #eef2f7;
     }
     .uploaded-file-item:last-child { border-bottom: none; }
+    .uploaded-file-main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      gap: 4px;
+    }
+    .uploaded-file-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 16px;
+      flex-shrink: 0;
+    }
     .file-name { font-size: 14px; color: #606266; }
     .no-evidence {
       text-align: center;
@@ -306,6 +319,25 @@
       font-size: 14px;
       line-height: 1;
       padding: 12px 22px;
+    }
+    .preview-modal {
+      width: 980px;
+      height: min(760px, calc(100vh - 56px));
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .preview-body {
+      flex: 1;
+      min-height: 0;
+      padding: 0 24px 24px;
+    }
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #dbe3ef;
+      border-radius: 14px;
+      background: #fff;
     }
     .ai-confirm-modal {
       width: 500px;
@@ -673,6 +705,40 @@
     }
     .action-btn:hover { color: #3b82f6; }
     .action-btn.delete-btn:hover { color: #ef4444; }
+    .application-source-banner {
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: #1e3a8a;
+    }
+    .application-source-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #2563eb;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .application-source-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+    .application-source-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #475569;
+    }
     .catalog-empty {
       min-height: 220px;
       display: flex;
@@ -855,10 +921,10 @@
 <body>
   <header class="hud-bar">
     <div class="hud-brand">
-      <img src="./广仲logo.png" class="hud-logo-img" alt="广州仲裁委">
+      <img src="./图片/广仲logo.png" class="hud-logo-img" alt="广州仲裁委">
       <div>
         <div class="hud-org">广州仲裁委</div>
-        <div class="hud-title">调解服务部</div>
+        <div class="hud-title">立案服务部</div>
       </div>
     </div>
     <nav class="filing-hud-progress" aria-label="调解服务流程进度">
@@ -998,12 +1064,101 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="previewModal">
+    <div class="modal preview-modal">
+      <div class="modal-header">
+        <div class="modal-title" id="previewModalTitle">预览</div>
+        <button type="button" class="modal-close" id="closePreviewBtn" aria-label="关闭">×</button>
+      </div>
+      <div class="preview-body">
+        <iframe class="preview-frame" id="previewFrame" title="文件预览"></iframe>
+      </div>
+    </div>
+  </div>
+
   <script>
     const state = {
       hasUploadList: [],
       tempArbList: [],
       catalogFiles: [],
-      evidenceUploads: []
+      evidenceUploads: [],
+      applicationSource: ''
+    }
+
+    function isFromApplicationBot() {
+      const query = new URLSearchParams(window.location.search)
+      if (query.get('from') === 'applicationBot') return true
+      try {
+        return localStorage.getItem('filingApplicationBotGenerated') === '1'
+      } catch (error) {
+        return false
+      }
+    }
+
+    function initApplicationBotResult() {
+      if (!isFromApplicationBot()) return
+      state.applicationSource = 'applicationBot'
+      state.hasUploadList = [createGeneratedApplicationRecord()]
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, match => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[match]))
+    }
+
+    function createGeneratedApplicationHtml() {
+      return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>仲裁申请书</title>
+  <style>
+    body { margin: 0; padding: 48px; background: #f8fafc; color: #111827; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .paper { max-width: 860px; margin: 0 auto; background: #fff; padding: 56px 64px; border: 1px solid #e5e7eb; box-shadow: 0 18px 45px rgba(15,23,42,.08); }
+    h1 { text-align: center; font-size: 28px; margin: 0 0 36px; letter-spacing: .08em; }
+    h2 { font-size: 17px; margin: 28px 0 12px; border-left: 4px solid #1d4ed8; padding-left: 10px; }
+    p { font-size: 15px; line-height: 1.9; margin: 8px 0; }
+    .sign { margin-top: 44px; text-align: right; }
+  </style>
+</head>
+<body>
+  <article class="paper">
+    <h1>仲裁申请书</h1>
+    <h2>一、当事人信息</h2>
+    <p>申请人：张三，身份证号：440100198805120011，联系电话：13800000000。</p>
+    <p>被申请人：广州某教育科技有限公司，统一社会信用代码：91440101MA0000000X。</p>
+    <h2>二、仲裁请求</h2>
+    <p>1. 请求裁决被申请人退还培训服务费人民币 15800 元。</p>
+    <p>2. 请求裁决被申请人承担本案仲裁费用。</p>
+    <h2>三、事实与理由</h2>
+    <p>申请人与被申请人签订线上职业培训课程服务合同，并按约支付课程费用。后被申请人未按约安排核心课程，多次沟通退款未果，已影响合同目的实现。</p>
+    <p>申请人现依据合同约定及相关法律规定，向广州仲裁委员会申请仲裁，请依法支持申请人的仲裁请求。</p>
+    <h2>四、证据及证明内容</h2>
+    <p>证据材料包括培训服务合同、付款凭证、沟通记录、退款申请记录等，用于证明合同关系、付款事实、履约争议及退款沟通过程。</p>
+    <p class="sign">此致<br>广州仲裁委员会<br><br>申请人：张三<br>日期：2026 年 5 月 18 日</p>
+  </article>
+<\/body>
+<\/html>`
+    }
+
+    function createGeneratedApplicationRecord() {
+      const html = createGeneratedApplicationHtml()
+      const docBlob = new Blob([html], { type: 'application/msword;charset=utf-8' })
+      const previewBlob = new Blob([html], { type: 'text/html;charset=utf-8' })
+      return {
+        id: 'application_bot_generated_doc',
+        name: '仲裁申请书（智能立案助手生成）.doc',
+        size: docBlob.size,
+        type: docBlob.type,
+        generated: true,
+        objectURL: URL.createObjectURL(docBlob),
+        previewURL: URL.createObjectURL(previewBlob)
+      }
     }
 
     function createLocalFileRecord(file) {
@@ -1044,18 +1199,72 @@
       document.body.removeChild(a)
     }
 
+    function previewFile(file) {
+      if (!file) return
+      const url = file.previewURL || file.objectURL
+      if (!url) return
+      document.getElementById('previewModalTitle').textContent = file.name || '预览'
+      document.getElementById('previewFrame').src = url
+      document.getElementById('previewModal').classList.add('show')
+    }
+
+    function revokeFileUrls(file) {
+      if (!file) return
+      if (file.objectURL) URL.revokeObjectURL(file.objectURL)
+      if (file.previewURL && file.previewURL !== file.objectURL) URL.revokeObjectURL(file.previewURL)
+    }
+
+    function isSavedArbFile(file) {
+      return state.hasUploadList.some(item => item.id === file.id && item.objectURL === file.objectURL)
+    }
+
+    function clearTempArbList(revokeUnsaved = true) {
+      if (revokeUnsaved) {
+        state.tempArbList.forEach(file => {
+          if (!isSavedArbFile(file)) revokeFileUrls(file)
+        })
+      }
+      state.tempArbList = []
+    }
+
     function renderArbList() {
       const box = document.getElementById('arbUploadList')
+      const sourceBanner = state.applicationSource === 'applicationBot'
+        ? `<div class="application-source-banner">
+            <div class="application-source-icon"><i class="el-icon-check"></i></div>
+            <div>
+              <div class="application-source-title">已由智能立案助手生成仲裁申请书</div>
+              <div class="application-source-text">请继续上传证据目录和证据材料。</div>
+            </div>
+          </div>`
+        : ''
+      const uploadButton = document.getElementById('openUploadDialogBtn')
+      if (uploadButton) uploadButton.textContent = state.applicationSource === 'applicationBot' ? '替换仲裁申请书' : '上传仲裁申请书'
       if (!state.hasUploadList.length) {
-        box.innerHTML = '<div class="no-evidence">暂未上传仲裁申请书，请点击右上角“上传仲裁申请书”</div>'
+        box.innerHTML = `${sourceBanner}<div class="no-evidence">暂未上传仲裁申请书，请点击右上角“上传仲裁申请书”</div>`
         return
       }
       box.innerHTML = `
+        ${sourceBanner}
         <div class="uploaded-files">
           <div class="uploaded-files-title">已上传的仲裁申请书：</div>
-          ${state.hasUploadList.map(file => `<div class="uploaded-file-item"><span class="file-name">${file.name}</span><span class="file-size">${formatFileSize(file.size)}</span></div>`).join('')}
+          ${state.hasUploadList.map(file => `<div class="uploaded-file-item" data-id="${file.id}">
+            <div class="uploaded-file-main">
+              <span class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
+              <span class="file-size">${formatFileSize(file.size)}</span>
+            </div>
+            <div class="uploaded-file-actions">
+              <i class="el-icon-view action-btn" data-action="preview-arb" title="预览" aria-label="预览"></i>
+              <i class="el-icon-download action-btn" data-action="download-arb" title="下载" aria-label="下载"></i>
+            </div>
+          </div>`).join('')}
         </div>
       `
+      box.querySelectorAll('.uploaded-file-item').forEach(el => {
+        const file = state.hasUploadList.find(item => item.id === el.dataset.id)
+        el.querySelector('[data-action="preview-arb"]').onclick = () => previewFile(file)
+        el.querySelector('[data-action="download-arb"]').onclick = () => downloadFile(file)
+      })
     }
 
     function renderTempArbList() {
@@ -1083,10 +1292,10 @@
       box.querySelectorAll('.temp-file-item').forEach(el => {
         const id = el.dataset.id
         const file = state.tempArbList.find(item => item.id === id)
-        el.querySelector('[data-action="preview-temp"]').onclick = () => window.open(file.objectURL, '_blank')
+        el.querySelector('[data-action="preview-temp"]').onclick = () => previewFile(file)
         el.querySelector('[data-action="download-temp"]').onclick = () => downloadFile(file)
         el.querySelector('[data-action="delete-temp"]').onclick = () => {
-          URL.revokeObjectURL(file.objectURL)
+          if (!isSavedArbFile(file)) revokeFileUrls(file)
           state.tempArbList = state.tempArbList.filter(item => item.id !== id)
           renderTempArbList()
         }
@@ -1123,10 +1332,10 @@
       list.querySelectorAll('.catalog-item').forEach(el => {
         const id = el.dataset.id
         const file = state.catalogFiles.find(x => x.id === id)
-        el.querySelector('[data-action="preview"]').onclick = () => window.open(file.objectURL, '_blank')
+        el.querySelector('[data-action="preview"]').onclick = () => previewFile(file)
         el.querySelector('[data-action="download"]').onclick = () => downloadFile(file)
         el.querySelector('[data-action="delete"]').onclick = () => {
-          URL.revokeObjectURL(file.objectURL)
+          revokeFileUrls(file)
           state.catalogFiles = state.catalogFiles.filter(x => x.id !== id)
           renderCatalogList()
         }
@@ -1202,7 +1411,7 @@
           removeBtn.onclick = () => {
             if (state.evidenceUploads.length <= 1) return
             if (window.confirm('确定删除该证据?')) {
-              evidence.uploadList.forEach(f => URL.revokeObjectURL(f.objectURL))
+              evidence.uploadList.forEach(revokeFileUrls)
               state.evidenceUploads = state.evidenceUploads.filter(x => x.id !== evidenceId)
               renderEvidenceList()
             }
@@ -1210,7 +1419,7 @@
         }
         el.querySelectorAll('[data-action="preview-file"]').forEach(btn => {
           const file = evidence.uploadList.find(f => f.id === btn.dataset.fileId)
-          btn.onclick = () => window.open(file.objectURL, '_blank')
+          btn.onclick = () => previewFile(file)
         })
         el.querySelectorAll('[data-action="download-file"]').forEach(btn => {
           const file = evidence.uploadList.find(f => f.id === btn.dataset.fileId)
@@ -1219,7 +1428,7 @@
         el.querySelectorAll('[data-action="remove-file"]').forEach(btn => {
           btn.onclick = () => {
             const file = evidence.uploadList.find(f => f.id === btn.dataset.fileId)
-            if (file) URL.revokeObjectURL(file.objectURL)
+            revokeFileUrls(file)
             evidence.uploadList = evidence.uploadList.filter(f => f.id !== btn.dataset.fileId)
             renderEvidenceList()
           }
@@ -1228,6 +1437,16 @@
     }
 
     const uploadModal = document.getElementById('uploadModal')
+    const previewModal = document.getElementById('previewModal')
+    const previewFrame = document.getElementById('previewFrame')
+    function closePreviewModal() {
+      previewModal.classList.remove('show')
+      previewFrame.removeAttribute('src')
+    }
+    document.getElementById('closePreviewBtn').addEventListener('click', closePreviewModal)
+    previewModal.addEventListener('click', (e) => {
+      if (e.target === previewModal) closePreviewModal()
+    })
     document.getElementById('openUploadDialogBtn').addEventListener('click', () => {
       state.tempArbList = state.hasUploadList.map(file => ({ ...file }))
       renderTempArbList()
@@ -1235,20 +1454,25 @@
     })
     document.getElementById('cancelUploadBtn').addEventListener('click', () => {
       uploadModal.classList.remove('show')
-      state.tempArbList = []
+      clearTempArbList()
     })
     document.getElementById('closeUploadBtn').addEventListener('click', () => {
       uploadModal.classList.remove('show')
-      state.tempArbList = []
+      clearTempArbList()
     })
     document.getElementById('confirmUploadBtn').addEventListener('click', () => {
       if (!state.tempArbList.length) {
         alert('请上传文件')
         return
       }
+      const retainedUrls = new Set(state.tempArbList.map(file => file.objectURL))
+      state.hasUploadList.forEach(file => {
+        if (!retainedUrls.has(file.objectURL)) revokeFileUrls(file)
+      })
       state.hasUploadList = state.tempArbList.map(file => ({ ...file }))
+      state.applicationSource = ''
       uploadModal.classList.remove('show')
-      state.tempArbList = []
+      clearTempArbList(false)
       renderArbList()
     })
     document.getElementById('arbInput').addEventListener('change', (e) => {
@@ -1274,15 +1498,16 @@
       window.location.href = './index.html'
     })
     document.getElementById('smartGenerateBtn').addEventListener('click', () => {
-      window.location.href = './分流bot.html'
+      window.location.href = './调解&撤案引导bot.html'
     })
     uploadModal.addEventListener('click', (e) => {
       if (e.target === uploadModal) {
         uploadModal.classList.remove('show')
-        state.tempArbList = []
+        clearTempArbList()
       }
     })
 
+    initApplicationBotResult()
     addEvidence()
     addEvidence()
     renderArbList()

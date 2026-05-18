@@ -348,7 +348,7 @@
       <div class="left-video-card tw-shadow-md">
         <div class="video-wrapper">
           <video class="step-video" controls autoplay muted loop>
-            <source src="./视频1/step1.mp4" type="video/mp4" />
+            <source src="./视频/step1.mp4" type="video/mp4" />
             您的浏览器不支持视频播放。
           </video>
         </div>
@@ -356,7 +356,7 @@
       <div class="right-content">
         <div class="institution-card tw-shadow-sm">
           <div class="icon-box">
-            <img src="./广仲logo.png" alt="广州仲裁委员会标识" />
+            <img src="./图片/广仲logo.png" alt="广州仲裁委员会标识" />
           </div>
           <div class="info-box">
             <h3 class="label">当前收案机构</h3>
@@ -386,7 +386,7 @@
       selectedTarget: '',
       caseTypeArr: [
         { value: '已有申请书', label: '已有申请书', desc: '已经准备好申请书，可直接上传申请书、证据目录和证据材料，进入提交前核对。', icon: 'el-icon-document-checked', target: './Step2SmartExtraction.html' },
-        { value: '暂无申请书，AI 对话生成申请书', label: '暂无申请书，AI 对话生成申请书', desc: '还没准备申请书时，先通过 AI 对话梳理当事人、纠纷事实、请求事项、金额和证据。', icon: 'el-icon-s-opportunity', target: './立案bot.html' }
+        { value: '暂无申请书，AI 对话生成申请书', label: '暂无申请书，AI 对话生成申请书', desc: '还没准备申请书时，先通过 AI 对话梳理当事人、纠纷事实、请求事项和金额，生成后进入第二步提交材料。', icon: 'el-icon-s-opportunity', target: './申请书bot.html' }
       ],
       materialsData: [
         {
@@ -453,6 +453,12 @@
         card.addEventListener('click', () => {
           state.applicantType = item.value
           state.selectedTarget = item.target
+          if (item.target === './Step2SmartExtraction.html') {
+            try {
+              localStorage.removeItem('filingApplicationBotGenerated')
+              localStorage.removeItem('filingApplicationBotGeneratedAt')
+            } catch (error) {}
+          }
           renderApplicantTypes()
           updateNextButton()
         })

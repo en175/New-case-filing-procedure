@@ -28,7 +28,7 @@
             </div>
             <div>
                 <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">广州仲裁委</div>
-                <div class="font-bold text-slate-800 leading-tight">调解服务部</div>
+                <div class="font-bold text-slate-800 leading-tight">立案服务部</div>
             </div>
         </div>
 
@@ -704,7 +704,7 @@
                         
                         <!-- Button 2: Accept Mediation -->
                         <button @click="showConfirmModal('mediation')" class="flex-1 max-w-[200px] py-2.5 bg-gradient-to-r from-[#2FA39A] to-[#258e86] text-white font-bold rounded-lg shadow-lg shadow-teal-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
-                            <i class="fas fa-handshake mr-2"></i>参与调解
+                            <i class="fas fa-handshake mr-2"></i>选择调解
                         </button>
                     </div>
                     
@@ -739,9 +739,9 @@
                 </div>
                 <div class="flex space-x-3">
                     <button @click="closeConfirmModal" class="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">
-                        再想想
+                        返回
                     </button>
-                    <button @click="executeConfirmAction" class="flex-1 px-4 py-2.5 text-white font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5"
+                    <button v-if="confirmModal.type !== 'withdrawDone'" @click="executeConfirmAction" class="flex-1 px-4 py-2.5 text-white font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5"
                             :class="confirmModal.type === 'mediation' ? 'bg-[#2FA39A] hover:bg-[#258e86] shadow-teal-500/30' : 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/30'">
                         确认
                     </button>

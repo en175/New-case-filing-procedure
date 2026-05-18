@@ -331,7 +331,7 @@
                     <button v-for="(opt, idx) in currentQuestion.options" :key="idx" 
                             @click="answerQuestion(opt, $event)"
                             class="w-full text-left p-4 rounded-xl qa-option-btn flex items-center group relative">
-                        <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-4 group-hover:bg-[#2367E8] group-hover:text-white font-bold text-sm transition-colors">{{ ['一','二','三','四'][idx] }}</span>
+                        <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-4 group-hover:bg-[#2367E8] group-hover:text-white font-bold text-sm transition-colors">{{ optionNumber(idx) }}</span>
                         <span class="text-slate-700 group-hover:text-[#2367E8] font-medium">{{ opt }}</span>
                     </button>
                 </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI智能立案助手</title>
+    <title>智能立案助手</title>
     <link rel="icon" href="data:,">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,7 +17,7 @@
     <div class="hud-bar">
         <div class="flex items-center">
             <div class="mr-3">
-                <img src="./广仲logo.png" class="hud-logo-img" alt="广州仲裁委">
+                <img src="./图片/广仲logo.png" class="hud-logo-img" alt="广州仲裁委">
             </div>
             <div>
                 <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">广州仲裁委</div>
@@ -63,10 +63,10 @@
                 <div class="ai-consult-header">
                     <div class="ai-prototype-brand">
                         <div class="ai-logo-wrap">
-                            <img src="./ai-assistant-logo.svg" alt="AI智能助手">
+                            <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
                         </div>
                         <div>
-                            <h2 class="ai-consult-title">AI智能立案助手</h2>
+                            <h2 class="ai-consult-title">智能立案助手</h2>
                             <p class="ai-consult-desc">围绕申请书请求、事实依据和管辖条款，辅助判断更适合先调解还是仲裁</p>
                         </div>
                     </div>
@@ -84,13 +84,13 @@
                         <div class="ai-chat-body">
                             <div v-for="message in messages" :key="message.id" class="ai-message-row" :class="message.role">
                                 <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
-                                    <div class="ai-role-avatar"><img src="./ai-assistant-logo.svg" alt="AI智能助手"></div>
+                                    <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
                                 </div>
                                 <div class="ai-bubble" v-html="message.content"></div>
                             </div>
                             <div v-if="aiIsThinking" class="ai-message-row">
                                 <div class="ai-avatar ai-bot-mark compact">
-                                    <div class="ai-role-avatar"><img src="./ai-assistant-logo.svg" alt="AI智能助手"></div>
+                                    <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
                                 </div>
                                 <div class="ai-bubble">
                                     <span class="ai-thinking"><span></span><span></span><span></span></span>
@@ -106,13 +106,16 @@
                                     <div><strong>下一步建议</strong><span>先启动调解邀约；若对方不同意或未按协议履行，再进入仲裁程序。</span></div>
                                 </div>
                                 <div class="result-actions">
-                                    <button class="result-btn arbitration" @click="chooseArbitration">
-                                        <i class="fas fa-route"></i>
-                                        选择仲裁
+                                    <button class="result-btn arbitration" @click="showConfirmModal('withdraw')">
+                                        <i class="fas fa-undo-alt"></i>
+                                        撤回案件
                                     </button>
-                                    <button class="result-btn mediation" @click="chooseMediation">
+                                    <button class="result-btn mediation" @click="showConfirmModal('mediation')">
                                         <i class="fas fa-handshake"></i>
                                         选择调解
+                                    </button>
+                                    <button class="result-contact-btn" @click="showConfirmModal('arbitration')">
+                                        联系客服，进行仲裁
                                     </button>
                                 </div>
                             </div>
@@ -157,14 +160,14 @@
             </aside>
         </main>
     </div>
-    <div class="diversion-confirm-mask" v-if="showMediationConfirm" role="dialog" aria-modal="true">
+    <div class="diversion-confirm-mask" v-if="confirmModal.show" role="dialog" aria-modal="true">
         <div class="diversion-confirm-card">
-            <div class="diversion-confirm-icon"><i class="fas fa-handshake"></i></div>
-            <h2>确认参与调解？</h2>
-            <p>您的案件将优先进入调解意向登记和沟通环节；调解以双方自愿为前提，若对方不同意或调解不成，仍可保留仲裁路径。</p>
+            <div class="diversion-confirm-icon"><i class="fas" :class="confirmModal.type === 'mediation' ? 'fa-handshake' : 'fa-exclamation-triangle'"></i></div>
+            <h2>{{ confirmModal.title }}</h2>
+            <p>{{ confirmModal.message }}</p>
             <div class="diversion-confirm-btns">
-                <button class="diversion-confirm-cancel" type="button" @click="cancelMediation">再想想</button>
-                <button class="diversion-confirm-ok" type="button" @click="confirmMediation">确认</button>
+                <button class="diversion-confirm-cancel" type="button" @click="closeConfirmModal">返回</button>
+                <button v-if="confirmModal.type !== 'withdrawDone'" class="diversion-confirm-ok" type="button" @click="executeConfirmAction">确认</button>
             </div>
         </div>
     </div>
