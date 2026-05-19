@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能立案助手</title>
+    <title>智能申请书生成助手</title>
     <link rel="icon" href="data:,">
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -311,8 +311,8 @@
                         <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
                     </div>
                     <div>
-                        <h2 class="ai-consult-title">智能立案助手</h2>
-                        <p class="ai-consult-desc">辅助申请人通过对话生成《仲裁申请书》，生成后进入提交案件材料页面继续上传证据目录和证据材料</p>
+                        <h2 class="ai-consult-title">智能申请书生成助手</h2>
+                        <p class="ai-consult-desc">围绕申请人信息、仲裁请求、事实理由和证据材料，辅助生成仲裁申请书初稿</p>
                     </div>
                 </div>
                 <div class="ai-model-badge">
@@ -321,6 +321,10 @@
                 <button @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking">
                     <i class="fas fa-forward-step"></i>
                     演示下一步
+                </button>
+                <button @click="autoFillApplicationTemplate" class="ai-demo-step-btn" :disabled="aiIsThinking">
+                    <i class="fas fa-file-lines"></i>
+                    自动填写模板
                 </button>
             </div>
 
@@ -350,9 +354,9 @@
 
                 <div class="ai-input-area">
                     <div class="ai-input-shell">
-                        <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" placeholder="请根据 AI 当前引导补充对应信息，例如姓名、证件号、请求事项或事实理由"></textarea>
+                            <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" placeholder=""></textarea>
                         <div class="ai-input-options">
-                            <button @click="triggerAiFileUpload" class="ai-attach-btn" :class="{ 'upload-needed': currentUploadRule.required }" aria-label="上传附件">
+                            <button @click="triggerAiFileUpload" class="ai-attach-btn" :class="{ 'upload-needed': isCurrentUploadStep }" aria-label="上传附件">
                                 <i class="fas fa-paperclip"></i>
                             </button>
                             <input ref="aiFileInput" type="file" class="hidden" :accept="currentUploadRule.accept" multiple @change="handleAiFileChange" />
@@ -360,7 +364,7 @@
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
-                        <div class="ai-upload-rule" v-html="currentUploadRule.text"></div>
+                        <div class="ai-upload-rule hidden" v-html="currentUploadRule.text"></div>
                     </div>
                 </div>
             </div>

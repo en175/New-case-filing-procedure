@@ -198,50 +198,179 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             });
             const conversationFields = [
                 {
+                    key: 'facts',
+                    label: '纠纷类型',
+                    context: 'caseEvidence',
+                    demo: '我是和一家教育培训机构发生了退费纠纷。我交了15800元培训费，但是他们一直没有按约开课，我想申请仲裁要求退款。',
+                    reply: '好的，已初步识别为教育培训合同退费纠纷。请先提供申请人信息，包括姓名、身份证号、联系电话和联系地址。',
+                    keywords: ['纠纷', '培训', '退费', '服务', '借款', '买卖', '合同', '仲裁', '退款']
+                },
+                {
                     key: 'applicant',
                     label: '申请人信息',
                     context: 'applicant',
-                    prompt: '请先补充申请人信息：\n1. 姓名或名称：\n2. 证件号或统一社会信用代码：\n3. 联系电话：\n4. 联系地址：',
+                    demo: '申请人是李明，身份证号是440106199008081234，电话是13800138000，地址是广州市天河区体育西路某小区。',
+                    reply: '请继续提供被申请人信息。您可以填写培训机构的公司名称、统一社会信用代码、注册地址、联系人和联系电话。如果暂时不清楚，也可以先上传合同或付款凭证，我会尝试从材料中提取。',
                     keywords: ['申请人', '姓名', '名称', '身份证', '证件', '信用代码', '电话', '手机', '地址']
                 },
                 {
                     key: 'respondent',
                     label: '被申请人信息',
                     context: 'respondent',
-                    prompt: '请继续补充被申请人信息：\n1. 姓名或名称：\n2. 证件号或统一社会信用代码：\n3. 联系电话：\n4. 联系地址：\n不知道的项目可以先写“暂不清楚”。',
+                    demo: '我只知道公司叫广州启航教育咨询有限公司，其他信息合同里应该有。',
+                    reply: '请上传培训服务合同，我将从合同中识别被申请人主体信息、服务内容、付款金额、退款条款和仲裁条款。',
                     keywords: ['被申请人', '对方', '公司', '名称', '信用代码', '电话', '地址', '暂不清楚']
                 },
                 {
-                    key: 'claims',
-                    label: '请求事项和金额',
+                    key: 'evidence',
+                    label: '培训服务合同',
                     context: 'caseEvidence',
-                    prompt: '请写明请求事项和金额：\n1. 请求事项：\n2. 请求金额：\n3. 金额计算方式：\n4. 仲裁费用由谁承担：',
-                    keywords: ['请求', '退还', '退款', '支付', '赔偿', '违约金', '费用', '金额', '元', '承担']
+                    expected: 'upload',
+                    demo: '上传合同',
+                    reply: '已收到《培训服务合同》。系统初步识别如下：\n被申请人为广州启航教育咨询有限公司；\n合同金额为15800元；\n课程名称为“跨境电商运营实战班”；\n合同约定争议提交广州仲裁委员会仲裁。\n请确认以上信息是否准确？',
+                    keywords: ['上传', '合同', '服务合同']
                 },
                 {
-                    key: 'facts',
-                    label: '事实与理由',
+                    key: 'respondent',
+                    label: '合同识别信息确认',
                     context: 'caseEvidence',
-                    prompt: '请按时间顺序补充事实与理由：\n1. 签约或下单时间：\n2. 合同、订单或服务内容：\n3. 付款时间和付款金额：\n4. 对方履行或违约情况：\n5. 沟通、催告或协商未果情况：',
-                    keywords: ['签约', '合同', '订单', '付款', '履行', '违约', '沟通', '协商', '退款', '课程', '服务']
+                    demo: '准确。',
+                    reply: '请上传付款凭证，例如银行转账记录、微信支付记录、支付宝支付记录或收据发票，用于证明您已经实际支付培训费用。',
+                    keywords: ['准确', '确认', '是的', '无误']
                 },
                 {
                     key: 'evidence',
-                    label: '证明材料线索',
+                    label: '付款凭证',
                     context: 'caseEvidence',
-                    prompt: '最后请补充申请书中可写入的证明材料线索：\n1. 合同、订单或协议：\n2. 付款凭证：\n3. 聊天记录或沟通记录：\n4. 通知、催告或退款申请：\n5. 其他可证明事实的材料：',
-                    keywords: ['证据', '合同', '凭证', '记录', '截图', '聊天', '通知', '催告', '材料', '发票']
+                    expected: 'upload',
+                    demo: '上传微信付款截图和电子收据',
+                    reply: '已收到付款凭证。系统识别付款金额为15800元，付款时间为2025年9月15日，收款方为广州启航教育咨询有限公司。请确认。',
+                    keywords: ['上传', '付款', '收据', '截图', '凭证']
+                },
+                {
+                    key: 'evidence',
+                    label: '付款信息确认',
+                    context: 'caseEvidence',
+                    demo: '确认。',
+                    reply: '为了写清楚事实经过，请您说明培训机构原本承诺提供哪些服务，包括课程形式、开课时间、课程内容、导师辅导等。',
+                    keywords: ['确认', '准确', '是的', '无误']
+                },
+                {
+                    key: 'facts',
+                    label: '承诺服务内容',
+                    context: 'caseEvidence',
+                    demo: '他们承诺提供12周核心直播课，还有一对一导师辅导、作业点评、就业和接单指导。原本说2025年10月10日开课。',
+                    reply: '请问对方实际提供了哪些服务？是否已经开课、是否提供录播课、是否安排导师辅导？',
+                    keywords: ['承诺', '直播课', '导师', '辅导', '作业', '就业', '接单', '开课']
+                },
+                {
+                    key: 'facts',
+                    label: '实际履行情况',
+                    context: 'caseEvidence',
+                    demo: '他们只给我开通了学习账号，里面有两节导学录播课。我看了一点，但核心直播课一直没有开，也没有导师辅导和作业点评。',
+                    reply: '请上传能够证明课程延期或未按约开课的材料，例如微信群公告、班主任通知、微信聊天记录、课程表截图等。',
+                    keywords: ['账号', '录播', '直播课', '导师', '辅导', '点评', '没有', '未开']
+                },
+                {
+                    key: 'evidence',
+                    label: '延期或未开课材料',
+                    context: 'caseEvidence',
+                    expected: 'upload',
+                    demo: '上传微信群延期通知和班主任微信聊天记录',
+                    reply: '已收到相关材料。系统识别到对方曾于2025年10月8日、10月25日、11月12日多次通知延期，理由包括“讲师档期调整”“班级人数不足”“等待下一期开班”。请确认。',
+                    keywords: ['上传', '延期', '通知', '聊天', '课程表']
+                },
+                {
+                    key: 'evidence',
+                    label: '延期材料确认',
+                    context: 'caseEvidence',
+                    demo: '确认，就是这样。',
+                    reply: '请问您是什么时间提出退款的？对方如何回复？',
+                    keywords: ['确认', '是的', '就是这样']
+                },
+                {
+                    key: 'facts',
+                    label: '退款沟通情况',
+                    context: 'caseEvidence',
+                    demo: '我2025年11月21日第一次申请退款。对方说可以继续等下一期开班，或者转其他课程，但不同意全额退款。后来又说如果一定要退，只能退70%。',
+                    reply: '请上传退款申请记录和对方拒绝退款或扣费的沟通记录。这部分证据将用于证明您曾经主张解除合同并要求退款，但双方未能协商一致。',
+                    keywords: ['退款', '全额', '70%', '30%', '扣', '申请', '回复']
+                },
+                {
+                    key: 'evidence',
+                    label: '退款沟通材料',
+                    context: 'caseEvidence',
+                    expected: 'upload',
+                    demo: '上传退款申请截图和微信聊天记录',
+                    reply: '已收到材料。系统识别到您曾明确提出解除合同并要求退还15800元，对方回复“不支持全额退费，可扣除30%后退款”。请确认。',
+                    keywords: ['上传', '退款', '截图', '聊天']
+                },
+                {
+                    key: 'evidence',
+                    label: '退款材料确认',
+                    context: 'caseEvidence',
+                    demo: '确认。',
+                    reply: '接下来需要确认仲裁请求。根据您目前的描述，建议将仲裁请求暂列为两项：\n第一，请求裁决被申请人退还培训服务费15800元；\n第二，请求裁决被申请人承担本案仲裁费。\n您是否还要主张违约金、利息、交通费或其他损失？',
+                    keywords: ['确认', '准确', '是的']
+                },
+                {
+                    key: 'claims',
+                    label: '仲裁请求',
+                    context: 'caseEvidence',
+                    demo: '暂时不主张违约金和利息，只要退培训费，仲裁费由对方承担。',
+                    reply: '好的。请确认本案事实理由的核心表述：\n您与被申请人签订培训服务合同并支付费用后，被申请人未按约安排核心直播课程、导师辅导、作业点评等主要服务内容，多次延期且未能明确实际开课时间，导致合同目的无法实现。您多次要求退款未果，因此申请仲裁。',
+                    keywords: ['违约金', '利息', '培训费', '仲裁费', '承担', '不主张']
+                },
+                {
+                    key: 'facts',
+                    label: '事实理由确认',
+                    context: 'caseEvidence',
+                    demo: '符合。',
+                    reply: '我还需要提醒您：从现有材料看，您的合同、付款、延期通知和退款沟通记录比较完整；但为了增强申请书的完整性，建议补充上传课程宣传页、课程安排表、学习账号后台截图，用于证明对方承诺服务内容和实际履行情况。您是否现在补充上传？',
+                    keywords: ['符合', '确认', '认可', '可以']
+                },
+                {
+                    key: 'evidence',
+                    label: '补充证明材料',
+                    context: 'caseEvidence',
+                    expected: 'upload',
+                    demo: '上传课程宣传页和学习账号截图',
+                    reply: '已收到补充材料。系统识别到宣传页中载明“12周核心直播课”“一对一导师辅导”“作业点评”“就业接单指导”等内容；学习账号截图显示目前仅开放两节导学录播课。请确认。',
+                    keywords: ['上传', '宣传页', '课程安排', '账号', '截图']
+                },
+                {
+                    key: 'evidence',
+                    label: '补充材料确认',
+                    context: 'caseEvidence',
+                    demo: '确认。',
+                    reply: '材料已基本完整。我将根据您确认的信息生成仲裁申请书初稿。生成后请您重点核对三类内容：\n一是申请人、被申请人身份信息是否准确；\n二是仲裁请求金额是否准确；\n三是事实经过和证据名称是否与实际材料一致。\n是否现在生成？',
+                    keywords: ['确认', '准确', '是的']
+                },
+                {
+                    key: 'evidence',
+                    label: '生成确认',
+                    context: 'caseEvidence',
+                    demo: '生成吧。',
+                    final: true,
+                    keywords: ['生成', '生成吧', '现在生成', '可以']
                 }
             ];
             const filingDemoAnswers = {
-                applicant: '申请人：张三，身份证号：440106199001011234，联系电话：13800138000，联系地址：广州市天河区体育西路 100 号。',
-                respondent: '被申请人：广州某某教育科技有限公司，统一社会信用代码：91440101MA0000000X，联系电话：020-88888888，联系地址：广州市越秀区中山五路 20 号。',
-                claims: '请求事项：请求被申请人退还培训服务费。请求金额：15800 元。金额计算方式：已付款 15800 元，未实际提供约定课程服务，要求全额退还。仲裁费用由被申请人承担。',
-                facts: '签约时间：2025年6月12日。合同内容：线上职业培训课程。付款时间和金额：2025年6月12日支付 15800 元。违约情况：对方未按约安排核心课程，多次沟通退款未果。',
-                evidence: '证明材料线索：1. 培训服务合同；2. 付款凭证；3. 微信沟通记录；4. 退款申请记录；5. 课程未开课通知。可证明双方合同关系、付款事实、对方未履行及退款沟通过程。'
+                applicant: '申请人是李明，身份证号是440106199008081234，电话是13800138000，地址是广州市天河区体育西路某小区。',
+                respondent: '我只知道公司叫广州启航教育咨询有限公司，其他信息合同里应该有。',
+                claims: '暂时不主张违约金和利息，只要退培训费，仲裁费由对方承担。',
+                facts: '我是和一家教育培训机构发生了退费纠纷。我交了15800元培训费，但是他们一直没有按约开课，我想申请仲裁要求退款。',
+                evidence: '确认。'
             };
             const conversationStepIndex = ref(0);
             const applicationReady = ref(false);
+            const isCurrentUploadStep = computed(() => {
+                if (!applicationReady.value) {
+                    const currentField = conversationFields[conversationStepIndex.value];
+                    return Boolean(currentField && currentField.expected === 'upload');
+                }
+                return currentUploadRule.value.required;
+            });
             const applicationDraft = ref({
                 applicant: '',
                 respondent: '',
@@ -276,96 +405,101 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             `;
             const buildFinalApplicationReviewHtml = () => {
                 const today = getTodayParts();
-                const applicant = draftText('applicant');
-                const respondent = draftText('respondent');
-                const claims = draftText('claims');
-                const facts = draftText('facts');
-                const evidence = draftText('evidence');
+                const docField = (field, value, className = '') => `
+                    <span class="application-fill doc-fill ${className}" contenteditable="true" data-required="true" data-field="${field}" data-placeholder="">${escapeHtml(value)}</span>
+                `;
+                const docBlock = (field, value, className = '') => `
+                    <div class="application-fill doc-fill doc-fill-block ${className}" contenteditable="true" data-required="true" data-field="${field}" data-placeholder="">${escapeHtml(value)}</div>
+                `;
+                const applicantName = '李明';
+                const applicantId = '440106199008081234';
+                const applicantGender = Number(applicantId.charAt(16)) % 2 === 1 ? '男' : '女';
+                const applicantBirthDate = new Date(`${applicantId.slice(6, 10)}-${applicantId.slice(10, 12)}-${applicantId.slice(12, 14)}`);
+                const applicantAge = String(Math.max(0, today.year - applicantBirthDate.getFullYear() - (
+                    new Date(`${today.year}-${today.month}-${today.day}`) < new Date(`${today.year}-${applicantId.slice(10, 12)}-${applicantId.slice(12, 14)}`) ? 1 : 0
+                )));
+                const applicantAddress = '广州市天河区体育西路某小区';
+                const applicantPhone = '13800138000';
+                const respondentName = '广州启航教育咨询有限公司';
+                const respondentCreditCode = '以《培训服务合同》及主体材料载明信息为准';
+                const respondentAddress = '以《培训服务合同》及主体材料载明信息为准';
+                const respondentPhone = '以《培训服务合同》及主体材料载明信息为准';
+                const claimOne = '请求裁决被申请人退还培训服务费15800元。';
+                const claimTwo = '请求裁决被申请人承担本案仲裁费。';
+                const claimThree = '申请人暂不主张违约金、利息、交通费或其他损失。';
+                const facts = '申请人与被申请人签订《培训服务合同》，合同金额为15800元，课程名称为“跨境电商运营实战班”，合同约定因本合同产生的争议提交广州仲裁委员会仲裁。被申请人承诺提供12周核心直播课、一对一导师辅导、作业点评、就业和接单指导等培训服务，原定于2025年10月10日开课。\n\n申请人已于2025年9月15日向被申请人支付培训费用15800元。付款后，被申请人仅为申请人开通学习账号并开放两节导学录播课，未按约安排核心直播课程、一对一导师辅导、作业点评、就业和接单指导等主要服务内容。\n\n被申请人曾于2025年10月8日、10月25日、11月12日多次通知课程延期，理由包括“讲师档期调整”“班级人数不足”“等待下一期开班”等，但始终未能明确实际开课时间。申请人于2025年11月21日首次提出解除合同并要求退还15800元培训费，被申请人表示可以继续等待下一期开班或转到其他课程，但不同意全额退款，并提出如坚持退款仅可扣除30%后退还70%。\n\n申请人认为，被申请人未按约提供核心课程及配套服务，导致合同目的无法实现。申请人多次要求退款未果，故向广州仲裁委员会申请仲裁，请求支持上述仲裁请求。';
+                const evidence = '证据目录包括：《培训服务合同》、微信付款截图、电子收据、课程宣传页、课程安排表、学习账号后台截图、微信群延期通知、班主任微信聊天记录、退款申请截图及微信聊天记录等。';
                 return `
                     <div class="arbitration-flow-card" data-module="final-application-review">
                         <div class="flow-card-head">
                             <div>
-                                <div class="flow-card-title">申请表核对</div>
-                                <div class="flow-card-sub">AI 已根据对话预填，请逐项编辑并确认申请书内容</div>
+                                <div class="flow-card-title">申请书确认</div>
+                                <div class="flow-card-sub">AI 已按甲方模板生成申请书预览，请逐项编辑并确认申请书内容</div>
                             </div>
                             <div class="flow-card-status">AI已预填</div>
                         </div>
-                        <article class="application-paper">
-                            <div class="paper-title">仲裁申请书</div>
-                            <div class="paper-section">
-                                <div class="paper-section-title">申请人：</div>
-                                <div class="paper-field-grid single">
-                                    <div class="paper-field full">
-                                        <label>申请人基础信息</label>
-                                        ${buildFilledField('申请人基础信息', applicant, 'tall', '姓名/名称、证件号、电话、地址')}
+                        <article class="application-paper doc-template">
+                            <section class="doc-page">
+                                <div class="doc-crop top-left"></div>
+                                <div class="doc-crop top-right"></div>
+                                <div class="doc-crop bottom-left"></div>
+                                <div class="doc-crop bottom-right"></div>
+                                <div class="doc-title">仲裁申请书</div>
+                                <div class="doc-row"><strong>申请人：</strong>${docField('申请人姓名', applicantName, 'w-name')}</div>
+                                <div class="doc-row doc-row-grid">
+                                    <span>性别：${docField('申请人性别', applicantGender, 'w-xs')}</span>
+                                    <span>年龄：${docField('申请人年龄', applicantAge, 'w-xs')}</span>
+                                    <span>职业：${docField('申请人职业', '', 'w-sm')}</span>
+                                    <span>工作单位：${docField('申请人工作单位', '', 'w-md')}</span>
+                                </div>
+                                <div class="doc-row">身份证号码：${docField('申请人身份证号码', applicantId, 'w-id')}</div>
+                                <div class="doc-row">住所：${docField('申请人住所', applicantAddress, 'w-line')}</div>
+                                <div class="doc-row">联系电话：${docField('申请人联系电话', applicantPhone, 'w-phone')}</div>
+                                <div class="doc-row"><strong>被申请人：</strong>${docField('被申请人名称', respondentName, 'w-name-long')}</div>
+                                <div class="doc-row doc-row-grid respondent-row">
+                                    <span>法定代表人/负责人：${docField('法定代表人或负责人', '', 'w-md')}</span>
+                                    <span>职务：${docField('职务', '', 'w-sm')}</span>
+                                </div>
+                                <div class="doc-row">统一社会信用代码：${docField('统一社会信用代码', respondentCreditCode, 'w-code')}</div>
+                                <div class="doc-row">住所：${docField('被申请人住所', respondentAddress, 'w-line')}</div>
+                                <div class="doc-row">联系电话：${docField('被申请人联系电话', respondentPhone, 'w-phone')}</div>
+
+                                <div class="doc-section-title">仲裁请求：</div>
+                                <div class="doc-request-line">（一）${docField('仲裁请求一', claimOne, 'w-request')}</div>
+                                <div class="doc-request-line">（二）${docField('仲裁请求二', claimTwo, 'w-request')}</div>
+                                <div class="doc-request-line">（三）${docField('仲裁请求三', claimThree, 'w-request')}</div>
+                                <div class="doc-request-line">（四）${docField('仲裁请求四', '', 'w-request')}</div>
+
+                                <div class="doc-section-title">事实与理由：</div>
+                                ${docBlock('事实与理由', facts, 'doc-facts')}
+                            </section>
+
+                            <section class="doc-page">
+                                <div class="doc-crop top-left"></div>
+                                <div class="doc-crop top-right"></div>
+                                <div class="doc-crop bottom-left"></div>
+                                <div class="doc-crop bottom-right"></div>
+                                <div class="doc-lined-space" aria-hidden="true">
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <div class="doc-closing">
+                                    <div>此致</div>
+                                    <div>广州仲裁委员会</div>
+                                </div>
+                                <div class="doc-attachment">附件：${docField('附件', '证据目录', 'w-attachment')}</div>
+                                <div class="doc-evidence">${docBlock('证据目录说明', evidence, 'doc-evidence-block')}</div>
+                                <div class="doc-signature">
+                                    <div>申请人：${docField('落款申请人', applicantName, 'w-sm')}</div>
+                                    <div>（签名或盖章）</div>
+                                    <div class="doc-date">
+                                        ${docField('落款年份', today.year, 'w-year')}年
+                                        ${docField('落款月份', today.month, 'w-date-part')}月
+                                        ${docField('落款日期', today.day, 'w-date-part')}日
                                     </div>
                                 </div>
-                            </div>
-                            <div class="paper-section">
-                                <div class="paper-section-title">被申请人：</div>
-                                <div class="paper-field-grid single">
-                                    <div class="paper-field full">
-                                        <label>被申请人基础信息</label>
-                                        ${buildFilledField('被申请人基础信息', respondent, 'tall', '姓名/名称、证件号或统一社会信用代码、电话、地址')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="paper-section">
-                                <div class="paper-section-title">仲裁请求：</div>
-                                <div class="paper-field-grid">
-                                    <div class="paper-field full">
-                                        <label>请求事项、金额和计算依据</label>
-                                        ${buildFilledField('请求事项、金额和计算依据', claims, 'tall', '请分项填写请求事项、金额、计算方式')}
-                                    </div>
-                                    <div class="paper-field full">
-                                        <label>仲裁费用承担</label>
-                                        ${buildFilledField('仲裁费用承担', '请求被申请人承担本案仲裁费用及其他依法应由其承担的费用。', 'short', '请填写费用承担请求')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="paper-section">
-                                <div class="paper-section-title">仲裁依据：</div>
-                                <div class="paper-field-grid">
-                                    <div class="paper-field full">
-                                        <label>合同、订单或协议情况</label>
-                                        ${buildFilledField('合同、订单或协议情况', facts, 'tall', '请填写合同/订单/协议名称及主要约定')}
-                                    </div>
-                                    <div class="paper-field full">
-                                        <label>仲裁条款或管辖依据</label>
-                                        ${buildFilledField('仲裁条款或管辖依据', '请在此补充合同、订单、平台协议或其他材料中约定广州仲裁委员会管辖的条款内容。', 'tall', '请填写仲裁条款或其他管辖依据')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="paper-section">
-                                <div class="paper-section-title">事实与理由：</div>
-                                <div class="paper-field-grid single">
-                                    <div class="paper-field full">
-                                        <label>事实经过和理由</label>
-                                        ${buildFilledField('事实经过和理由', facts, 'tall', '请按时间顺序补充签约、付款、履行、违约、沟通过程')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="paper-section">
-                                <div class="paper-section-title">证据及证明内容：</div>
-                                <div class="paper-field-grid single">
-                                    <div class="paper-field full">
-                                        <label>证据名称和证明目的</label>
-                                        ${buildFilledField('证据名称和证明目的', evidence, 'tall', '请列明证据名称、证明目的、对应请求事项')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="paper-section">
-                                <div class="paper-section-title no-bar">此致</div>
-                                <div>广州仲裁委员会</div>
-                            </div>
-                            <div class="paper-sign">
-                                <div class="date-line">
-                                    <span class="date-title">日期</span>
-                                    <span class="date-part"><span class="application-fill" contenteditable="true" data-required="true" data-field="落款年份" data-placeholder="">${today.year}</span>年</span>
-                                    <span class="date-part"><span class="application-fill" contenteditable="true" data-required="true" data-field="落款月份" data-placeholder="">${today.month}</span>月</span>
-                                    <span class="date-part"><span class="application-fill" contenteditable="true" data-required="true" data-field="落款日期" data-placeholder="">${today.day}</span>日</span>
-                                </div>
-                            </div>
+                            </section>
                         </article>
                         <div class="flow-action-row final-review-actions">
                             <button class="flow-primary-btn" type="button" data-action="confirm-final-application-review">确认申请书内容</button>
@@ -1351,6 +1485,11 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     aiReplyTimer = null;
                     try {
                         const text = typeof reply === 'function' ? reply() : reply;
+                        if (!text) {
+                            aiIsThinking.value = false;
+                            scrollAiChatToBottom();
+                            return;
+                        }
                         streamAiMessage(text);
                     } catch (error) {
                         aiIsThinking.value = false;
@@ -1400,10 +1539,10 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 window.location.href = './Step2SmartExtraction.html?from=applicationBot';
             };
             const buildStep2TransferReply = () => buildAiReply({
-                lead: '《仲裁申请书》已生成并暂存。',
+                lead: '《仲裁申请书》已生成。',
                 rows: [
                     { label: '处理结果', value: '申请书草稿已作为本次材料准备成果。' },
-                    { label: '下一步', value: '进入第二步提交案件材料页面，继续上传证据目录和证据材料。' }
+                    { label: '下一步', value: '补充案件材料。' }
                 ],
                 note: '<button class="flow-primary-btn" type="button" data-action="enter-step2-materials">进入第二步：提交案件材料</button>'
             });
@@ -1439,60 +1578,12 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 });
             };
             const confirmFinalApplication = () => {
-                const module = document.querySelector('[data-module="final-application-review"]');
-                const requiredFields = Array.from(module ? module.querySelectorAll('[data-required="true"]') : []);
-                const missingFields = [];
-                requiredFields.forEach(field => {
-                    const value = field.innerText.replace(/\s+/g, '').trim();
-                    const missing = !value;
-                    field.classList.toggle('missing', missing);
-                    if (missing) missingFields.push(field.dataset.field || '必填项');
-                });
-                if (missingFields.length) {
-                    aiMessages.value.push({
-                        id: ++aiMessageId,
-                        role: 'assistant',
-                        content: buildAiReply({
-                            lead: '申请表还有<strong>必填内容未填写</strong>，请先补齐高亮空白项。',
-                            rows: [
-                                { label: '缺失字段', value: missingFields.join('、') },
-                                { label: '处理建议', value: '补齐后再次确认，进入第二步提交案件材料。' }
-                            ]
-                        }),
-                        streaming: false
-                    });
-                    scrollAiChatToBottom();
-                    return;
-                }
                 applicationConfirmed.value = true;
                 finishAiConsult();
             };
             const confirmFinalApplicationReview = () => {
                 const module = document.querySelector('[data-module="final-application-review"]');
-                const requiredFields = Array.from(module ? module.querySelectorAll('[data-required="true"]') : []);
-                const missingFields = [];
-                requiredFields.forEach(field => {
-                    const value = field.innerText.replace(/\s+/g, '').trim();
-                    const missing = !value;
-                    field.classList.toggle('missing', missing);
-                    if (missing) missingFields.push(field.dataset.field || '必填项');
-                });
-                if (missingFields.length) {
-                    aiMessages.value.push({
-                        id: ++aiMessageId,
-                        role: 'assistant',
-                        content: buildAiReply({
-                            lead: '《仲裁申请书》还有<strong>必填内容未填写</strong>，请先补齐高亮空白项。',
-                            rows: [
-                                { label: '缺失字段', value: missingFields.join('、') },
-                                { label: '处理建议', value: '补齐后再次点击“确认申请书内容”。' }
-                            ]
-                        }),
-                        streaming: false
-                    });
-                    scrollAiChatToBottom();
-                    return;
-                }
+                module?.querySelectorAll('.missing').forEach(field => field.classList.remove('missing'));
                 applicationConfirmed.value = true;
                 finalReviewReady.value = false;
                 markApplicationGeneratedForStep2();
@@ -1521,30 +1612,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
                 if (findActionTarget(event, 'confirm-application-doc')) {
                     const module = event.target.closest('[data-module="arbitration-application"]');
-                    const requiredFields = Array.from(module ? module.querySelectorAll('[data-required="true"]') : []);
-                    const missingFields = [];
-                    requiredFields.forEach(field => {
-                        const value = field.innerText.replace(/\s+/g, '').trim();
-                        const missing = !value;
-                        field.classList.toggle('missing', missing);
-                        if (missing) missingFields.push(field.dataset.field || '必填项');
-                    });
-                    if (missingFields.length) {
-                        aiMessages.value.push({
-                            id: ++aiMessageId,
-                            role: 'assistant',
-                            content: buildAiReply({
-                                lead: '《仲裁申请书》还有<strong>必填内容未填写</strong>，请先补齐高亮空白项。',
-                                rows: [
-                                    { label: '缺失字段', value: missingFields.join('、') },
-                                    { label: '处理建议', value: '补齐后再次点击“确认生成《仲裁申请书》”。' }
-                                ]
-                            }),
-                            streaming: false
-                        });
-                        scrollAiChatToBottom();
-                        return;
-                    }
+                    module?.querySelectorAll('.missing').forEach(field => field.classList.remove('missing'));
                     applicationConfirmed.value = true;
                     const status = module && module.querySelector('.flow-card-status');
                     if (status) status.textContent = '已生成';
@@ -1615,9 +1683,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const handleAiPanelInput = (event) => {
                 const target = event.target;
                 if (!target || !target.closest || !target.closest('[data-module="arbitration-application"], [data-module="final-application-review"]')) return;
-                if (target.matches && target.matches('[data-required="true"]')) {
-                    target.classList.toggle('missing', !target.innerText.replace(/\s+/g, '').trim());
-                }
+                if (target.matches && target.matches('[data-required="true"]')) target.classList.remove('missing');
                 if (applicationConfirmed.value) {
                     applicationConfirmed.value = false;
                     const module = target.closest('[data-module="arbitration-application"]');
@@ -1722,10 +1788,15 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         id: ++aiMessageId,
                         role: 'assistant',
                         content: buildAiReply({
-                            lead: '您好，欢迎来到广州仲裁委员会，请问我能为你做什么？',
-                            rows: [
-                                { label: '申请人信息', value: conversationFields[0].prompt },
-                                { label: '本轮结果', value: '信息收集完成后，我会生成一张已预填的申请表，并支持您编辑确认。' }
+                            lead: '您好，欢迎来到广州仲裁委员会，我将根据您的口述信息和上传的证据材料，协助生成仲裁申请书初稿。',
+                            steps: [
+                                '为保证申请书内容完整，我们会依次梳理以下内容：',
+                                '1.申请人和被申请人信息；',
+                                '2.仲裁请求和金额；',
+                                '3.合同关系及仲裁条款；',
+                                '4.事实经过和退款沟通情况；',
+                                '5.证据材料清单。',
+                                '请先简单说明：本案大致是什么纠纷？例如培训退费、服务合同、借款、买卖合同等。'
                             ]
                         }),
                         streaming: false
@@ -1876,9 +1947,13 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
             const recordConversationAnswer = (text) => {
                 const field = conversationFields[conversationStepIndex.value] || conversationFields[conversationFields.length - 1];
+                const previous = applicationDraft.value[field.key];
+                const nextValue = previous && String(previous).trim()
+                    ? `${previous}\n${text}`
+                    : text;
                 applicationDraft.value = {
                     ...applicationDraft.value,
-                    [field.key]: text
+                    [field.key]: nextValue
                 };
                 currentUploadContext.value = field.context || inferUploadContext(text);
                 return field;
@@ -1900,7 +1975,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const buildStayOnCurrentFieldReply = (field) => {
                 currentUploadContext.value = field.context || 'general';
                 return buildAiReply({
-                    lead: `这个问题后面可以再处理。为了先帮您生成申请书，${field.prompt}`,
+                    lead: field.expected === 'upload'
+                        ? `请先上传${field.label}相关材料，便于继续识别并生成申请书。`
+                        : '这个问题后面可以再处理。为了先帮您生成申请书，请先围绕当前问题补充信息。',
                     rows: [
                         { label: '建议这样填写', value: field.key === 'applicant' ? '例如：申请人张三，身份证号……，电话……，地址……。' : '请围绕当前问题补充，暂不清楚的内容可以先写“暂不清楚”。' }
                     ]
@@ -1908,28 +1985,23 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             };
 
             const buildNextCollectionReply = (field, text) => {
+                if (field.final) {
+                    applicationReady.value = true;
+                    currentUploadContext.value = 'caseEvidence';
+                    appendFinalApplicationReview();
+                    return '';
+                }
                 const nextIndex = conversationStepIndex.value + 1;
                 if (nextIndex < conversationFields.length) {
                     const nextField = conversationFields[nextIndex];
                     conversationStepIndex.value = nextIndex;
                     currentUploadContext.value = nextField.context || 'general';
-                    return buildAiReply({
-                        lead: `好的，已记录。${nextField.prompt}`,
-                        rows: [
-                            { label: '当前进度', value: `已完成${field.label}，正在补充${nextField.label}。` }
-                        ]
-                    });
+                    return buildAiReply({ lead: field.reply || `好的，已记录。请继续补充${nextField.label}。` });
                 }
                 applicationReady.value = true;
                 currentUploadContext.value = 'caseEvidence';
                 appendFinalApplicationReview();
-                return buildAiReply({
-                    lead: '好的，已记录。信息已基本收齐，我会先整理成一张<strong>已预填的申请表</strong>，请您在表内编辑、补齐和确认。',
-                    rows: [
-                        { label: '本次整理范围', value: '仲裁申请书草稿。' },
-                        { label: '下一步', value: '请核对表单中的蓝色字段，确认无误后进入第二步提交案件材料。' }
-                    ]
-                });
+                return '';
             };
 
             const sendAiMessage = () => {
@@ -1976,8 +2048,21 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 }
                 const currentField = conversationFields[conversationStepIndex.value];
                 if (!currentField) return;
-                aiInput.value = filingDemoAnswers[currentField.key] || `${currentField.label}：暂按演示材料补充。`;
+                aiInput.value = currentField.demo || filingDemoAnswers[currentField.key] || `${currentField.label}：暂按演示材料补充。`;
                 sendAiMessage();
+            };
+            const autoFillApplicationTemplate = () => {
+                if (aiIsThinking.value) return;
+                applicationReady.value = true;
+                applicationTransferReady.value = false;
+                applicationConfirmed.value = false;
+                finalReviewReady.value = false;
+                currentUploadContext.value = 'caseEvidence';
+                const exists = document.querySelector('[data-module="final-application-review"]');
+                if (!exists) {
+                    appendFinalApplicationReview();
+                }
+                scrollAiChatToBottom();
             };
 
             const chooseAiPreset = (card) => {
@@ -2029,6 +2114,16 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 });
                 aiIsThinking.value = true;
                 scrollAiChatToBottom();
+
+                if (!applicationReady.value) {
+                    const currentField = conversationFields[conversationStepIndex.value] || conversationFields[conversationFields.length - 1];
+                    if (currentField && currentField.expected === 'upload') {
+                        const recordedField = recordConversationAnswer(`已上传${currentField.label}：${aiAttachmentName.value}`);
+                        scheduleAiReply(() => buildNextCollectionReply(recordedField, aiAttachmentName.value));
+                        event.target.value = '';
+                        return;
+                    }
+                }
 
                 scheduleAiReply(buildAiReply({
                     lead: '已记录您上传的材料。',
@@ -2312,9 +2407,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 showCaseTypeBadge, scorePopups, contactService,
                 showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
                 aiInput, aiMessages, aiPresetCards, aiIsThinking, aiScrollBody, aiChatBody, aiFileInput, aiAttachmentName,
-                currentUploadRule, currentUploadContext, applicationConfirmed, applicationReady, applicationTransferReady,
+                currentUploadRule, currentUploadContext, isCurrentUploadStep, applicationConfirmed, applicationReady, applicationTransferReady,
                 showFloatingFinalReportButton,
-                sendAiMessage, playDemoNextStep, chooseAiPreset, triggerAiFileUpload, triggerUploadBlock, handleAiFileChange, finishAiConsult,
+                sendAiMessage, playDemoNextStep, autoFillApplicationTemplate, chooseAiPreset, triggerAiFileUpload, triggerUploadBlock, handleAiFileChange, finishAiConsult,
                 confirmFinalApplication,
                 handleAiPanelClick, handleAiPanelChange, handleAiPanelInput,
                 confirmModal, showConfirmModal, closeConfirmModal, executeConfirmAction,
