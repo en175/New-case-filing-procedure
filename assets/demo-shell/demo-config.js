@@ -4,11 +4,13 @@
   /** 演示配置默认值；每个配置字段单独存为一个 localStorage key */
   const DEFAULT_CONFIG = {
     /** 是否显示左侧导航栏 */
-    isShowNavAside: 1
+    isShowNavAside: 1,
+    /** 是否显示顶部立案流程进度 */
+    isShowFilingHudProgress: 0
   };
 
   /** 开关类字段统一用 0/1 存储，便于在 LS 里直接改 */
-  const SWITCH_KEYS = new Set(['isShowNavAside']);
+  const SWITCH_KEYS = new Set(['isShowNavAside', 'isShowFilingHudProgress']);
 
   function isOn(value) {
     return value === 1 || value === '1' || value === true;

@@ -55,8 +55,13 @@
     document.body.style.removeProperty('--demo-body-pad-left');
   }
 
+  function applyHudProgressConfig(config) {
+    document.body.classList.toggle('demo-hide-filing-hud-progress', !isConfigOn(config.isShowFilingHudProgress));
+  }
+
   function createNav() {
     const demoConfig = window.FilingDemoConfig?.load?.() || { isShowNavAside: 1 };
+    applyHudProgressConfig(demoConfig);
     if (!isConfigOn(demoConfig.isShowNavAside)) {
       teardownNav();
       return;
@@ -133,6 +138,7 @@
 
   window.addEventListener('filing-demo-config-change', event => {
     const config = event.detail || {};
+    applyHudProgressConfig(config);
     if (!isConfigOn(config.isShowNavAside)) {
       teardownNav();
       return;
