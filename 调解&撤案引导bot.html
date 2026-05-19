@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能立案助手</title>
+    <title>智能案情研判助手</title>
     <link rel="icon" href="data:,">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -66,14 +66,14 @@
                             <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
                         </div>
                         <div>
-                            <h2 class="ai-consult-title">智能立案助手</h2>
-                            <p class="ai-consult-desc">围绕申请书请求、事实依据和管辖条款，辅助判断更适合先调解还是仲裁</p>
+                            <h2 class="ai-consult-title">智能案情研判助手</h2>
+                            <p class="ai-consult-desc">基于合同、事实和证据材料，辅助形成案件研判和程序建议</p>
                         </div>
                     </div>
                     <div class="ai-model-badge">
                         <span>已接入 DeepSeek V4 Pro</span>
                     </div>
-                    <button @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking || resultReady">
+                    <button v-if="showDemoStepButton" @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking || resultReady">
                         <i class="fas fa-forward-step"></i>
                         演示下一步
                     </button>
@@ -97,13 +97,13 @@
                                 </div>
                             </div>
                             <div v-if="resultReady" class="diversion-result">
-                                <div class="result-kicker">本轮结果</div>
-                                <h3>建议优先尝试调解，同时保留仲裁路径</h3>
-                                <p>本案目前表现为教育培训合同退款争议，金额清晰、核心事实集中、双方仍有围绕退款金额和履行安排协商的空间。若先进入调解，有机会在较短周期内降低沟通成本；如对方拒绝或方案无法接受，再转入仲裁路径。</p>
+                                <div class="result-kicker">AI建议</div>
+                                <h3>优先选择调解方案，省时省力</h3>
                                 <div class="result-points">
-                                    <div><strong>适合调解的原因</strong><span>争议焦点集中，退款金额和履行情况可通过方案磋商处理。</span></div>
-                                    <div><strong>需要保留的仲裁准备</strong><span>继续保留仲裁条款、合同、付款凭证、沟通记录和证据目录。</span></div>
-                                    <div><strong>下一步建议</strong><span>先启动调解邀约；若对方不同意或未按协议履行，再进入仲裁程序。</span></div>
+                                    <div><strong>案件判断</strong><span>本案属于教育培训合同退费争议，合同关系、付款金额、仲裁条款较为清楚。争议焦点集中在培训机构是否按约提供核心课程、延期是否构成未按约履行，以及已提供录播内容是否应扣减相应费用。</span></div>
+                                    <div><strong>适合调解的原因</strong><span>本案金额明确、证据集中、双方争议点相对单一。通过调解可围绕退款金额、付款期限、合同解除和后续责任一次性处理，有利于降低时间成本和沟通成本。</span></div>
+                                    <div><strong>需重点准备的证据材料</strong><span>建议重点准备培训服务合同、付款凭证、课程宣传页、课程安排表、延期通知、微信沟通记录、退款申请记录、账号使用记录等证据材料。</span></div>
+                                    <div><strong>下一步建议</strong><span>先按“退还14500元、5个工作日内一次性支付、双方就本合同争议一次性了结”的预期方案发起调解；若对方拒绝、拖延或无法达成一致，再进入仲裁立案程序。</span></div>
                                 </div>
                                 <div class="result-actions">
                                     <button class="result-btn arbitration" @click="showConfirmModal('withdraw')">
@@ -129,9 +129,6 @@
                                 <button @click="sendMessage" class="ai-send-btn" aria-label="发送">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
-                            </div>
-                            <div class="ai-upload-rule">
-                                <strong>当前引导：</strong>{{ currentGuide }}
                             </div>
                         </div>
                     </div>

@@ -6,11 +6,13 @@
     /** 是否显示左侧导航栏 */
     isShowNavAside: 1,
     /** 是否显示顶部立案流程进度 */
-    isShowFilingHudProgress: 0
+    isShowFilingHudProgress: 0,
+    /** 是否显示调解与撤案引导 bot 的演示下一步按钮 */
+    isShowDiversionDemoStepBtn: 0
   };
 
   /** 开关类字段统一用 0/1 存储，便于在 LS 里直接改 */
-  const SWITCH_KEYS = new Set(['isShowNavAside', 'isShowFilingHudProgress']);
+  const SWITCH_KEYS = new Set(['isShowNavAside', 'isShowFilingHudProgress', 'isShowDiversionDemoStepBtn']);
 
   function isOn(value) {
     return value === 1 || value === '1' || value === true;
