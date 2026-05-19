@@ -39,24 +39,34 @@
     return pageKeyByFile[file] || '';
   }
 
+  function isConfigOn(value) {
+    const isOn = window.FilingDemoConfig?.isOn || (nextValue => nextValue === 1 || nextValue === '1');
+    return isOn(value);
+  }
+
   function setExpanded(expanded) {
     document.body.classList.toggle('demo-nav-expanded', expanded);
-    try {
-      localStorage.setItem('filingDemoNavExpanded', expanded ? '1' : '0');
-    } catch (error) {}
+  }
+
+  /** isShowNavAside=0 时彻底移除导航，避免残留坍缩态（窄条 + 左侧留白） */
+  function teardownNav() {
+    document.querySelectorAll('.demo-global-nav').forEach(node => node.remove());
+    document.body.classList.remove('demo-nav-ready', 'demo-nav-expanded');
+    document.body.style.removeProperty('--demo-body-pad-left');
   }
 
   function createNav() {
+    const demoConfig = window.FilingDemoConfig?.load?.() || { isShowNavAside: 1 };
+    if (!isConfigOn(demoConfig.isShowNavAside)) {
+      teardownNav();
+      return;
+    }
     if (document.querySelector('.demo-global-nav')) return;
     const originalPaddingLeft = window.getComputedStyle(document.body).paddingLeft || '0px';
     document.body.style.setProperty('--demo-body-pad-left', originalPaddingLeft);
     document.body.classList.add('demo-nav-ready');
 
-    let expanded = true;
-    try {
-      expanded = localStorage.getItem('filingDemoNavExpanded') !== '0';
-    } catch (error) {}
-    setExpanded(expanded);
+    setExpanded(true);
 
     const activeKey = currentPageKey();
     const nav = document.createElement('aside');
@@ -107,9 +117,26 @@
     document.body.appendChild(nav);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', createNav);
-  } else {
+  function startNavAfterConfigReady() {
+    if (!window.FilingDemoConfig) {
+      window.addEventListener('filing-demo-config-ready', startNavAfterConfigReady, { once: true });
+      return;
+    }
     createNav();
   }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startNavAfterConfigReady);
+  } else {
+    startNavAfterConfigReady();
+  }
+
+  window.addEventListener('filing-demo-config-change', event => {
+    const config = event.detail || {};
+    if (!isConfigOn(config.isShowNavAside)) {
+      teardownNav();
+      return;
+    }
+    createNav();
+  });
 })();

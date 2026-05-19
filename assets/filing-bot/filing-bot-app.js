@@ -2274,7 +2274,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 clearInterval(aiStreamTimer);
                 const shouldOpenReport = (() => {
                     try {
-                        const flag = localStorage.getItem('filingDemoOpenReport');
+                        const flag = localStorage.getItem('filingDemoOpenReport') || '';
                         return flag === 'auxTool' || flag === 'filingBot';
                     } catch (error) {
                         return false;
