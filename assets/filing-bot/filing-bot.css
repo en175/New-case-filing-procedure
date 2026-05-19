@@ -1067,6 +1067,19 @@
             vertical-align: -2px;
             animation: blink 1s step-start infinite;
         }
+        .ai-inline-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 16px;
+            margin-left: 4px;
+            border-radius: 999px;
+            background: #2563eb;
+            vertical-align: -2px;
+            animation: blink 1s step-start infinite;
+        }
+        .ai-bubble:not(.ai-streaming-cursor) .ai-inline-cursor {
+            display: none;
+        }
         .ai-finish-btn:hover {
             transform: translateY(-2px);
             background-position: 100% 0;
@@ -2308,6 +2321,173 @@
         .date-part .application-fill[data-field="落款年份"] {
             min-width: 54px;
             width: 54px;
+        }
+        .doc-template {
+            margin: 18px;
+            padding: 18px;
+            background: #eef7f1;
+            border: 1px solid #d5e7db;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .65);
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 14px;
+            overflow-x: auto;
+            justify-items: center;
+        }
+        .doc-page {
+            position: relative;
+            width: min(620px, 100%);
+            min-height: 880px;
+            padding: 54px 56px 48px;
+            background: #fff;
+            border: 1px solid #d7d7d7;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+            color: #000;
+            font-family: SimSun, "Songti SC", "Noto Serif CJK SC", serif;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+        .doc-title {
+            margin-bottom: 18px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .doc-row,
+        .doc-request-line,
+        .doc-attachment {
+            min-height: 24px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+        .doc-row-grid {
+            display: grid;
+            grid-template-columns: auto auto auto 1fr;
+            gap: 8px;
+            align-items: end;
+        }
+        .doc-row-grid.respondent-row {
+            grid-template-columns: 1fr 1fr;
+        }
+        .doc-section-title {
+            margin: 8px 0 2px;
+            font-weight: 700;
+        }
+        .doc-template .application-fill {
+            min-height: 0;
+            padding: 0 4px 1px !important;
+            color: #000 !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-bottom: 1px solid #000 !important;
+            border-radius: 0;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1.45;
+            vertical-align: baseline;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .doc-template .application-fill:empty::before {
+            content: "";
+        }
+        .doc-fill {
+            display: inline-block;
+        }
+        .doc-fill-block {
+            display: block;
+            width: 100%;
+            min-height: 160px;
+            padding: 2px 0 !important;
+            line-height: 1.8;
+            background-image: repeating-linear-gradient(
+                to bottom,
+                transparent 0,
+                transparent 25px,
+                #000 26px,
+                transparent 27px
+            ) !important;
+            border-bottom: 0 !important;
+        }
+        .doc-facts {
+            min-height: 176px;
+        }
+        .doc-evidence-block {
+            min-height: 64px;
+            font-size: 11px;
+        }
+        .w-xs { min-width: 38px; }
+        .w-sm { min-width: 66px; }
+        .w-md { min-width: 120px; }
+        .w-name { min-width: 178px; }
+        .w-name-long { min-width: 260px; }
+        .w-id { min-width: 190px; }
+        .w-line { min-width: 320px; }
+        .w-phone { min-width: 160px; }
+        .w-code { min-width: 210px; }
+        .w-request { min-width: 315px; }
+        .w-attachment { min-width: 120px; }
+        .w-year { min-width: 42px; text-align: center; }
+        .w-date-part { min-width: 28px; text-align: center; }
+        .doc-lined-space {
+            display: grid;
+            gap: 13px;
+            margin-top: 8px;
+            margin-bottom: 32px;
+        }
+        .doc-lined-space span {
+            display: block;
+            height: 13px;
+            border-bottom: 1px solid #000;
+        }
+        .doc-closing {
+            margin: 28px 0 28px 24px;
+            line-height: 1.8;
+        }
+        .doc-evidence {
+            margin-top: 6px;
+        }
+        .doc-signature {
+            margin-top: 30px;
+            margin-left: auto;
+            width: 180px;
+            line-height: 1.9;
+            text-align: left;
+        }
+        .doc-date {
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+        .doc-crop {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+        }
+        .doc-crop::before,
+        .doc-crop::after {
+            content: "";
+            position: absolute;
+            background: #b7b7b7;
+        }
+        .doc-crop::before {
+            width: 1px;
+            height: 14px;
+        }
+        .doc-crop::after {
+            width: 14px;
+            height: 1px;
+        }
+        .doc-crop.top-left { top: 42px; left: 42px; }
+        .doc-crop.top-right { top: 42px; right: 42px; transform: rotate(90deg); }
+        .doc-crop.bottom-left { bottom: 42px; left: 42px; transform: rotate(-90deg); }
+        .doc-crop.bottom-right { bottom: 42px; right: 42px; transform: rotate(180deg); }
+        @media (max-width: 760px) {
+            .doc-page {
+                width: 100%;
+                padding: 44px 34px 40px;
+            }
         }
         .flow-action-row {
             padding: 0 18px 18px;

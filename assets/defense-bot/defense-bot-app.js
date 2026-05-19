@@ -1,5 +1,38 @@
 const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
+const PARTIAL_REFUND_DIALOGUE = [
+    { role: 'assistant', text: '李明，你要求全额退还15800元，我们不同意。你现在的说法是“对方没有提供服务”，但事实并不是这样。账号已经开通，导学课程已经开放，你也有登录学习记录。你不能一边使用了服务，一边主张对方零履行、全额退款。' },
+    { role: 'user', text: '我只是看了两节导学录播课，核心直播课根本没开。' },
+    { role: 'assistant', text: '你不要把“核心直播课延期”偷换成“合同完全没有履行”。这是两个问题。延期最多说明履行存在争议，不等于你当然有权解除合同，更不等于你当然可以拿回全部费用。' },
+    { role: 'user', text: '可是合同和宣传页都写了12周核心直播课、一对一辅导和作业点评。' },
+    { role: 'assistant', text: '那请你拿出合同正文。宣传页不是退款条款，也不是解除条款。你要全额退款，就请明确指出合同里哪一条写着：只要直播课延期，学员可以无条件全额退款。如果没有，你的请求就是把自己的理解当成合同约定。' },
+    { role: 'user', text: '合同虽然没有写无条件全额退款，但你们没有按约提供主要服务。' },
+    { role: 'assistant', text: '“主要服务没有提供”也不是你单方定义的。合同约定的是一揽子培训服务，不是只要某一项服务没有按你期待的时间提供，就可以否定全部履行。你已经获得账号、课程入口、导学内容、班主任服务，这些你准备怎么解释？' },
+    { role: 'user', text: '这些不是我真正购买的核心内容。' },
+    { role: 'assistant', text: '你说“不是真正购买的核心内容”，这是你的主观评价。仲裁看的是合同约定和实际履行，不是你事后认为哪些值钱、哪些不值钱。你如果主张这些服务没有价值，就请举证说明两节导学课、平台账号、班主任服务的价值为零。' },
+    { role: 'user', text: '我不需要证明它们为零，你们要证明扣30%合理。' },
+    { role: 'assistant', text: '我们当然会证明。平台开通记录、课程配置记录、班主任服务记录、学习记录都可以证明服务已经开始履行。反过来，你要证明自己有权全额退款。你目前的证据只能证明延期，不能直接证明全额退款成立。' },
+    { role: 'user', text: '你们延期了三次，而且一直不给明确开课时间。' },
+    { role: 'assistant', text: '延期三次不等于合同目的必然无法实现。你报名这个课程有没有明确写明必须在某个日期前完成？有没有约定逾期开课几天就可以全额退款？有没有证据证明我们明确拒绝继续履行？如果这些都没有，你的解除理由并不稳。' },
+    { role: 'user', text: '你们一直拖，我当然不能无限期等。' },
+    { role: 'assistant', text: '你可以不等，但“不愿意继续等”和“依法可以全额退款”不是一回事。你现在最大的问题是：你把履行瑕疵直接放大成根本违约，把部分退款争议直接包装成全额退款请求。这个逻辑在仲裁里未必站得住。' },
+    { role: 'user', text: '那你们准备怎么处理？' },
+    { role: 'assistant', text: '我们的立场很明确：不同意全额退款。最多退还70%，也就是11060元。这个金额已经考虑了未开核心直播课的情况。如果你坚持15800元，我们就进入仲裁，由仲裁庭判断你已经使用的服务是否应当扣减。' },
+    { role: 'user', text: '11060元太低了，我不能接受。' },
+    { role: 'assistant', text: '那你也要清楚，仲裁不是你说退多少就退多少。你主张14500元，等于只允许我们扣1300元。这个金额凭什么来？你如何证明已经开通的课程、账号、资料、班主任服务、平台资源全部只值1300元？' },
+    { role: 'user', text: '因为你们真正核心的课没有开，这些东西本来就不值这么多钱。' },
+    { role: 'assistant', text: '“不值这么多钱”仍然是你的判断。我们不接受这种没有计算依据的金额。我们可以调解，但不是因为认可你的全部主张，而是为了减少双方程序成本。调解金额可以提高到13000元，一次性支付。超过这个金额，我们建议直接仲裁。' },
+    { role: 'user', text: '13000元还是太低。我最低接受14000元。' },
+    { role: 'assistant', text: '14000元已经接近全额退款。我们没有义务在证据和合同依据都存在争议的情况下接受这个金额。最后方案：13500元，5个工作日内一次性支付，合同解除，双方就本合同费用返还问题一次性了结。你接受，就调解；不接受，就走仲裁。' },
+    { role: 'user', text: '我还是要求14000元。' },
+    { role: 'assistant', text: '可以，那我们把话说清楚：如果走仲裁，我们会抗辩三点。第一，你已经使用部分服务，不存在全额退款基础；第二，延期不等于根本违约；第三，合同没有约定你可以无条件全额退款。你要承担仲裁周期、举证压力和金额被扣减的风险。' },
+    { role: 'user', text: '我知道有风险，但我也有证据证明你们没有提供核心课程。' },
+    { role: 'assistant', text: '所以这就是一个退款比例争议，不是你单方主张全额退款就能解决。我们最终可以在13500元基础上再让一步，退还13800元，5个工作日内一次性支付。这个金额已经接近我们的调解上限。' },
+    { role: 'user', text: '如果是13800元，我还要考虑。但我更希望14000元。' },
+    { role: 'assistant', text: '14000元可以作为最终一次性方案，但必须附带两个条件：第一，付款完成后双方合同解除，费用争议一次性了结；第二，你不得再就本合同另行主张违约金、利息、赔偿或其他费用。逾期未付款的，你可以继续申请仲裁。这个条件接受，才有调解空间。' },
+    { role: 'user', text: '可以。只要5个工作日内一次性退14000元，我接受。' }
+];
+
     createApp({
         setup() {
             // Assets
@@ -98,11 +131,21 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const aiAttachmentName = ref('');
             const aiReplyDelay = 3000;
             let aiMessageId = 0;
-            let aiStreamTimer = null;
-            let aiReplyTimer = null;
             const aiMessages = ref([]);
+            let aiTypewriter = null;
             const aiDefenseRoundCount = ref(0);
-            const canFinishAiConsult = computed(() => aiDefenseRoundCount.value >= 3);
+            const aiPartialRefundScriptActive = ref(false);
+            const partialRefundCursor = ref(0);
+            const AI_DEFENSE_REQUIRED_ROUNDS = 3;
+            const canFinishAiConsult = computed(() => aiDefenseRoundCount.value >= AI_DEFENSE_REQUIRED_ROUNDS);
+            const aiInputPlaceholder = computed(() => {
+                if (!aiPartialRefundScriptActive.value) return '';
+                const step = PARTIAL_REFUND_DIALOGUE[partialRefundCursor.value];
+                if (step && step.role === 'user') {
+                    return `请扮演申请人输入（可参考）：${step.text}`;
+                }
+                return '请等待被申请人回复…';
+            });
             const aiPresetCards = ref([
                 {
                     title: '课程已经提供',
@@ -138,11 +181,10 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 },
                 {
                     title: '只接受部分退款',
-                    desc: '模拟对方愿意协商，但不同意全额退费。',
+                    desc: '模拟双方就退款比例多轮拉锯，最终收敛到可调解金额。',
                     tag: '调解争议',
                     icon: 'fas fa-handshake',
-                    prompt: '如果调解，你们能不能全额退款？',
-                    answer: '全额退款我们无法接受。我们已经投入老师、教务、系统账号和课程资源，也提供过部分服务。如果进入调解，我们最多考虑扣除已履行部分和必要成本后，按一个合理比例处理。<br><br>如果您坚持全额退款，那双方差距会比较大。我们可以讨论分期退一部分，也可以提供补课或延期服务，但不接受把所有经营成本都由我们承担。'
+                    scriptId: 'partial-refund'
                 },
                 {
                     title: '经营困难分期退',
@@ -783,68 +825,115 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 });
             };
 
-            const clearAiReplyTimer = () => {
-                if (aiReplyTimer) {
-                    window.clearTimeout(aiReplyTimer);
-                    aiReplyTimer = null;
+            const getAiTypewriter = () => {
+                if (!aiTypewriter) {
+                    aiTypewriter = window.createAiTypewriter({
+                        messagesRef: aiMessages,
+                        thinkingRef: aiIsThinking,
+                        replyDelay: aiReplyDelay,
+                        fallbackText: '我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务、您是否配合履行以及完整沟通记录核算。',
+                        nextId: () => ++aiMessageId,
+                        escapeHtml,
+                        scrollToBottom: scrollAiChatToBottom
+                    });
                 }
+                return aiTypewriter;
             };
+            const mediationEntryHtml = '<br><br><span class="text-slate-500">如果希望降低对抗成本，可以直接申请调解：</span><br><a class="ai-mediation-link" href="./调解申请提交结果.html"><i class="fas fa-handshake"></i>进入调解</a>';
+            const shouldShowMediationEntry = () => (
+                stage.value === 'ai_consult' && aiDefenseRoundCount.value >= AI_DEFENSE_REQUIRED_ROUNDS
+            );
+            const getMediationAfterCompleteHtml = () => (shouldShowMediationEntry() ? mediationEntryHtml : '');
+            const clearAiReplyTimer = () => getAiTypewriter().clearReplyTimer();
+            const clearAiStreamTimer = () => getAiTypewriter().clearStreamTimer();
 
-            const streamAiMessage = (text) => {
-                clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
-                const normalizedText = String(text || '我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务和完整沟通记录核算。')
-                    .replace(/<br\s*\/?>/gi, '\n')
-                    .replace(/<\/?strong>/gi, '');
-                const mediationEntryHtml = '<br><br><span class="text-slate-500">如果希望降低对抗成本，可以直接申请调解：</span><br><a class="ai-mediation-link" href="./调解申请提交结果.html"><i class="fas fa-handshake"></i>进入调解</a>';
-                const message = {
+            const pushAiChatAssistantMessage = (text, { showMediation = false } = {}) => {
+                let content = escapeHtml(text);
+                if (showMediation) {
+                    content += mediationEntryHtml;
+                }
+                aiMessages.value.push({
                     id: ++aiMessageId,
                     role: 'assistant',
-                    content: '',
-                    streaming: true
-                };
-                aiMessages.value.push(message);
-                const streamingMessage = aiMessages.value[aiMessages.value.length - 1];
-                aiIsThinking.value = false;
-
-                let index = 0;
-                aiStreamTimer = window.setInterval(() => {
-                    if (index < normalizedText.length) {
-                        const char = normalizedText.charAt(index);
-                        streamingMessage.content += char === '\n' ? '<br>' : escapeHtml(char);
-                        index++;
-                        scrollAiChatToBottom();
-                    } else {
-                        streamingMessage.streaming = false;
-                        clearInterval(aiStreamTimer);
-                        if (stage.value === 'ai_consult') {
-                            streamingMessage.content += mediationEntryHtml;
-                        }
-                        scrollAiChatToBottom();
-                    }
-                }, 28);
+                    content,
+                    streaming: false
+                });
+                scrollAiChatToBottom();
             };
 
-            const scheduleAiReply = (reply, delay = aiReplyDelay) => {
-                clearAiReplyTimer();
-                aiReplyTimer = window.setTimeout(() => {
-                    aiReplyTimer = null;
-                    try {
-                        const text = typeof reply === 'function' ? reply() : reply;
-                        streamAiMessage(text);
-                    } catch (error) {
+            const finishPartialRefundScript = () => {
+                aiPartialRefundScriptActive.value = false;
+                partialRefundCursor.value = 0;
+                pushAiChatAssistantMessage('', { showMediation: true });
+            };
+
+            const advancePartialRefundAfterUserSend = () => {
+                partialRefundCursor.value += 1;
+                if (partialRefundCursor.value >= PARTIAL_REFUND_DIALOGUE.length) {
+                    finishPartialRefundScript();
+                    return;
+                }
+
+                const next = PARTIAL_REFUND_DIALOGUE[partialRefundCursor.value];
+                if (!next || next.role !== 'assistant') {
+                    finishPartialRefundScript();
+                    return;
+                }
+
+                aiIsThinking.value = true;
+                scheduleAiReply(next.text, 650, {
+                    afterCompleteHtml: '',
+                    afterComplete: () => {
+                        partialRefundCursor.value += 1;
                         aiIsThinking.value = false;
-                        streamAiMessage('我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务、您是否配合履行以及完整沟通记录核算。');
                     }
-                }, delay);
+                });
             };
+
+            const startPartialRefundScript = () => {
+                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+
+                clearAiReplyTimer();
+                clearAiStreamTimer();
+                aiInput.value = '';
+                aiAttachmentName.value = '';
+                aiMessages.value = [];
+                aiDefenseRoundCount.value = 0;
+                aiMessageId = 0;
+                aiPartialRefundScriptActive.value = true;
+                partialRefundCursor.value = 0;
+                scrollAiChatToBottom();
+
+                const opening = PARTIAL_REFUND_DIALOGUE[0];
+                if (!opening || opening.role !== 'assistant') {
+                    aiPartialRefundScriptActive.value = false;
+                    return;
+                }
+
+                aiIsThinking.value = true;
+                scheduleAiReply(opening.text, 650, {
+                    afterCompleteHtml: '',
+                    afterComplete: () => {
+                        partialRefundCursor.value = 1;
+                        aiIsThinking.value = false;
+                    }
+                });
+            };
+            const streamAiMessage = (text, streamOptions = {}) => getAiTypewriter().streamMessage(text, {
+                afterCompleteHtml: getMediationAfterCompleteHtml(),
+                ...streamOptions
+            });
+            const scheduleAiReply = (reply, delay = aiReplyDelay, streamOptions) => getAiTypewriter().scheduleReply(reply, delay, {
+                afterCompleteHtml: getMediationAfterCompleteHtml(),
+                ...(streamOptions || {})
+            });
 
             const setAiStaticGreeting = () => {
                 aiMessages.value = [
                     {
                         id: ++aiMessageId,
                         role: 'assistant',
-                        content: '我们先说明立场：全额退款我们目前无法接受。您可以直接就退款、违约、补课、调解或分期履行提出问题，我们会按合同约定和实际履行情况回应。<br><br><span class="text-slate-500">如果希望降低对抗成本，可以直接申请调解：</span><br><a class="ai-mediation-link" href="./调解申请提交结果.html"><i class="fas fa-handshake"></i>进入调解</a>',
+                        content: '我们先说明立场：全额退款我们目前无法接受。您可以直接就退款、违约、补课、调解或分期履行提出问题，我们会按合同约定和实际履行情况回应。',
                         streaming: false
                     }
                 ];
@@ -892,7 +981,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const sendAiMessage = () => {
                 const text = aiInput.value.trim();
                 if (!text || aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
 
                 aiMessages.value.push({
                     id: ++aiMessageId,
@@ -902,15 +991,24 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 });
                 aiDefenseRoundCount.value += 1;
                 aiInput.value = '';
-                aiIsThinking.value = true;
                 scrollAiChatToBottom();
 
+                if (aiPartialRefundScriptActive.value) {
+                    advancePartialRefundAfterUserSend();
+                    return;
+                }
+
+                aiIsThinking.value = true;
                 scheduleAiReply(() => getAiReply(text));
             };
 
             const chooseAiPreset = (card) => {
-                if (aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                if (card.scriptId === 'partial-refund') {
+                    startPartialRefundScript();
+                    return;
+                }
+                clearAiStreamTimer();
                 aiMessages.value.push({
                     id: ++aiMessageId,
                     role: 'user',
@@ -933,8 +1031,8 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
             const handleAiFileChange = (event) => {
                 const file = event.target.files && event.target.files[0];
-                if (!file || aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                if (!file || aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                clearAiStreamTimer();
                 aiAttachmentName.value = file.name;
 
                 aiMessages.value.push({
@@ -955,7 +1053,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 if (!canFinishAiConsult.value) return;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
+                aiPartialRefundScriptActive.value = false;
+                partialRefundCursor.value = 0;
                 try {
                     const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
                     completed.defense = true;
@@ -1078,7 +1178,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 aiDefenseRoundCount.value = 0;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
+                aiPartialRefundScriptActive.value = false;
+                partialRefundCursor.value = 0;
                 setAiStaticGreeting();
             });
 
@@ -1095,7 +1197,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 analysisData, filingMeta, confirmAnalysis,
                 showCaseTypeBadge, scorePopups, contactService,
                 showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
-                aiInput, aiMessages, aiPresetCards, aiIsThinking, aiChatBody, aiFileInput, aiAttachmentName,
+                aiInput, aiInputPlaceholder, aiMessages, aiPresetCards, aiIsThinking, aiPartialRefundScriptActive, aiChatBody, aiFileInput, aiAttachmentName,
                 aiDefenseRoundCount, canFinishAiConsult,
                 filingProgressSteps, isProgressStepDone, getProgressStepClass,
                 sendAiMessage, chooseAiPreset, triggerAiFileUpload, handleAiFileChange, finishAiConsult,

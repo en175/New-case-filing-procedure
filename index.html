@@ -35,6 +35,8 @@
     }
     .left-video-card {
       flex: 0 0 30%;
+      max-width: 460px;
+      max-height: calc(100vh - 48px);
       background: #fff;
       border-radius: 24px;
       padding: 16px;
@@ -44,7 +46,9 @@
     }
     .video-wrapper {
       width: 100%;
-      height: 100%;
+      height: min(100%, calc(100vh - 80px));
+      max-height: calc(100vh - 80px);
+      aspect-ratio: 9 / 16;
       background: #000;
       border-radius: 16px;
       overflow: hidden;
@@ -53,8 +57,10 @@
     .step-video {
       width: 100%;
       height: 100%;
+      max-height: calc(100vh - 80px);
       min-height: 420px;
       object-fit: cover;
+      display: block;
     }
     .right-content {
       flex: 1;
@@ -378,6 +384,25 @@
       </div>
     </div>
 
+    <div class="step-content-wrapper materials-section tw-shadow-md">
+      <div class="step-title-block">
+        <div class="blue-bar"></div>
+        <div class="title-text">网上立案必备材料</div>
+        <div class="subtitle-text">请在填写立案申请表单前准备好以下材料</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px;">序号</th>
+            <th style="width:160px;">材料类别</th>
+            <th>具体材料及要求</th>
+            <th style="width:220px;">注意事项</th>
+          </tr>
+        </thead>
+        <tbody id="materialsBody"></tbody>
+      </table>
+    </div>
+
   </div>
 
   <script>
@@ -385,8 +410,8 @@
       applicantType: '',
       selectedTarget: '',
       caseTypeArr: [
-        { value: '已有申请书', label: '已有申请书', desc: '已经准备好申请书，可直接上传申请书、证据目录和证据材料，进入提交前核对。', icon: 'el-icon-document-checked', target: './Step2SmartExtraction.html' },
-        { value: '暂无申请书，AI 对话生成申请书', label: '暂无申请书，AI 对话生成申请书', desc: '还没准备申请书时，先通过 AI 对话梳理当事人、纠纷事实、请求事项和金额，生成后进入第二步提交材料。', icon: 'el-icon-s-opportunity', target: './申请书bot.html' }
+        { value: '已有申请书', label: '已有申请书', desc: '已经准备好申请书，可直接上传申请书、证据目录和证据材料。', icon: 'el-icon-document-checked', target: './Step2SmartExtraction.html' },
+        { value: '暂无申请书，AI 对话生成申请书', label: '暂无申请书，AI 对话生成申请书', desc: '还没准备申请书时，先通过 AI 对话梳理当事人、纠纷事实、请求事项和金额，ai自动生成申请书。', icon: 'el-icon-s-opportunity', target: './申请书bot.html' }
       ],
       materialsData: [
         {
@@ -538,7 +563,9 @@
     })
     renderApplicantTypes()
     updateNextButton()
+    renderMaterials()
   </script>
+  <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
 </body>
 </html>

@@ -260,7 +260,7 @@
       display: flex;
       justify-content: space-between;
       gap: 32px;
-      align-items: flex-end;
+      align-items: flex-start;
       z-index: 1;
     }
 
@@ -298,31 +298,6 @@
       color: var(--muted);
       font-size: 15px;
       line-height: 1.8;
-    }
-
-    .case-chip {
-      flex: none;
-      min-width: 310px;
-      padding: 16px 18px;
-      border-radius: 18px;
-      border: 1px solid #dbe7f1;
-      background: #f8fbff;
-      box-shadow: 0 12px 32px rgba(15, 23, 42, .06);
-    }
-
-    .case-chip span {
-      display: block;
-      color: var(--subtle);
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .case-chip strong {
-      display: block;
-      margin-top: 5px;
-      font-size: 17px;
-      line-height: 1.35;
-      font-weight: 900;
     }
 
     .head-actions {
@@ -659,7 +634,6 @@
       .choice-panel { min-height: 0; padding: 30px 20px; }
       .panel-head { align-items: stretch; flex-direction: column; }
       .head-actions { align-items: stretch; flex-direction: column; }
-      .case-chip { min-width: 0; }
       .card-grid { grid-template-columns: 1fr; }
       .choice-card { height: 430px; }
       .system-topbar { height: auto; min-height: 86px; align-items: flex-start; padding: 10px 14px; }
@@ -699,10 +673,6 @@
           </div>
           <div class="head-actions">
             <a class="back-link" href="./申请书bot.html"><i class="fas fa-arrow-left"></i>返回案件评估报告</a>
-            <aside class="case-chip">
-              <span>当前案件类型</span>
-              <strong>教育培训服务合同退费纠纷</strong>
-            </aside>
           </div>
         </div>
 
@@ -714,7 +684,7 @@
                   <div class="card-icon"><i class="fas fa-list-check"></i></div>
                 </div>
                 <div>
-                  <h2 class="card-title">快速完成案情问答</h2>
+                  <h2 class="card-title">案情问答</h2>
                   <p class="card-desc">通过互动问答与视频讲解，帮助你梳理合同、履行、退款和证据要点。</p>
                 </div>
               </div>
@@ -742,7 +712,7 @@
                   <div class="card-icon"><i class="fas fa-comments"></i></div>
                 </div>
                 <div>
-                  <h2 class="card-title">AI模拟·提前看看对方会怎么说</h2>
+                  <h2 class="card-title">AI模拟被申请人·提前看看对方会怎么说</h2>
                   <p class="card-desc">提前听一听对方可能如何回应您的退款主张。</p>
                 </div>
               </div>
@@ -813,6 +783,7 @@
       link.addEventListener('click', () => markCompleted(link.dataset.enter));
     });
   </script>
+  <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
 </body>
 </html>

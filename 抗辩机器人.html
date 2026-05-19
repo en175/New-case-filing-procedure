@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI模拟对方抗辩</title>
+    <title>AI模拟被申请人</title>
     <link rel="icon" href="data:,">
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -220,7 +220,7 @@
                 </div>
             </div>
             <h2 class="text-3xl font-bold mb-3 tracking-wide" style="text-shadow: 0 0 10px rgba(59,130,246,0.5);">智能解析中...</h2>
-            <p class="text-blue-200 text-lg tracking-wider">正在分析案情要素与分流规则</p>
+            <p class="text-blue-200 text-lg tracking-wider">正在分析案情要素</p>
         </div>
 
         <!-- Analysis Result Page -->
@@ -366,8 +366,7 @@
                     </div>
                 </div>
                 <div>
-                    <h2 class="ai-consult-title">AI模拟对方抗辩</h2>
-                    <p class="ai-consult-desc">以被申请人口吻模拟争议对话</p>
+                    <h2 class="ai-consult-title">AI模拟被申请人</h2>
                 </div>
                 <a class="ai-back-link" href="./立案提交后路径选择.html">
                     <i class="fas fa-arrow-left"></i>
@@ -377,24 +376,11 @@
 
             <div class="ai-chat-body custom-scrollbar" ref="aiChatBody">
                 <div class="ai-welcome-panel">
-                    <h3 class="ai-welcome-title">你好<strong>李海洋</strong>，下面将模拟被申请人与您直接对话。</h3>
+                    <h3 class="ai-welcome-title">你好<strong>李明</strong>，下面将模拟被申请人与您直接对话。</h3>
                     <p class="ai-welcome-desc">请选择一个争议场景，由培训机构一方直接回应您的退款主张，重点呈现对方可能坚持的事实和理由。</p>
                     <div class="ai-preset-grid">
-                        <button v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking">
-                            <div v-if="index === 2" class="ai-card-robot">
-                                <span class="ai-card-robot-tip">现在由对方回应</span>
-                                <div class="ai-bot-mark compact">
-                                    <div class="ai-bot-bubble">
-                                        <div class="ai-bot-bars">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <button v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking || aiPartialRefundScriptActive">
+                      
                             <div class="ai-preset-icon">
                                 <i :class="card.icon"></i>
                             </div>
@@ -443,18 +429,18 @@
 
             <div class="ai-input-area">
                 <div class="ai-input-shell">
-                    <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" placeholder="可以直接向对方提出退款、违约、补课、调解等问题，也可以上传合同、付款凭证、沟通截图等材料"></textarea>
+                    <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" :placeholder="aiInputPlaceholder"></textarea>
                     <div class="ai-input-options">
                         <button @click="triggerAiFileUpload" class="ai-attach-btn" aria-label="上传附件">
                             <i class="fas fa-paperclip"></i>
                         </button>
                         <input ref="aiFileInput" type="file" class="hidden" @change="handleAiFileChange" />
-                        <button @click="sendAiMessage" class="ai-send-btn" aria-label="发送">
+                        <button @click="sendAiMessage" class="ai-send-btn" :disabled="aiIsThinking" aria-label="发送">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
-                <button @click="finishAiConsult" class="ai-finish-btn" :disabled="!canFinishAiConsult">
+                <button v-if="canFinishAiConsult" @click="finishAiConsult" class="ai-finish-btn" :disabled="!canFinishAiConsult">
                     <span>{{ canFinishAiConsult ? '结束对话，进入下一步' : `还需对话 ${Math.max(0, 3 - aiDefenseRoundCount)} 轮` }}</span>
                 </button>
             </div>
@@ -827,7 +813,9 @@
 
     </div>
 
+<script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/defense-bot/defense-bot-app.js"></script>
+  <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
 </body>
 </html>
