@@ -429,106 +429,10 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 return '请先选择下方处理方式，确认后本次立案流程即完成。';
             });
             
-            // Add currentReportType and two report data objects
             const currentReportType = ref('default');
-            
-            const reportDataDefault = {
-                risk_level: "较高风险",
-                risk_overview: "你方手握合同、付款凭证且对方确在清算，看似优势明显，似乎已立于不败之地。然而，你方核心的违约指控（服务不专业、无效果）缺乏有力证据支撑，对方可凭借对己方有利的合同条款轻松抗辩，而公司清算更将导致漫长、高成本的执行难题。胜算有，但赢的代价可能远超预期。",
-                success_probability_max: "55",
-                success_probability_min: "35",
-                favorable_factors: [
-                    {
-                        title: "合同关系与支付事实清晰",
-                        description: "你方与幸福有爱公司签署了两份协议，并有银行流水清晰显示向“婚恋无忧”账户支付总计105,800元，这构成了主张权利最坚实的基础。对方难以否认收到款项这一客观事实。"
-                    },
-                    {
-                        title: "对方存在履约瑕疵及清算行为",
-                        description: "聊天记录显示，对方老师在服务后期沟通中确实存在拖延、敷衍的情况，未能就你的退款诉求给出实质性解决方案。且被申请人公司已进入清算程序，从商业常理看，这构成了其可能无法继续履约的初步迹象。"
-                    }
-                ],
-                unfavorable_factors: [
-                    {
-                        title: "核心违约主张证据链断裂",
-                        description: "你方主张对方服务不专业、无效果，但现有聊天记录仅能证明对方提供了持续性沟通，内容多为“劝坚持”，不足以直接证明其服务构成欺诈或根本违约。缺乏对方明确承认服务无效、或第三方对服务质量的专业否定性评价，这一主张在仲裁庭上极易被对方否认。"
-                    },
-                    {
-                        title: "合同条款对你方维权构成多重限制",
-                        description: "协议第十二条特别约定将“关系不管因何种原因修复”均视为服务有效，这几乎排除了以“未达到效果”为由退款的可能。另一协议第五条更规定异议期仅为三个月，过期视为认可服务。而违约责任条款主要约束你方，你方主张的30%违约金在合同中缺乏对等的明确依据。"
-                    },
-                    {
-                        title: "法律认定门槛高且执行前景黯淡",
-                        description: "主张“根本违约”以返还全部费用，在法律上需证明对方行为已致合同目的完全无法实现，仅凭清算行为和服务效果的主观感受，仲裁庭支持难度较大。更现实的是，对方主体正在清算，即便胜诉，追索财产也将面临极大障碍，可能陷入“赢了官司输了钱”的困境。"
-                    }
-                ]
-            };
-
-            const reportDataNew = {
-                risk_level: "较高风险",
-                risk_overview: "你方手握合同与付款凭证，维权诉求在情理之中。但合同条款暗藏诸多对你方不利的“坑”，特别是业绩核算与反馈机制的设计，使你方在证明对方根本违约时面临极高的举证门槛和法律认定困难，维权之路将充满不确定性。",
-                success_probability_max: "50",
-                success_probability_min: "30",
-                favorable_factors: [
-                    {
-                        title: "一、基础法律关系明确，核心诉求存在事实依据",
-                        description: "合同与付款凭证齐全，证明了25万元服务费已支付。对方未支付约定的美容师补贴、未能协助达成380万元业绩，这些核心违约事实是启动维权的坚实基础。你方的委屈和诉求是有现实依据的。"
-                    }
-                ],
-                unfavorable_factors: [
-                    {
-                        title: "一、业绩承诺落空的举证难度极大",
-                        description: "主张业绩未达标，但协议明确约定业绩核算以乙方提供的报表为准，且需你方每月主动交付。你方很可能无法提供经对方确认的、完整的业绩报表，或被对方以你方未按时提供报表为由，主张视为其已完成承诺。"
-                    },
-                    {
-                        title: "二、主张服务未履行的证据链不完整",
-                        description: "协议附件规定，三次上门服务后进入“反馈服务阶段”，需由你方提出具体意见。对方律师会咬住此点，主张你方从未提出有效反馈需求，或你方存在不配合行为。你方难以证明已穷尽一切方式要求其提供有效服务。"
-                    },
-                    {
-                        title: "三、合同限制性条款将成为对方有力盾牌",
-                        description: "协议第九条规定，若你方不配合、不按时提供业绩报表，则视为乙方已履行义务。对方完全可以主张是你方不提供数据导致无法核算业绩，是你方不主动反馈导致服务无法推进。这些条款将成为你方维权的巨大障碍。"
-                    },
-                    {
-                        title: "四、法律上“根本违约”认定门槛高",
-                        description: "司法实践中，要论证对方未履行业绩承诺就导致合同目的无法实现，从而支持解除合同、全额退款，门槛极高。合同目的并非仅此一项，对方会主张其提供了线上服务、品项梳理等，你方单以未达业绩目标为由解除合同，难获支持。"
-                    }
-                ]
-            };
-
-            const reportDataThird = {
-                risk_level: "较高风险",
-                risk_overview: "你方手握合同和付款凭证，维权基础事实清晰，诉求具有正当性。然而，合同的关键条款、举证责任分配及业绩目标的证明方式均对你方极为不利，核心主张缺乏直接证据，法律认定门槛高。即便部分诉求被支持，也难以实现全额退款的仲裁目标，维权过程将异常艰辛。",
-                success_probability_max: "50",
-                success_probability_min: "30",
-                favorable_factors: [
-                    {
-                        title: "1、合同与付款事实清晰",
-                        description: "合同签订与25万元全额付款的事实确凿，证据链清晰。这为你方主张对方违约、要求其承担相应责任奠定了无可争议的事实基础。"
-                    },
-                    {
-                        title: "2、被申请人存在违约表象",
-                        description: "你方主张被申请人未支付前五个月每月1万元的补贴，此项若有聊天记录等证据支持，对方将难以自圆其说，属于对我方有利的切入点。"
-                    }
-                ],
-                unfavorable_factors: [
-                    {
-                        title: "1、核心业绩违约举证艰难",
-                        description: "协议第七条第4款约定，业绩核算以乙方提供的报表为准，且需你方每月主动提交。若你方无法证明已按期提交真实报表，或无法提供经对方确认的未达标证据，该业绩承诺条款几乎无法对你方产生约束力。"
-                    },
-                    {
-                        title: "2、合同解除与退款障碍巨大",
-                        description: "对方可依据协议第七条第5款抗辩，主张业绩下滑或纠纷是你方自身经营原因导致，从而拒绝退款。即便仲裁庭认定其违约，依据第七条第3款，退款也需在扣除其服务成本后按比例计算，你方主张全额退款的法律和合同依据严重不足。"
-                    },
-                    {
-                        title: "3、服务履行的证明困境",
-                        description: "你方主张对方未提供有效服务，但协议附件中列有大量线上服务与三次上门服务。对方仅需举证提供了部分表格、方案或进行了线上沟通，即可主张已履行主要义务。你方难以证明其服务完全未提供或根本无效。"
-                    }
-                ]
-            };
 
             const currentReportData = computed(() => {
-                if (currentReportType.value === 'default') return reportDataDefault;
-                if (currentReportType.value === 'new') return reportDataNew;
-                return reportDataThird;
+                return window.getCaseAssessmentReportData(currentReportType.value);
             });
 
             const nextReportStep = () => {
@@ -837,4 +741,6 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 newBadgeCount, currentMilestone, flyingScores, scoreDisplay, scoreAnimate
             };
         }
-    }).mount('#app');
+    })
+    .component('case-assessment-report', window.CaseAssessmentReport)
+    .mount('#app');
