@@ -158,10 +158,13 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const evidenceCatalogFiles = ref([]);
             const evidenceGroups = ref([]);
             const aiReplyDelay = 700;
+            const randomDelay = (min, max) => Math.floor(min + Math.random() * (max - min + 1));
+            const randomTextReplyDelay = () => randomDelay(1000, 2000);
+            const randomUploadReplyDelay = () => randomDelay(3000, 4000);
+            const randomTemplateRenderDelay = () => randomDelay(3000, 4000);
             let aiMessageId = 0;
-            let aiStreamTimer = null;
-            let aiReplyTimer = null;
             const aiMessages = ref([]);
+            let aiTypewriter = null;
             const applicationConfirmed = ref(false);
             const applicationTransferReady = ref(false);
             const uploadRules = {
@@ -364,6 +367,8 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             };
             const conversationStepIndex = ref(0);
             const applicationReady = ref(false);
+            const showApplicationDemoStepButton = ref(false);
+            const showApplicationAutoFillButton = ref(false);
             const isCurrentUploadStep = computed(() => {
                 if (!applicationReady.value) {
                     const currentField = conversationFields[conversationStepIndex.value];
@@ -1429,78 +1434,44 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 });
             };
 
-            const clearAiReplyTimer = () => {
-                if (aiReplyTimer) {
-                    window.clearTimeout(aiReplyTimer);
-                    aiReplyTimer = null;
-                }
-            };
-
-            const streamAiMessage = (text) => {
-                clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
-                const rawText = String(text || '请补充您当前卡住的步骤，我会按材料、申请书、管辖依据、请求事项和证据关系继续协助核对。');
-                if (/<(table|ol|ul|p|div|strong|br)\b/i.test(rawText) || rawText.includes('\n')) {
-                    aiMessages.value.push({
-                        id: ++aiMessageId,
-                        role: 'assistant',
-                        content: rawText,
-                        streaming: false
-                    });
-                    aiIsThinking.value = false;
-                    scrollAiChatToBottom();
-                    return;
-                }
-                const normalizedText = rawText
-                    .replace(/<br\s*\/?>/gi, '\n')
-                    .replace(/<\/?strong>/gi, '');
-                const message = {
-                    id: ++aiMessageId,
-                    role: 'assistant',
-                    content: '',
-                    streaming: true
-                };
-                aiMessages.value.push(message);
-                const streamingMessage = aiMessages.value[aiMessages.value.length - 1];
-                aiIsThinking.value = false;
-
-                let index = 0;
-                aiStreamTimer = window.setInterval(() => {
-                    if (index < normalizedText.length) {
-                        const char = normalizedText.charAt(index);
-                        streamingMessage.content += char === '\n' ? '<br>' : escapeHtml(char);
-                        index++;
-                        scrollAiChatToBottom();
-                    } else {
-                        streamingMessage.streaming = false;
-                        clearInterval(aiStreamTimer);
-                        scrollAiChatToBottom();
-                    }
-                }, 28);
-            };
-
-            const scheduleAiReply = (reply, delay = aiReplyDelay) => {
-                clearAiReplyTimer();
-                aiReplyTimer = window.setTimeout(() => {
-                    aiReplyTimer = null;
-                    try {
-                        const text = typeof reply === 'function' ? reply() : reply;
-                        if (!text) {
-                            aiIsThinking.value = false;
-                            scrollAiChatToBottom();
-                            return;
+            const getAiTypewriter = () => {
+                if (!aiTypewriter) {
+                    aiTypewriter = window.createAiTypewriter({
+                        messagesRef: aiMessages,
+                        thinkingRef: aiIsThinking,
+                        replyDelay: aiReplyDelay,
+                        fallbackText: '请补充您当前卡住的步骤，我会按材料、申请书、管辖依据、请求事项和证据关系继续协助核对。',
+                        nextId: () => ++aiMessageId,
+                        escapeHtml,
+                        scrollToBottom: scrollAiChatToBottom,
+                        shouldStream: (rawText) => {
+                            const html = String(rawText || '');
+                            if (/<(button|a|input|textarea|select|form|table|article|section|aside|iframe)\b/i.test(html)) return false;
+                            if (/(data-action|data-module|data-role|contenteditable|application-fill|flow-card|dialog-upload|evidence-dialog|arbitration-flow-card)/i.test(html)) return false;
+                            return true;
                         }
-                        streamAiMessage(text);
-                    } catch (error) {
-                        aiIsThinking.value = false;
-                        streamAiMessage('请补充您当前卡住的步骤，我会按材料、申请书、管辖依据、请求事项和证据关系继续协助核对。');
-                    }
-                }, delay);
+                    });
+                }
+                return aiTypewriter;
             };
+            const aiReplyHtmlToStreamText = (html) => String(html || '')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/(div|p|li)>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+            const clearAiReplyTimer = () => getAiTypewriter().clearReplyTimer();
+            const clearAiStreamTimer = () => getAiTypewriter().clearStreamTimer();
+            const withFilingStreamOptions = (streamOptions = {}) => ({
+                toStreamText: aiReplyHtmlToStreamText,
+                ...streamOptions
+            });
+            const streamAiMessage = (text, streamOptions) => getAiTypewriter().streamMessage(text, withFilingStreamOptions(streamOptions));
+            const scheduleAiReply = (reply, delay = randomTextReplyDelay(), streamOptions) => getAiTypewriter().scheduleReply(reply, delay, withFilingStreamOptions(streamOptions));
 
             const appendAiModule = (type, html) => {
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 aiMessages.value.push({
                     id: ++aiMessageId,
                     role: 'assistant',
@@ -1716,7 +1687,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         { label: '继续补充', value: '如需上传下一组，请再次点击附件按钮。' }
                     ],
                     note: '证据材料需与证据目录保持对应，最终以仲裁委正式审核结果为准。'
-                }));
+                }), randomUploadReplyDelay());
             };
             const recordEvidenceGroupUpload = (fileNames) => {
                 const names = Array.isArray(fileNames) ? fileNames.filter(Boolean) : [];
@@ -1746,7 +1717,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         { label: '后续操作', value: '可继续点击附件按钮上传下一证据组。' },
                         { label: '完成提交', value: '确认目录和材料已补充完成后，可点击页面右下角生成案件评估报告。' }
                     ]
-                }));
+                }), randomUploadReplyDelay());
             };
             const handleAiPanelChange = (event) => {
                 const input = event.target;
@@ -2007,7 +1978,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const sendAiMessage = () => {
                 const text = aiInput.value.trim();
                 if (!text || aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
 
                 aiMessages.value.push({
                     id: ++aiMessageId,
@@ -2022,16 +1993,19 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 if (!applicationReady.value) {
                     const currentField = conversationFields[conversationStepIndex.value] || conversationFields[conversationFields.length - 1];
                     if (!isRelevantConversationAnswer(currentField, text)) {
-                        scheduleAiReply(() => buildStayOnCurrentFieldReply(currentField));
+                        scheduleAiReply(() => buildStayOnCurrentFieldReply(currentField), randomTextReplyDelay());
                         return;
                     }
                     const recordedField = recordConversationAnswer(text);
-                    scheduleAiReply(() => buildNextCollectionReply(recordedField, text));
+                    scheduleAiReply(
+                        () => buildNextCollectionReply(recordedField, text),
+                        recordedField.final ? randomTemplateRenderDelay() : randomTextReplyDelay()
+                    );
                     return;
                 }
 
                 currentUploadContext.value = inferUploadContext(text);
-                scheduleAiReply(() => getAiReply(text));
+                scheduleAiReply(() => getAiReply(text), randomTextReplyDelay());
             };
 
             const playDemoNextStep = () => {
@@ -2060,7 +2034,13 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 currentUploadContext.value = 'caseEvidence';
                 const exists = document.querySelector('[data-module="final-application-review"]');
                 if (!exists) {
-                    appendFinalApplicationReview();
+                    aiIsThinking.value = true;
+                    scrollAiChatToBottom();
+                    scheduleAiReply(() => {
+                        appendFinalApplicationReview();
+                        return '';
+                    }, randomTemplateRenderDelay(), { stream: false });
+                    return;
                 }
                 scrollAiChatToBottom();
             };
@@ -2074,7 +2054,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     window.location.href = card.href;
                     return;
                 }
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 currentUploadContext.value = card.uploadContext || inferUploadContext(card.prompt);
                 aiMessages.value.push({
                     id: ++aiMessageId,
@@ -2086,7 +2066,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 aiIsThinking.value = true;
                 scrollAiChatToBottom();
 
-                scheduleAiReply(card.answer);
+                scheduleAiReply(card.answer, randomTextReplyDelay());
             };
 
             const triggerAiFileUpload = () => {
@@ -2103,7 +2083,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const handleAiFileChange = (event) => {
                 const files = Array.from(event.target.files || []);
                 if (!files.length || aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 aiAttachmentName.value = files.map(file => file.name).join('、');
 
                 aiMessages.value.push({
@@ -2119,7 +2099,10 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     const currentField = conversationFields[conversationStepIndex.value] || conversationFields[conversationFields.length - 1];
                     if (currentField && currentField.expected === 'upload') {
                         const recordedField = recordConversationAnswer(`已上传${currentField.label}：${aiAttachmentName.value}`);
-                        scheduleAiReply(() => buildNextCollectionReply(recordedField, aiAttachmentName.value));
+                        scheduleAiReply(
+                            () => buildNextCollectionReply(recordedField, aiAttachmentName.value),
+                            recordedField.final ? randomTemplateRenderDelay() : randomUploadReplyDelay()
+                        );
                         event.target.value = '';
                         return;
                     }
@@ -2132,14 +2115,14 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         { label: '核对重点', value: '请确认材料内容清晰、完整，并与当前问题相关。' }
                     ],
                     note: '如已进入证据上传环节，请按系统提示提交证据目录和证据材料。'
-                }));
+                }), randomUploadReplyDelay());
                 event.target.value = '';
             };
 
             const selectFilingStep = (index) => {
                 if (index < 0 || index >= filingSteps.length || aiIsThinking.value) return;
                 currentFilingStepIndex.value = index;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 aiMessages.value.push({
                     id: ++aiMessageId,
                     role: 'user',
@@ -2244,7 +2227,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const finishAiConsult = () => {
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 try {
                     const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
                     completed.defense = true;
@@ -2349,6 +2332,22 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 location.reload();
             };
 
+            const isDemoConfigOn = (value) => value === 1 || value === '1' || value === true;
+            const syncApplicationDemoButtonConfig = (config = {}) => {
+                const demoStepValue = Object.prototype.hasOwnProperty.call(config, 'isShowApplicationDemoStepBtn')
+                    ? config.isShowApplicationDemoStepBtn
+                    : localStorage.getItem('isShowApplicationDemoStepBtn');
+                const autoFillValue = Object.prototype.hasOwnProperty.call(config, 'isShowApplicationAutoFillBtn')
+                    ? config.isShowApplicationAutoFillBtn
+                    : localStorage.getItem('isShowApplicationAutoFillBtn');
+                showApplicationDemoStepButton.value = isDemoConfigOn(demoStepValue);
+                showApplicationAutoFillButton.value = isDemoConfigOn(autoFillValue);
+            };
+
+            syncApplicationDemoButtonConfig(window.FilingDemoConfig?.load?.());
+            window.addEventListener('filing-demo-config-ready', event => syncApplicationDemoButtonConfig(event.detail || {}));
+            window.addEventListener('filing-demo-config-change', event => syncApplicationDemoButtonConfig(event.detail || {}));
+
             // Init
             onMounted(() => {
                 // 演示模式：打开页面直接进入 AI 对话框，跳过前置答题流程。
@@ -2366,7 +2365,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 aiMessageId = 0;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 const shouldOpenReport = (() => {
                     try {
                         const flag = localStorage.getItem('filingDemoOpenReport') || '';
@@ -2408,6 +2407,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
                 aiInput, aiMessages, aiPresetCards, aiIsThinking, aiScrollBody, aiChatBody, aiFileInput, aiAttachmentName,
                 currentUploadRule, currentUploadContext, isCurrentUploadStep, applicationConfirmed, applicationReady, applicationTransferReady,
+                showApplicationDemoStepButton, showApplicationAutoFillButton,
                 showFloatingFinalReportButton,
                 sendAiMessage, playDemoNextStep, autoFillApplicationTemplate, chooseAiPreset, triggerAiFileUpload, triggerUploadBlock, handleAiFileChange, finishAiConsult,
                 confirmFinalApplication,

@@ -1067,6 +1067,19 @@
             vertical-align: -2px;
             animation: blink 1s step-start infinite;
         }
+        .ai-inline-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 16px;
+            margin-left: 4px;
+            border-radius: 999px;
+            background: #2563eb;
+            vertical-align: -2px;
+            animation: blink 1s step-start infinite;
+        }
+        .ai-bubble:not(.ai-streaming-cursor) .ai-inline-cursor {
+            display: none;
+        }
         .ai-finish-btn:hover {
             transform: translateY(-2px);
             background-position: 100% 0;

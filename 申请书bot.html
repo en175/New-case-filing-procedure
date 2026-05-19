@@ -318,11 +318,11 @@
                 <div class="ai-model-badge">
                     <span>已接入 DeepSeek V4 Pro</span>
                 </div>
-                <button @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking">
+                <button v-if="showApplicationDemoStepButton" @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking">
                     <i class="fas fa-forward-step"></i>
                     演示下一步
                 </button>
-                <button @click="autoFillApplicationTemplate" class="ai-demo-step-btn" :disabled="aiIsThinking">
+                <button v-if="showApplicationAutoFillButton" @click="autoFillApplicationTemplate" class="ai-demo-step-btn" :disabled="aiIsThinking">
                     <i class="fas fa-file-lines"></i>
                     自动填写模板
                 </button>
@@ -753,6 +753,7 @@
 <script src="./assets/filing-bot/filing-bot-data.js"></script>
 <script src="./assets/filing-bot/filing-bot-chat.js"></script>
 <script src="./assets/filing-bot/filing-bot-report.js"></script>
+<script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/filing-bot/filing-bot-app.js"></script>
 <script>
     (function () {

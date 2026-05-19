@@ -16,6 +16,7 @@ createApp({
         const stepIndex = ref(0);
         const showDemoStepButton = ref(false);
         let messageId = 0;
+        let messageTypewriter = null;
 
         const flowSteps = [
             {
@@ -117,6 +118,27 @@ createApp({
             });
         };
 
+        const getMessageTypewriter = () => {
+            if (!messageTypewriter) {
+                messageTypewriter = window.createAiTypewriter({
+                    messagesRef: messages,
+                    thinkingRef: aiIsThinking,
+                    replyDelay: 700,
+                    fallbackText: '已记录。请继续补充下一项信息。',
+                    nextId: () => ++messageId,
+                    escapeHtml,
+                    scrollToBottom
+                });
+            }
+            return messageTypewriter;
+        };
+
+        const scheduleAssistantReply = (text, onComplete) => {
+            getMessageTypewriter().scheduleReply(text, 700, {
+                afterComplete: onComplete
+            });
+        };
+
         const addAssistant = (content) => {
             messages.value.push({
                 id: ++messageId,
@@ -154,16 +176,14 @@ createApp({
             addUser(text);
             inputText.value = '';
             aiIsThinking.value = true;
-            window.setTimeout(() => {
-                aiIsThinking.value = false;
-                addAssistant(`<div class="ai-reply-lead">${step.reply}</div>`);
+            scheduleAssistantReply(step.reply, () => {
                 if (stepIndex.value >= flowSteps.length - 1) {
                     resultReady.value = true;
                 } else {
                     stepIndex.value += 1;
                 }
                 scrollToBottom();
-            }, 420);
+            });
         };
 
         const playDemoNextStep = () => {

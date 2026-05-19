@@ -98,9 +98,8 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const aiAttachmentName = ref('');
             const aiReplyDelay = 3000;
             let aiMessageId = 0;
-            let aiStreamTimer = null;
-            let aiReplyTimer = null;
             const aiMessages = ref([]);
+            let aiTypewriter = null;
             const aiDefenseRoundCount = ref(0);
             const canFinishAiConsult = computed(() => aiDefenseRoundCount.value >= 3);
             const aiPresetCards = ref([
@@ -783,61 +782,31 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 });
             };
 
-            const clearAiReplyTimer = () => {
-                if (aiReplyTimer) {
-                    window.clearTimeout(aiReplyTimer);
-                    aiReplyTimer = null;
+            const getAiTypewriter = () => {
+                if (!aiTypewriter) {
+                    aiTypewriter = window.createAiTypewriter({
+                        messagesRef: aiMessages,
+                        thinkingRef: aiIsThinking,
+                        replyDelay: aiReplyDelay,
+                        fallbackText: '我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务、您是否配合履行以及完整沟通记录核算。',
+                        nextId: () => ++aiMessageId,
+                        escapeHtml,
+                        scrollToBottom: scrollAiChatToBottom
+                    });
                 }
+                return aiTypewriter;
             };
-
-            const streamAiMessage = (text) => {
-                clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
-                const normalizedText = String(text || '我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务和完整沟通记录核算。')
-                    .replace(/<br\s*\/?>/gi, '\n')
-                    .replace(/<\/?strong>/gi, '');
-                const mediationEntryHtml = '<br><br><span class="text-slate-500">如果希望降低对抗成本，可以直接申请调解：</span><br><a class="ai-mediation-link" href="./调解申请提交结果.html"><i class="fas fa-handshake"></i>进入调解</a>';
-                const message = {
-                    id: ++aiMessageId,
-                    role: 'assistant',
-                    content: '',
-                    streaming: true
-                };
-                aiMessages.value.push(message);
-                const streamingMessage = aiMessages.value[aiMessages.value.length - 1];
-                aiIsThinking.value = false;
-
-                let index = 0;
-                aiStreamTimer = window.setInterval(() => {
-                    if (index < normalizedText.length) {
-                        const char = normalizedText.charAt(index);
-                        streamingMessage.content += char === '\n' ? '<br>' : escapeHtml(char);
-                        index++;
-                        scrollAiChatToBottom();
-                    } else {
-                        streamingMessage.streaming = false;
-                        clearInterval(aiStreamTimer);
-                        if (stage.value === 'ai_consult') {
-                            streamingMessage.content += mediationEntryHtml;
-                        }
-                        scrollAiChatToBottom();
-                    }
-                }, 28);
-            };
-
-            const scheduleAiReply = (reply, delay = aiReplyDelay) => {
-                clearAiReplyTimer();
-                aiReplyTimer = window.setTimeout(() => {
-                    aiReplyTimer = null;
-                    try {
-                        const text = typeof reply === 'function' ? reply() : reply;
-                        streamAiMessage(text);
-                    } catch (error) {
-                        aiIsThinking.value = false;
-                        streamAiMessage('我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务、您是否配合履行以及完整沟通记录核算。');
-                    }
-                }, delay);
-            };
+            const mediationEntryHtml = '<br><br><span class="text-slate-500">如果希望降低对抗成本，可以直接申请调解：</span><br><a class="ai-mediation-link" href="./调解申请提交结果.html"><i class="fas fa-handshake"></i>进入调解</a>';
+            const clearAiReplyTimer = () => getAiTypewriter().clearReplyTimer();
+            const clearAiStreamTimer = () => getAiTypewriter().clearStreamTimer();
+            const streamAiMessage = (text, streamOptions = {}) => getAiTypewriter().streamMessage(text, {
+                afterCompleteHtml: stage.value === 'ai_consult' ? mediationEntryHtml : '',
+                ...streamOptions
+            });
+            const scheduleAiReply = (reply, delay = aiReplyDelay, streamOptions) => getAiTypewriter().scheduleReply(reply, delay, {
+                afterCompleteHtml: stage.value === 'ai_consult' ? mediationEntryHtml : '',
+                ...(streamOptions || {})
+            });
 
             const setAiStaticGreeting = () => {
                 aiMessages.value = [
@@ -892,7 +861,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const sendAiMessage = () => {
                 const text = aiInput.value.trim();
                 if (!text || aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
 
                 aiMessages.value.push({
                     id: ++aiMessageId,
@@ -910,7 +879,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
             const chooseAiPreset = (card) => {
                 if (aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 aiMessages.value.push({
                     id: ++aiMessageId,
                     role: 'user',
@@ -934,7 +903,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const handleAiFileChange = (event) => {
                 const file = event.target.files && event.target.files[0];
                 if (!file || aiIsThinking.value) return;
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 aiAttachmentName.value = file.name;
 
                 aiMessages.value.push({
@@ -955,7 +924,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 if (!canFinishAiConsult.value) return;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 try {
                     const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
                     completed.defense = true;
@@ -1078,7 +1047,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 aiDefenseRoundCount.value = 0;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
-                clearInterval(aiStreamTimer);
+                clearAiStreamTimer();
                 setAiStaticGreeting();
             });
 

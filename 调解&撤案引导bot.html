@@ -82,11 +82,11 @@
                 <div class="ai-prototype-panel diversion-panel">
                     <div class="ai-scroll-content custom-scrollbar" ref="chatScroll">
                         <div class="ai-chat-body">
-                            <div v-for="message in messages" :key="message.id" class="ai-message-row" :class="message.role">
+                            <div v-for="message in messages" :key="message.id" class="ai-message-row" :class="[message.role, message.type]">
                                 <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
                                     <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
                                 </div>
-                                <div class="ai-bubble" v-html="message.content"></div>
+                                <div class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming }" v-html="message.content"></div>
                             </div>
                             <div v-if="aiIsThinking" class="ai-message-row">
                                 <div class="ai-avatar ai-bot-mark compact">
@@ -169,6 +169,7 @@
         </div>
     </div>
 </div>
+<script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/filing-bot/diversion-bot-app.js"></script>
 <script src="./assets/demo-shell/demo-config.js"></script>
 <script src="./assets/demo-shell/demo-nav.js"></script>
