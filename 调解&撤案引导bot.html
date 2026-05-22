@@ -54,7 +54,9 @@
     </div>
 
     <div class="map-container map-blur">
-        <div class="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500"></div>
+        <div class="absolute inset-0 z-0">
+            <img src="./图片/智能服务大厅背景.png" class="w-full h-full object-cover" alt="流程背景">
+        </div>
     </div>
 
     <div class="absolute inset-0 z-30 flex items-start justify-center bg-black/35 backdrop-blur-sm px-10 pb-10 pt-[86px] ai-demo-overlay">
@@ -123,9 +125,23 @@
                     </div>
 
                     <div class="ai-input-area">
-                        <div class="ai-input-shell">
+                        <div class="ai-input-shell" :class="{ 'has-diversion-attachments': uploadedFiles.length }">
+                            <div v-if="uploadedFiles.length" class="diversion-attachment-list" aria-label="已选择附件">
+                                <div v-for="file in uploadedFiles" :key="file.id" class="diversion-attachment-item">
+                                    <i class="fas fa-file-lines"></i>
+                                    <span class="diversion-attachment-name" :title="file.name">{{ file.name }}</span>
+                                    <span class="diversion-attachment-size">{{ formatFileSize(file.size) }}</span>
+                                    <button type="button" class="diversion-attachment-remove" @click="removeAttachment(file.id)" aria-label="删除附件">
+                                        <i class="fas fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
                             <textarea v-model="inputText" @keydown.enter.exact.prevent="sendMessage" :placeholder="currentPlaceholder"></textarea>
                             <div class="ai-input-options">
+                                <button @click="triggerAttachmentUpload" class="ai-attach-btn" type="button" aria-label="上传附件">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <input ref="attachmentInput" type="file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" multiple @change="handleAttachmentChange" />
                                 <button @click="sendMessage" class="ai-send-btn" aria-label="发送">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>

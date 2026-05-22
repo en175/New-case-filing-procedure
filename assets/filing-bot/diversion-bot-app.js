@@ -6,6 +6,8 @@ createApp({
         const inputText = ref('');
         const aiIsThinking = ref(false);
         const resultReady = ref(false);
+        const uploadedFiles = ref([]);
+        const attachmentInput = ref(null);
         const confirmModal = ref({
             show: false,
             type: '',
@@ -162,6 +164,30 @@ createApp({
         const currentStep = computed(() => flowSteps[Math.min(stepIndex.value, flowSteps.length - 1)]);
         const currentGuide = computed(() => resultReady.value ? '本轮分析已完成，请选择后续路径。' : currentStep.value.guide);
         const currentPlaceholder = computed(() => '');
+        const formatFileSize = (size) => {
+            if (!Number.isFinite(size)) return '';
+            if (size < 1024) return `${size}B`;
+            if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)}KB`;
+            return `${(size / 1024 / 1024).toFixed(1)}MB`;
+        };
+        const triggerAttachmentUpload = () => {
+            if (attachmentInput.value) attachmentInput.value.click();
+        };
+        const handleAttachmentChange = (event) => {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+            uploadedFiles.value.push(...files.map(file => ({
+                id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                name: file.name,
+                size: file.size,
+                raw: file
+            })));
+            event.target.value = '';
+            scrollToBottom();
+        };
+        const removeAttachment = (id) => {
+            uploadedFiles.value = uploadedFiles.value.filter(file => file.id !== id);
+        };
         const syncDemoStepButtonConfig = (config = {}) => {
             const value = Object.prototype.hasOwnProperty.call(config, 'isShowDiversionDemoStepBtn')
                 ? config.isShowDiversionDemoStepBtn
@@ -268,11 +294,17 @@ createApp({
             inputText,
             aiIsThinking,
             resultReady,
+            uploadedFiles,
+            attachmentInput,
             confirmModal,
             chatScroll,
             showDemoStepButton,
             currentGuide,
             currentPlaceholder,
+            formatFileSize,
+            triggerAttachmentUpload,
+            handleAttachmentChange,
+            removeAttachment,
             sendMessage,
             playDemoNextStep,
             showConfirmModal,

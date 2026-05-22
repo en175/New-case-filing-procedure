@@ -26,7 +26,7 @@ window.CaseAssessmentReport = {
         <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col animate__animated animate__zoomIn mt-8" style="max-height: calc(100vh - 120px);">
             <div class="px-6 pt-8 pb-6 border-b border-slate-100 flex justify-between items-center bg-white z-10 rounded-t-2xl">
                 <div class="flex items-center gap-3">
-                    <button v-if="showBackButton" @click="$emit('back')" class="report-back-btn" aria-label="上一步">
+                    <button type="button" v-if="showBackButton" @click="$emit('back')" class="report-back-btn" aria-label="上一步">
                         <i class="fas fa-arrow-left"></i>
                     </button>
                     <h2 class="text-2xl font-bold text-slate-800">案件评估报告</h2>
@@ -219,7 +219,7 @@ window.CaseAssessmentReport = {
 
             <div class="p-4 border-t border-slate-100 bg-white/95 backdrop-blur rounded-b-2xl z-10 flex flex-col items-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
                 <div v-if="reportStep === 1" class="w-full flex justify-center">
-                    <button @click="$emit('next')" class="w-full max-w-sm py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <button type="button" @click="$emit('next')" class="w-full max-w-sm py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                         <span>查看维权策略推荐</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -232,22 +232,22 @@ window.CaseAssessmentReport = {
                         </span>
                     </div>
                     <div class="flex items-center space-x-4 w-full justify-center">
-                        <button @click="$emit('prev')" class="flex-none px-4 py-2.5 bg-slate-100 text-slate-500 font-bold rounded-lg hover:bg-slate-200 transition-colors text-sm">
+                        <button type="button" @click="$emit('prev')" class="flex-none px-4 py-2.5 bg-slate-100 text-slate-500 font-bold rounded-lg hover:bg-slate-200 transition-colors text-sm">
                             <i class="fas fa-arrow-left mr-1"></i>上一步
                         </button>
 
-                        <button @click="$emit('confirm', 'withdraw')" class="flex-1 max-w-[160px] py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-lg shadow-lg shadow-amber-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
+                        <button type="button" @click="$emit('confirm', 'withdraw')" class="flex-1 max-w-[160px] py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-lg shadow-lg shadow-amber-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
                             <i class="fas fa-undo-alt mr-2"></i>撤回案件
                         </button>
 
-                        <button @click="$emit('confirm', 'mediation')"
+                        <button type="button" @click="$emit('confirm', 'mediation')"
                                 :class="{'btn-mediation-glow': !isFilingCompleted}"
                                 class="flex-1 max-w-[200px] py-2.5 bg-gradient-to-r from-[#2FA39A] to-[#258e86] text-white font-bold rounded-lg shadow-lg shadow-teal-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
                             <i class="fas fa-handshake mr-2"></i>{{ mediationLabel }}
                         </button>
                     </div>
 
-                    <button @click="$emit('confirm', 'arbitration')" class="mt-3 text-slate-400 text-xs hover:text-blue-500 transition-colors flex items-center justify-center w-full">
+                    <button type="button" @click="$emit('confirm', 'arbitration')" class="mt-3 text-slate-400 text-xs hover:text-blue-500 transition-colors flex items-center justify-center w-full">
                         <span class="underline ml-1">联系客服，进行仲裁</span>
                     </button>
                 </div>

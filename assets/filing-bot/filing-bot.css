@@ -13,13 +13,38 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #f8fafc; /* Use a solid color or gradient instead of image if desired, or keep image */
-            /* background-size: cover; */
-            /* background-position: center; */
+            overflow: hidden;
+            background-color: #edf4f8;
             transition: filter 0.5s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .map-container::before,
+        .map-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .map-container::before {
+            z-index: 0;
+            background-image: url('../../图片/智能服务大厅背景.png');
+            background-size: cover;
+            background-position: center;
+            filter: saturate(0.96) contrast(1.04);
+            transform: scale(1.02);
+        }
+
+        .map-container::after {
+            z-index: 1;
+            background:
+                linear-gradient(180deg, rgba(239, 247, 255, 0.24) 0%, rgba(17, 38, 56, 0.34) 100%),
+                radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.28), transparent 36%),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.05), transparent 18%, transparent 82%, rgba(15, 23, 42, 0.1));
+            backdrop-filter: blur(3px) saturate(0.96);
         }
 
         /* 地图节点动画 */
@@ -3388,6 +3413,72 @@
         }
         .ai-upload-rule strong {
             color: #1d4ed8;
+        }
+        .ai-input-shell.has-diversion-attachments {
+            grid-template-rows: auto auto;
+        }
+        .ai-input-shell.has-diversion-attachments .diversion-attachment-list {
+            grid-column: 1 / 4;
+            grid-row: 1;
+        }
+        .ai-input-shell.has-diversion-attachments textarea,
+        .ai-input-shell.has-diversion-attachments .ai-attach-btn,
+        .ai-input-shell.has-diversion-attachments .ai-send-btn {
+            grid-row: 2;
+        }
+        .diversion-attachment-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+        .diversion-attachment-item {
+            min-width: 0;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 9px;
+            border: 1px solid #dbe7f6;
+            border-radius: 12px;
+            background: #f8fbff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .diversion-attachment-item > i {
+            color: #2563eb;
+            flex-shrink: 0;
+        }
+        .diversion-attachment-name {
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .diversion-attachment-size {
+            color: #94a3b8;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
+        .diversion-attachment-remove {
+            width: 22px;
+            height: 22px;
+            border: 0;
+            border-radius: 8px;
+            color: #64748b;
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all .16s ease;
+        }
+        .diversion-attachment-remove:hover {
+            color: #dc2626;
+            background: #fee2e2;
         }
         .input-upload-guidance {
             margin-top: 14px;

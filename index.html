@@ -228,10 +228,10 @@
     }
     .card-title.active { color: #1E3A8A; }
     .card-desc { font-size: 15px; color: #64748b; line-height: 1.6; }
-    .choice-footer {
-      margin-top: 24px;
+    .page-action-footer {
       display: flex;
       justify-content: flex-end;
+      padding: 0 8px 8px;
     }
     .next-step-btn {
       min-width: 132px;
@@ -293,6 +293,8 @@
     .materials-category-link {
       color: #2563eb;
       cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
       transition: color 0.2s ease;
     }
     .materials-category-link:hover { color: #1d4ed8; }
@@ -377,9 +379,6 @@
             <div class="title-text">第一步：选择申请书准备方式</div>
           </div>
           <div class="applicant-type-group" id="applicantGroup"></div>
-          <div class="choice-footer">
-            <button class="next-step-btn" id="nextStepBtn" disabled>下一步</button>
-          </div>
         </div>
       </div>
     </div>
@@ -401,6 +400,10 @@
         </thead>
         <tbody id="materialsBody"></tbody>
       </table>
+    </div>
+
+    <div class="page-action-footer">
+      <button class="next-step-btn" id="nextStepBtn" disabled>下一步</button>
     </div>
 
   </div>

@@ -21,6 +21,12 @@ body.demo-hide-filing-hud-progress .filing-hud-progress {
   display: none !important;
 }
 
+body.demo-nav-ready .hud-bar {
+  left: var(--demo-nav-width) !important;
+  width: calc(100% - var(--demo-nav-width)) !important;
+  transition: left 0.22s ease, width 0.22s ease, transform 0.3s ease;
+}
+
 .demo-global-nav {
   position: fixed;
   inset: 0 auto 0 0;
@@ -239,6 +245,11 @@ body.demo-nav-expanded .demo-nav-copy {
 @media (max-width: 900px) {
   body.demo-nav-ready {
     padding-left: var(--demo-body-pad-left) !important;
+  }
+
+  body.demo-nav-ready .hud-bar {
+    left: 0 !important;
+    width: 100% !important;
   }
 
   .demo-global-nav {
