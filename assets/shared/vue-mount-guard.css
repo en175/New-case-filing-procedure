@@ -1,0 +1,5 @@
+/* Hide Vue root until mounted — prevents {{ }} / v-* flash (v-cloak equivalent) */
+#app:not([data-v-app]),
+[v-cloak] {
+  display: none !important;
+}
