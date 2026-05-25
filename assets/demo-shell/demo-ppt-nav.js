@@ -8,8 +8,8 @@
     { id: '3.3', key: 'step2', title: '材料智能提取', href: './Step2SmartExtraction.html' },
     { id: '3.4', key: 'material-split', title: '立案分流智能判断', href: './立案分流智能判断.html' },
     { id: '3.5', key: 'diversion', title: '纠纷化解引导', href: './调解&撤案引导bot.html' },
-    { id: '3.6', key: 'defense', title: '抗辩模拟', href: './抗辩机器人.html' },
     { id: '3.10', key: 'followup', title: '立案后路径选择', href: './立案提交后路径选择.html' },
+    { id: '3.6', key: 'defense', title: '抗辩模拟', href: './抗辩机器人.html' },
     { id: '3.7', key: 'qa', title: '案情闯关', href: './游戏化问答.html' },
     { id: '3.8', key: 'path-map', title: '案件路径图', href: './案件路径图.html' },
     {
