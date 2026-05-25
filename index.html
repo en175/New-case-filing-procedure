@@ -33,35 +33,6 @@
       border: 1px solid #f1f5f9;
       background: #fff;
     }
-    .left-video-card {
-      flex: 0 0 30%;
-      max-width: 460px;
-      max-height: calc(100vh - 48px);
-      background: #fff;
-      border-radius: 24px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      min-width: 350px;
-    }
-    .video-wrapper {
-      width: 100%;
-      height: min(100%, calc(100vh - 80px));
-      max-height: calc(100vh - 80px);
-      aspect-ratio: 9 / 16;
-      background: #000;
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-    }
-    .step-video {
-      width: 100%;
-      height: 100%;
-      max-height: calc(100vh - 80px);
-      min-height: 420px;
-      object-fit: cover;
-      display: block;
-    }
     .right-content {
       flex: 1;
       display: flex;
@@ -343,24 +314,12 @@
       transition: color 0.2s ease;
     }
     .action-icon:hover { color: #1d4ed8; }
-    /* @media (max-width: 1200px) {
-      .video-content-block { flex-direction: column; }
-      .left-video-card { min-width: auto; }
-    } */
   </style>
   <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
 </head>
 <body>
   <div class="hz-step-content">
     <div class="video-content-block">
-      <div class="left-video-card tw-shadow-md">
-        <div class="video-wrapper">
-          <video class="step-video" controls autoplay muted loop>
-            <source src="./视频/step1.mp4" type="video/mp4" />
-            您的浏览器不支持视频播放。
-          </video>
-        </div>
-      </div>
       <div class="right-content">
         <div class="institution-card tw-shadow-sm">
           <div class="icon-box">
@@ -479,14 +438,18 @@
           </div>
         `
         card.addEventListener('click', () => {
-          state.applicantType = item.value
-          state.selectedTarget = item.target
           if (item.target === './Step2SmartExtraction.html') {
             try {
               localStorage.removeItem('filingApplicationBotGenerated')
               localStorage.removeItem('filingApplicationBotGeneratedAt')
             } catch (error) {}
           }
+          if (item.target) {
+            window.location.href = item.target
+            return
+          }
+          state.applicantType = item.value
+          state.selectedTarget = item.target
           renderApplicantTypes()
           updateNextButton()
         })
