@@ -639,12 +639,26 @@ const PPT_DEMO_MODE = true;
                 advancePptQuestion(event);
             };
 
-            const handlePptDemoKeydown = (event) => {
-                if (!PPT_DEMO_MODE || stage.value !== 'qa') return;
-                if (event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    advancePptQuestion(event);
-                }
+            const handlePptDemoInnerKey = (event) => {
+                if (!PPT_DEMO_MODE || stage.value !== 'qa') return false;
+                const keyCodes = window.DemoPptNav?.getKeyCodes?.();
+                if (!keyCodes) return false;
+                const code = event.keyCode || event.which;
+                if (code !== keyCodes.next) return false;
+                event.preventDefault();
+                advancePptQuestion(event);
+                return true;
+            };
+
+            const bindPptPageInnerNav = () => {
+                if (!PPT_DEMO_MODE || !window.DemoPptNav?.registerInnerKeyHandler) return null;
+                return window.DemoPptNav.registerInnerKeyHandler(handlePptDemoInnerKey);
+            };
+
+            let unregisterPptPageInnerNav = null;
+            const syncPptPageInnerNav = () => {
+                unregisterPptPageInnerNav?.();
+                unregisterPptPageInnerNav = bindPptPageInnerNav();
             };
 
             const answerQuestion = (option, event) => {
@@ -791,14 +805,16 @@ const PPT_DEMO_MODE = true;
 
                 if (PPT_DEMO_MODE) {
                     document.addEventListener('click', handlePptDemoClick);
-                    window.addEventListener('keydown', handlePptDemoKeydown);
+                    syncPptPageInnerNav();
+                    window.addEventListener('demo-ppt-nav-ready', syncPptPageInnerNav);
                 }
             });
 
             onUnmounted(() => {
                 if (PPT_DEMO_MODE) {
                     document.removeEventListener('click', handlePptDemoClick);
-                    window.removeEventListener('keydown', handlePptDemoKeydown);
+                    unregisterPptPageInnerNav?.();
+                    window.removeEventListener('demo-ppt-nav-ready', syncPptPageInnerNav);
                 }
             });
 
