@@ -87,6 +87,26 @@
     return index;
   }
 
+  function firstNavigableIndex() {
+    return PPT_PAGES.findIndex(page => !page.placeholder && page.href);
+  }
+
+  function lastNavigableIndex() {
+    for (let i = PPT_PAGES.length - 1; i >= 0; i -= 1) {
+      const page = PPT_PAGES[i];
+      if (!page.placeholder && page.href) return i;
+    }
+    return -1;
+  }
+
+  function isFirstPage(index) {
+    return index >= 0 && index === firstNavigableIndex();
+  }
+
+  function isLastPage(index) {
+    return index >= 0 && index === PPT_PAGES.length - 1;
+  }
+
   function resolveNavigableIndex(startIndex, direction) {
     let index = startIndex;
     const step = direction > 0 ? 1 : -1;
@@ -117,7 +137,10 @@
   function goNext() {
     const current = currentPageIndex();
     if (current < 0) return false;
-    const nextIndex = resolveNavigableIndex(current, 1);
+    let nextIndex = resolveNavigableIndex(current, 1);
+    if (nextIndex < 0 && isLastPage(current)) {
+      nextIndex = firstNavigableIndex();
+    }
     if (nextIndex < 0) return false;
     return navigateToIndex(nextIndex);
   }
@@ -125,7 +148,10 @@
   function goPrev() {
     const current = currentPageIndex();
     if (current < 0) return false;
-    const prevIndex = resolveNavigableIndex(current, -1);
+    let prevIndex = resolveNavigableIndex(current, -1);
+    if (prevIndex < 0 && isFirstPage(current)) {
+      prevIndex = lastNavigableIndex();
+    }
     if (prevIndex < 0) return false;
     return navigateToIndex(prevIndex);
   }
@@ -167,8 +193,8 @@
     const nextBtn = root.querySelector('[data-ppt-nav="next"]');
     const label = root.querySelector('[data-ppt-nav="label"]');
     const page = current >= 0 ? PPT_PAGES[current] : null;
-    const hasPrev = current >= 0 && resolveNavigableIndex(current, -1) >= 0;
-    const hasNext = current >= 0 && resolveNavigableIndex(current, 1) >= 0;
+    const hasPrev = current >= 0 && (resolveNavigableIndex(current, -1) >= 0 || isFirstPage(current));
+    const hasNext = current >= 0 && (resolveNavigableIndex(current, 1) >= 0 || isLastPage(current));
 
     if (prevBtn) prevBtn.disabled = !hasPrev;
     if (nextBtn) nextBtn.disabled = !hasNext;
