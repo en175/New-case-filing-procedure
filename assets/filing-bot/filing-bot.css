@@ -2416,6 +2416,16 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
+        .doc-template .application-fill.doc-fill:not(.doc-fill-block) {
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
+        }
+        .doc-template .application-fill.doc-fill:not(.doc-fill-block):empty {
+            min-width: 0 !important;
+            padding: 0 !important;
+            border-bottom: 0 !important;
+        }
         .doc-template .application-fill:empty::before {
             content: "";
         }
@@ -2424,8 +2434,9 @@
         }
         .doc-template .application-fill.doc-fill-block {
             display: block;
-            width: 100%;
-            min-height: 160px;
+            width: fit-content;
+            max-width: 100%;
+            min-height: 0;
             padding: 0 !important;
             line-height: var(--doc-line-step);
             background-color: transparent !important;
@@ -2438,13 +2449,14 @@
             ) !important;
             background-size: 100% var(--doc-line-step);
             border-bottom: 0 !important;
-        }
-        .doc-facts {
-            min-height: 176px;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         .doc-evidence-block {
-            min-height: 64px;
             font-size: 11px;
+        }
+        .doc-page-tail {
+            min-height: auto;
         }
         .w-xs { min-width: 38px; }
         .w-sm { min-width: 66px; }
@@ -2459,19 +2471,8 @@
         .w-attachment { min-width: 120px; }
         .w-year { min-width: 42px; text-align: center; }
         .w-date-part { min-width: 28px; text-align: center; }
-        .doc-lined-space {
-            display: grid;
-            gap: calc(var(--doc-line-step) / 2);
-            margin-top: 8px;
-            margin-bottom: 32px;
-        }
-        .doc-lined-space span {
-            display: block;
-            height: calc(var(--doc-line-step) / 2);
-            border-bottom: 1px solid #000;
-        }
         .doc-closing {
-            margin: 28px 0 28px 24px;
+            margin: 0 0 28px 24px;
             line-height: 1.8;
         }
         .doc-evidence {
