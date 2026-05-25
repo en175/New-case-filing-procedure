@@ -596,16 +596,11 @@ const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
                                 ${docBlock('事实与理由', facts, 'doc-facts')}
                             </section>
 
-                            <section class="doc-page">
+                            <section class="doc-page doc-page-tail">
                                 <div class="doc-crop top-left"></div>
                                 <div class="doc-crop top-right"></div>
                                 <div class="doc-crop bottom-left"></div>
                                 <div class="doc-crop bottom-right"></div>
-                                <div class="doc-lined-space" aria-hidden="true">
-                                    <span></span><span></span><span></span><span></span><span></span>
-                                    <span></span><span></span><span></span><span></span><span></span>
-                                    <span></span><span></span><span></span>
-                                </div>
                                 <div class="doc-closing">
                                     <div>此致</div>
                                     <div>广州仲裁委员会</div>
