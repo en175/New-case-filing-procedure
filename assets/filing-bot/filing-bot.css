@@ -3583,6 +3583,37 @@
             flex-shrink: 0;
             text-align: center;
         }
+        body.ppt-report-demo-page,
+        body.ppt-report-demo-page #app {
+            height: auto;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        body.ppt-report-demo-page .map-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+        body.ppt-report-demo-page .hud-bar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        body.ppt-report-demo-page .ppt-report-overlay {
+            position: relative !important;
+            inset: auto !important;
+            min-height: 100vh;
+            height: auto;
+            overflow: visible;
+            align-items: flex-start;
+            cursor: pointer;
+        }
+        .report-ppt-demo-card {
+            max-height: none !important;
+            margin-bottom: 32px;
+            cursor: default;
+        }
         .path-action-highlight {
             border-radius: 12px;
             border: 2px solid #2FA39A;

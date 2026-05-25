@@ -1,7 +1,18 @@
-const { createApp, ref, computed, onMounted, nextTick } = Vue;
+const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
 
     createApp({
         setup() {
+            const pptReportDemoMode = (() => {
+                try {
+                    return new URLSearchParams(window.location.search).get('demoStage') === 'report';
+                } catch (error) {
+                    return false;
+                }
+            })();
+
+            const syncPptReportDemoPageClass = () => {
+                document.body.classList.toggle('ppt-report-demo-page', pptReportDemoMode && stage.value === 'report');
+            };
             // Assets
             const npcImage = ref('./图片/引导角色1.png');
             const mapImage = ref('./图片/智能服务大厅背景.png');
@@ -1251,6 +1262,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 stage.value = 'ai_consult';
                 waitingForInteraction.value = false;
                 reportStep.value = 1;
+                syncPptReportDemoPageClass();
                 nextTick(() => {
                     const panel = document.querySelector('.ai-scroll-content');
                     if (panel) panel.scrollTop = panel.scrollHeight;
@@ -2460,7 +2472,38 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             window.addEventListener('filing-demo-config-ready', event => syncApplicationDemoButtonConfig(event.detail || {}));
             window.addEventListener('filing-demo-config-change', event => syncApplicationDemoButtonConfig(event.detail || {}));
 
+            let pptReportAdvanceLocked = false;
+
+            const isPptReportAdvanceBlockedTarget = (target) => {
+                if (!target?.closest) return true;
+                return !!target.closest(
+                    'button, a, input, textarea, select, label, .demo-global-nav, .hud-bar, .score-cta, video'
+                );
+            };
+
+            const advancePptReportStep = () => {
+                if (!pptReportDemoMode || stage.value !== 'report' || reportStep.value !== 1) return;
+                if (pptReportAdvanceLocked || confirmModal.value.show) return;
+
+                pptReportAdvanceLocked = true;
+                window.setTimeout(() => {
+                    pptReportAdvanceLocked = false;
+                }, 280);
+                nextReportStep();
+            };
+
+            const handlePptReportDemoClick = (event) => {
+                if (!pptReportDemoMode || stage.value !== 'report' || reportStep.value !== 1) return;
+                if (isPptReportAdvanceBlockedTarget(event.target)) return;
+                advancePptReportStep();
+            };
+
             const handleApplicationDemoKeydown = (event) => {
+                if (pptReportDemoMode && stage.value === 'report' && reportStep.value === 1 && event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    advancePptReportStep();
+                    return;
+                }
                 if (stage.value !== 'ai_consult') return;
                 if (event.key === 'ArrowRight') {
                     event.preventDefault();
@@ -2494,7 +2537,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         return false;
                     }
                 })();
-                if (shouldOpenReport) {
+                if (shouldOpenReport || pptReportDemoMode) {
                     try {
                         localStorage.removeItem('filingDemoOpenReport');
                         localStorage.removeItem('filingDemoAuxReturn');
@@ -2502,9 +2545,15 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     reportStep.value = 1;
                     stage.value = 'report';
                     waitingForInteraction.value = false;
+                    syncPptReportDemoPageClass();
                     return;
                 }
                 setAiStaticGreeting();
+            });
+
+            onUnmounted(() => {
+                window.removeEventListener('keydown', handleApplicationDemoKeydown);
+                document.body.classList.remove('ppt-report-demo-page');
             });
 
             return {
@@ -2536,6 +2585,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 confirmModal, showConfirmModal, closeConfirmModal, executeConfirmAction,
                 score, badges, earnedBadges, toggleBadgeDrawer, isBadgeDrawerOpen,
                 reportStep, nextReportStep, prevReportStep, returnToAiConsultFromReport,
+                pptReportDemoMode, handlePptReportDemoClick,
                 isFilingCompleted, selectedReportPath,
                 filingStatusTitle, filingStatusDesc,
                 currentReportType, currentReportData,

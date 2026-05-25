@@ -19,11 +19,15 @@ window.CaseAssessmentReport = {
         mediationLabel: {
             type: String,
             default: '参与调解'
+        },
+        pptDemoMode: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ['back', 'next', 'prev', 'confirm'],
     template: `
-        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col animate__animated animate__zoomIn mt-8" style="max-height: calc(100vh - 120px);">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col animate__animated animate__zoomIn mt-8" :class="{ 'report-ppt-demo-card': pptDemoMode }" :style="pptDemoMode ? null : 'max-height: calc(100vh - 120px);'">
             <div class="px-6 pt-8 pb-6 border-b border-slate-100 flex justify-between items-center bg-white z-10 rounded-t-2xl">
                 <div class="flex items-center gap-3">
                     <button type="button" v-if="showBackButton" @click="$emit('back')" class="report-back-btn" aria-label="上一步">
@@ -39,7 +43,7 @@ window.CaseAssessmentReport = {
                 <span>最后一步：阅读完毕后请在底部选择您的后续路径。</span>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50 custom-scrollbar">
+            <div :class="pptDemoMode ? 'p-8 space-y-8 bg-slate-50' : 'flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50 custom-scrollbar'">
                 <div v-if="reportStep === 1" class="space-y-8 animate__animated animate__fadeIn">
                     <div class="bg-red-50/50 rounded-2xl p-6 border border-red-100">
                         <div class="flex items-center justify-between mb-6">
@@ -51,7 +55,7 @@ window.CaseAssessmentReport = {
                             </div>
                         </div>
 
-                        <div class="flex flex-col items-center mb-8">
+                        <div v-if="!pptDemoMode" class="flex flex-col items-center mb-8">
                             <div class="text-6xl font-bold text-orange-500 mb-2">{{ reportData.success_probability_min }}% - {{ reportData.success_probability_max }}%</div>
                             <div class="text-sm text-orange-400 font-medium">评估分析（{{ reportData.risk_level }}，基于智能数据进行分析，仅供参考）</div>
                         </div>
@@ -217,8 +221,8 @@ window.CaseAssessmentReport = {
                 </div>
             </div>
 
-            <div class="p-4 border-t border-slate-100 bg-white/95 backdrop-blur rounded-b-2xl z-10 flex flex-col items-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                <div v-if="reportStep === 1" class="w-full flex justify-center">
+            <div v-if="reportStep === 2 || !pptDemoMode" class="p-4 border-t border-slate-100 bg-white/95 backdrop-blur rounded-b-2xl z-10 flex flex-col items-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+                <div v-if="reportStep === 1 && !pptDemoMode" class="w-full flex justify-center">
                     <button type="button" @click="$emit('next')" class="w-full max-w-sm py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                         <span>查看维权策略推荐</span>
                         <i class="fas fa-arrow-right"></i>
