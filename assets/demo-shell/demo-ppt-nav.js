@@ -1,13 +1,12 @@
 (function () {
   /**
    * PPT 演示页顺序，与 AgentDoc/PPT演示重构文档.md 3.1–3.12 一一对应。
-   * placeholder 页暂无 HTML，前进/后退时会自动跳过。
    */
   const PPT_PAGES = [
     { id: '3.1', key: 'index', title: '演示入口', href: './index.html' },
     { id: '3.2', key: 'filing-bot', title: '申请书生成', href: './申请书bot.html' },
     { id: '3.3', key: 'step2', title: '材料智能提取', href: './Step2SmartExtraction.html' },
-    { id: '3.4', key: 'material-split', title: '材料提交分流', placeholder: true },
+    { id: '3.4', key: 'material-split', title: '立案分流智能判断', href: './立案分流智能判断.html' },
     { id: '3.5', key: 'diversion', title: '纠纷化解引导', href: './调解&撤案引导bot.html' },
     { id: '3.6', key: 'defense', title: '抗辩模拟', href: './抗辩机器人.html' },
     { id: '3.7', key: 'qa', title: '案情闯关', href: './游戏化问答.html' },
@@ -67,22 +66,42 @@
     };
   }
 
-  function currentFileName() {
-    return decodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
+  /** Netlify 等托管会把 Step2SmartExtraction.html 301 到 /step2smartextraction，需忽略大小写与 .html 后缀 */
+  function pageSlug(value) {
+    if (!value) return 'index';
+    let name = String(value);
+    try {
+      name = decodeURIComponent(name);
+    } catch (error) {}
+    const segment = name.split('/').filter(Boolean).pop() || 'index.html';
+    const lower = segment.toLowerCase();
+    if (lower === 'index' || lower === 'index.html') return 'index';
+    return lower.endsWith('.html') ? lower.slice(0, -5) : lower;
+  }
+
+  function currentPageSlug() {
+    const segments = window.location.pathname.split('/').filter(Boolean);
+    if (!segments.length) return 'index';
+    return pageSlug(segments[segments.length - 1]);
+  }
+
+  function hrefPageSlug(href) {
+    const url = new URL(href, window.location.href);
+    return pageSlug(url.pathname.split('/').pop() || 'index.html');
   }
 
   function currentPageIndex() {
-    const file = currentFileName();
+    const slug = currentPageSlug();
     const query = new URLSearchParams(window.location.search);
-    if (file === '申请书bot.html') {
+    const filingBotSlug = pageSlug('申请书bot.html');
+    if (slug === filingBotSlug) {
       return query.get('demoStage') === 'report'
         ? PPT_PAGES.findIndex(page => page.key === 'report')
         : PPT_PAGES.findIndex(page => page.key === 'filing-bot');
     }
     const index = PPT_PAGES.findIndex(page => {
       if (!page.href) return false;
-      const url = new URL(page.href, window.location.href);
-      return decodeURIComponent(url.pathname.split('/').pop() || '') === file;
+      return hrefPageSlug(page.href) === slug;
     });
     return index;
   }

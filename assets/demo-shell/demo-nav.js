@@ -5,6 +5,7 @@
       items: [
         { key: 'index', short: '1', title: '第一步', desc: '申请书准备方式', href: './index.html' },
         { key: 'step2', short: '2', title: '材料提取', desc: 'AI 解析核对', href: './Step2SmartExtraction.html' },
+        { key: 'material-split', short: '分', title: '立案分流', desc: '智能判断', href: './立案分流智能判断.html' },
         { key: 'diversion', short: '3', title: '调解与撤案引导', desc: '路径确认', href: './调解&撤案引导bot.html' },
         { key: 'filing', short: '4', title: '智能立案助手', desc: '生成申请书', href: './申请书bot.html' },
         { key: 'report', short: '5', title: '评估报告', desc: '风险与路径建议', href: './申请书bot.html?demoStage=report', openReport: true }
@@ -26,6 +27,7 @@
   const pageKeyByFile = {
     'index.html': 'index',
     'Step2SmartExtraction.html': 'step2',
+    '立案分流智能判断.html': 'material-split',
     '调解&撤案引导bot.html': 'diversion',
     '申请书bot.html': 'filing',
     '立案提交后路径选择.html': 'followup',
@@ -36,11 +38,33 @@
     '演示结束页.html': 'ending'
   };
 
+  function pageSlug(value) {
+    if (!value) return 'index';
+    let name = String(value);
+    try {
+      name = decodeURIComponent(name);
+    } catch (error) {}
+    const segment = name.split('/').filter(Boolean).pop() || 'index.html';
+    const lower = segment.toLowerCase();
+    if (lower === 'index' || lower === 'index.html') return 'index';
+    return lower.endsWith('.html') ? lower.slice(0, -5) : lower;
+  }
+
+  function currentPageSlug() {
+    const segments = window.location.pathname.split('/').filter(Boolean);
+    if (!segments.length) return 'index';
+    return pageSlug(segments[segments.length - 1]);
+  }
+
   function currentPageKey() {
-    const file = decodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
+    const slug = currentPageSlug();
     const query = new URLSearchParams(window.location.search);
-    if (file === '申请书bot.html' && query.get('demoStage') === 'report') return 'report';
-    return pageKeyByFile[file] || '';
+    const filingBotSlug = pageSlug('申请书bot.html');
+    if (slug === filingBotSlug && query.get('demoStage') === 'report') return 'report';
+    for (const [file, key] of Object.entries(pageKeyByFile)) {
+      if (pageSlug(file) === slug) return key;
+    }
+    return '';
   }
 
   function isConfigOn(value) {
