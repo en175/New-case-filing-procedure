@@ -68,6 +68,7 @@
         }
     </style>
     <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+    <link rel="stylesheet" href="./assets/demo-shell/demo-ppt-nav.css">
 </head>
 <body class="text-gray-800 p-4 md:p-8 font-sans antialiased">
 
@@ -499,19 +500,15 @@
       }
 
       function shouldIgnoreClick(event) {
-        return event.target.closest('.demo-global-nav');
+        return event.target.closest('.demo-global-nav, .demo-ppt-nav');
       }
 
       document.addEventListener('click', (event) => {
         if (!PPT_DEMO_MODE || shouldIgnoreClick(event)) return;
         goToEndingPage();
       });
-
-      document.addEventListener('keydown', (event) => {
-        if (!PPT_DEMO_MODE || event.key !== 'ArrowRight') return;
-        goToEndingPage();
-      });
     })();
   </script>
+  <script src="./assets/demo-shell/demo-ppt-nav.js"></script>
 </body>
 </html>

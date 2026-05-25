@@ -2372,6 +2372,7 @@
             font-family: SimSun, "Songti SC", "Noto Serif CJK SC", serif;
             font-size: 12px;
             line-height: 1.65;
+            --doc-line-step: 26px;
         }
         .doc-title {
             margin-bottom: 18px;
@@ -2404,7 +2405,7 @@
             min-height: 0;
             padding: 0 4px 1px !important;
             color: #000 !important;
-            background: transparent !important;
+            background-color: transparent !important;
             border: 0 !important;
             border-bottom: 1px solid #000 !important;
             border-radius: 0;
@@ -2421,19 +2422,21 @@
         .doc-fill {
             display: inline-block;
         }
-        .doc-fill-block {
+        .doc-template .application-fill.doc-fill-block {
             display: block;
             width: 100%;
             min-height: 160px;
-            padding: 2px 0 !important;
-            line-height: 1.8;
+            padding: 0 !important;
+            line-height: var(--doc-line-step);
+            background-color: transparent !important;
             background-image: repeating-linear-gradient(
                 to bottom,
                 transparent 0,
-                transparent 25px,
-                #000 26px,
-                transparent 27px
+                transparent calc(var(--doc-line-step) - 1px),
+                #000 calc(var(--doc-line-step) - 1px),
+                #000 var(--doc-line-step)
             ) !important;
+            background-size: 100% var(--doc-line-step);
             border-bottom: 0 !important;
         }
         .doc-facts {
@@ -2458,13 +2461,13 @@
         .w-date-part { min-width: 28px; text-align: center; }
         .doc-lined-space {
             display: grid;
-            gap: 13px;
+            gap: calc(var(--doc-line-step) / 2);
             margin-top: 8px;
             margin-bottom: 32px;
         }
         .doc-lined-space span {
             display: block;
-            height: 13px;
+            height: calc(var(--doc-line-step) / 2);
             border-bottom: 1px solid #000;
         }
         .doc-closing {

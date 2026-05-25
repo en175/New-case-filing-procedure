@@ -4,7 +4,7 @@
   /** 演示配置默认值；每个配置字段单独存为一个 localStorage key */
   const DEFAULT_CONFIG = {
     /** 是否显示左侧导航栏 */
-    isShowNavAside: 1,
+    isShowNavAside: 0,
     /** 是否显示顶部立案流程进度 */
     isShowFilingHudProgress: 0,
     /** 是否显示调解与撤案引导 bot 的演示下一步按钮 */
@@ -12,7 +12,13 @@
     /** 是否显示申请书 bot 的演示下一步按钮 */
     isShowApplicationDemoStepBtn: 0,
     /** 是否显示申请书 bot 的自动填写模板按钮 */
-    isShowApplicationAutoFillBtn: 0
+    isShowApplicationAutoFillBtn: 0,
+    /** 是否显示 PPT 页级前进 / 后退控件 */
+    isShowPptNavControls: 0,
+    /** PPT 下一页键位 keyCode，默认右方向键 39 */
+    pptNavKeyCodeNext: 39,
+    /** PPT 上一页键位 keyCode，默认左方向键 37 */
+    pptNavKeyCodePrev: 37
   };
 
   /** 开关类字段统一用 0/1 存储，便于在 LS 里直接改 */
@@ -21,7 +27,13 @@
     'isShowFilingHudProgress',
     'isShowDiversionDemoStepBtn',
     'isShowApplicationDemoStepBtn',
-    'isShowApplicationAutoFillBtn'
+    'isShowApplicationAutoFillBtn',
+    'isShowPptNavControls'
+  ]);
+
+  const NUMERIC_KEYS = new Set([
+    'pptNavKeyCodeNext',
+    'pptNavKeyCodePrev'
   ]);
 
   function isOn(value) {
@@ -32,8 +44,16 @@
     return isOn(value) ? 1 : 0;
   }
 
+  function normalizeNumeric(key, value) {
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isFinite(parsed)) return DEFAULT_CONFIG[key];
+    return parsed;
+  }
+
   function normalizeValue(key, value) {
-    return SWITCH_KEYS.has(key) ? toSwitch(value) : value;
+    if (SWITCH_KEYS.has(key)) return toSwitch(value);
+    if (NUMERIC_KEYS.has(key)) return normalizeNumeric(key, value);
+    return value;
   }
 
   function hasDefaultKey(key) {

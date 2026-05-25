@@ -2498,12 +2498,25 @@ const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
                 advancePptReportStep();
             };
 
+            const handlePptReportInnerKey = (event) => {
+                if (!pptReportDemoMode || stage.value !== 'report' || reportStep.value !== 1) return false;
+                const keyCodes = window.DemoPptNav?.getKeyCodes?.();
+                if (!keyCodes) return false;
+                const code = event.keyCode || event.which;
+                if (code !== keyCodes.next) return false;
+                event.preventDefault();
+                advancePptReportStep();
+                return true;
+            };
+
+            let unregisterPptReportInnerNav = null;
+            const syncPptReportInnerNav = () => {
+                unregisterPptReportInnerNav?.();
+                if (!window.DemoPptNav?.registerInnerKeyHandler) return;
+                unregisterPptReportInnerNav = window.DemoPptNav.registerInnerKeyHandler(handlePptReportInnerKey);
+            };
+
             const handleApplicationDemoKeydown = (event) => {
-                if (pptReportDemoMode && stage.value === 'report' && reportStep.value === 1 && event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    advancePptReportStep();
-                    return;
-                }
                 if (stage.value !== 'ai_consult') return;
                 if (event.key === 'ArrowRight') {
                     event.preventDefault();
@@ -2513,6 +2526,8 @@ const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
             // Init
             onMounted(() => {
                 window.addEventListener('keydown', handleApplicationDemoKeydown);
+                syncPptReportInnerNav();
+                window.addEventListener('demo-ppt-nav-ready', syncPptReportInnerNav);
                 // 演示模式：打开页面直接进入 AI 对话框，跳过前置答题流程。
                 filingStatus.value = {
                     answeredQuestions: [],
@@ -2553,6 +2568,8 @@ const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
 
             onUnmounted(() => {
                 window.removeEventListener('keydown', handleApplicationDemoKeydown);
+                unregisterPptReportInnerNav?.();
+                window.removeEventListener('demo-ppt-nav-ready', syncPptReportInnerNav);
                 document.body.classList.remove('ppt-report-demo-page');
             });
 
