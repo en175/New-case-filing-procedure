@@ -369,15 +369,15 @@
                 <div>
                     <h2 class="ai-consult-title">AI模拟被申请人</h2>
                 </div>
-                <a class="ai-back-link" href="./立案提交后路径选择.html">
+                <!-- <a class="ai-back-link" href="./立案提交后路径选择.html">
                     <i class="fas fa-arrow-left"></i>
                     <span>返回路径选择</span>
-                </a>
+                </a> -->
             </div>
 
             <div class="ai-chat-body custom-scrollbar" ref="aiChatBody">
                 <div class="ai-welcome-panel">
-                    <h3 class="ai-welcome-title">你好<strong>李明</strong>，下面将模拟被申请人与您直接对话。</h3>
+                    <h3 class="ai-welcome-title">您好，下面将模拟被申请人与您直接对话。</h3>
                     <p class="ai-welcome-desc">请选择一个争议场景，由培训机构一方直接回应您的退款主张，重点呈现对方可能坚持的事实和理由。</p>
                     <div class="ai-preset-grid">
                         <button type="button" v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking || aiPartialRefundScriptActive">

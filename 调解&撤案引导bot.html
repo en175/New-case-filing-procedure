@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能案情研判助手</title>
+    <title>智能纠纷化解引导助手</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="./assets/shared/vue-mount-guard.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -61,7 +61,7 @@
     </div>
 
     <div class="absolute inset-0 z-30 flex items-start justify-center bg-black/35 backdrop-blur-sm px-10 pb-10 pt-[86px] ai-demo-overlay">
-        <main class="diversion-stage">
+        <main class="diversion-stage diversion-stage-single">
             <section class="ai-consult-card diversion-card animate__animated animate__fadeInUp">
                 <div class="ai-consult-header">
                     <div class="ai-prototype-brand">
@@ -69,7 +69,7 @@
                             <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
                         </div>
                         <div>
-                            <h2 class="ai-consult-title">智能案情研判助手</h2>
+                            <h2 class="ai-consult-title">智能纠纷化解引导助手</h2>
                             <p class="ai-consult-desc">基于合同、事实和证据材料，辅助形成案件研判和程序建议</p>
                         </div>
                     </div>
@@ -125,7 +125,19 @@
                         </div>
                     </div>
 
-                    <div class="ai-input-area">
+                    <div class="ai-input-area diversion-input-area">
+                        <div class="diversion-suggestions" aria-label="引导选项卡">
+                            <div
+                                v-for="(item, index) in suggestionPrompts"
+                                :key="index"
+                                class="diversion-suggestion-chip is-display-only"
+                            >
+                                <span class="diversion-suggestion-icon" aria-hidden="true">
+                                    <i class="fas" :class="item.icon"></i>
+                                </span>
+                                <span class="diversion-suggestion-label">{{ item.label }}</span>
+                            </div>
+                        </div>
                         <div class="ai-input-shell" :class="{ 'has-diversion-attachments': uploadedFiles.length }">
                             <div v-if="uploadedFiles.length" class="diversion-attachment-list" aria-label="已选择附件">
                                 <div v-for="file in uploadedFiles" :key="file.id" class="diversion-attachment-item">
@@ -137,7 +149,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <textarea v-model="inputText" @keydown.enter.exact.prevent="sendMessage" :placeholder="currentPlaceholder"></textarea>
+                            <textarea v-model="inputText" readonly placeholder=""></textarea>
                             <div class="ai-input-options">
                                 <button @click="triggerAttachmentUpload" class="ai-attach-btn" type="button" aria-label="上传附件">
                                     <i class="fas fa-paperclip"></i>
@@ -151,27 +163,6 @@
                     </div>
                 </div>
             </section>
-
-            <aside class="ai-side-tools diversion-tools">
-                <div class="ai-side-title">辅助工具</div>
-                <div class="ai-preset-grid">
-                    <a class="ai-preset-card featured" href="./游戏化问答.html">
-                        <div class="ai-preset-icon"><i class="fas fa-list-check"></i></div>
-                        <div class="ai-preset-title">游戏化答题</div>
-                        <div class="ai-preset-desc">通过通俗问答快速梳理纠纷事实、合同履行、退款沟通和证据缺口。</div>
-                    </a>
-                    <a class="ai-preset-card" href="./抗辩机器人.html">
-                        <div class="ai-preset-icon"><i class="fas fa-comments"></i></div>
-                        <div class="ai-preset-title">AI抗辩模拟</div>
-                        <div class="ai-preset-desc">提前模拟对方可能如何回应您的退款、违约或证据主张。</div>
-                    </a>
-                    <a class="ai-preset-card" href="./案件路径图.html">
-                        <div class="ai-preset-icon"><i class="fas fa-scale-balanced"></i></div>
-                        <div class="ai-preset-title">仲裁/调解路径</div>
-                        <div class="ai-preset-desc">对比调解与仲裁的办理节奏、适用场景和后续选择。</div>
-                    </a>
-                </div>
-            </aside>
         </main>
     </div>
     <div class="diversion-confirm-mask" v-if="confirmModal.show" role="dialog" aria-modal="true">
@@ -186,7 +177,6 @@
         </div>
     </div>
 </div>
-<script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/filing-bot/diversion-bot-app.js"></script>
 <script src="./assets/demo-shell/demo-config.js"></script>
 <script src="./assets/demo-shell/demo-nav.js"></script>

@@ -1,5 +1,24 @@
 const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
+const DEFAULT_DEMO_OPENING = '我们先说明立场：全额退款我们目前无法接受。您可以直接就退款、违约、补课、调解或分期履行提出问题，我们会按合同约定和实际履行情况回应。';
+
+const DEFAULT_DEMO_DIALOGUE = [
+    { role: 'user', text: '我报名的是 VIP导师保障营，交了 18800 元。现在课一直没正常上，我要求你们全额退款。' },
+    { role: 'assistant', text: '陈先生，我们理解您对课程安排不满意，但全额退款我们不能接受。双方签过《网络教育咨询服务协议》，账号也已经开通，不能直接说我们完全没有履行。' },
+    { role: 'user', text: '账号开通不代表服务到位。我买的是核心直播课和导师服务，不是只买一个学习账号。' },
+    { role: 'assistant', text: '您可以主张核心服务履行存在争议，但账号开通、课程入口、班主任沟通和资料交付也属于服务内容。是否退款可以谈，但不能直接按零履行计算。' },
+    { role: 'user', text: '微信群里你们自己也发过延期通知，课程一拖再拖，我就是因为这个才申请退款。' },
+    { role: 'assistant', text: '延期通知只能说明课程安排发生变化，不等于合同自动解除，也不等于当然全退。要判断是否构成根本违约，还要看协议约定、延期时间和后续是否仍能继续履行。' },
+    { role: 'user', text: '课程宣传页里承诺的内容，和你们实际提供的服务差距很大。' },
+    { role: 'assistant', text: '宣传页可以作为您报名时预期的参考，但最终权利义务还是要回到协议条款。您如果认为宣传内容已经构成具体承诺，需要说明哪一项承诺没有兑现，以及它和协议内容怎么对应。' },
+    { role: 'user', text: '我还提交了退款申请截图和班主任聊天记录，已经不止一次要求退款。' },
+    { role: 'assistant', text: '退款申请和聊天记录可以证明您提出过诉求，但不能证明我们已经同意全额退款。我们还会看课程冻结协议，冻结是双方对后续学习安排的补充，不是退款确认书。' },
+    { role: 'user', text: '所以你们的意思是，一分钱都不退？' },
+    { role: 'assistant', text: '不是。我们可以讨论部分退款，但要扣除已经开通账号、配置课程资源、教务服务和已发生的履约成本。本案真正争议不是退不退，而是有没有全退依据，以及应当退多少。' },
+    { role: 'user', text: '如果我不同意部分退款，坚持全额退款呢？' },
+    { role: 'assistant', text: '那就进入仲裁，由仲裁庭结合协议、延期通知、学习账号、退款沟通和冻结协议判断。我们会重点抗辩三点：服务并非零履行，延期不当然等于全额退款，冻结协议会影响退费判断。' }
+];
+
 const PARTIAL_REFUND_DIALOGUE = [
     { role: 'assistant', text: '李明，你要求全额退还15800元，我们不同意。你现在的说法是“对方没有提供服务”，但事实并不是这样。账号已经开通，导学课程已经开放，你也有登录学习记录。你不能一边使用了服务，一边主张对方零履行、全额退款。' },
     { role: 'user', text: '我只是看了两节导学录播课，核心直播课根本没开。' },
@@ -135,6 +154,7 @@ const PARTIAL_REFUND_DIALOGUE = [
             let aiTypewriter = null;
             const aiDefenseRoundCount = ref(0);
             const aiPartialRefundScriptActive = ref(false);
+            const aiDemoPreloaded = ref(true);
             const partialRefundCursor = ref(0);
             const AI_DEFENSE_REQUIRED_ROUNDS = 3;
             const canFinishAiConsult = computed(() => aiDefenseRoundCount.value >= AI_DEFENSE_REQUIRED_ROUNDS);
@@ -935,14 +955,26 @@ const PARTIAL_REFUND_DIALOGUE = [
             });
 
             const setAiStaticGreeting = () => {
-                aiMessages.value = [
+                aiMessageId = 0;
+                const messages = [
                     {
                         id: ++aiMessageId,
                         role: 'assistant',
-                        content: '我们先说明立场：全额退款我们目前无法接受。您可以直接就退款、违约、补课、调解或分期履行提出问题，我们会按合同约定和实际履行情况回应。',
+                        content: DEFAULT_DEMO_OPENING,
                         streaming: false
                     }
                 ];
+                DEFAULT_DEMO_DIALOGUE.forEach((step) => {
+                    messages.push({
+                        id: ++aiMessageId,
+                        role: step.role,
+                        content: escapeHtml(step.text),
+                        streaming: false
+                    });
+                });
+                aiMessages.value = messages;
+                const userTurns = DEFAULT_DEMO_DIALOGUE.filter((step) => step.role === 'user').length;
+                aiDefenseRoundCount.value = Math.max(AI_DEFENSE_REQUIRED_ROUNDS, userTurns);
                 aiIsThinking.value = false;
                 scrollAiChatToTop();
             };
@@ -1009,7 +1041,7 @@ const PARTIAL_REFUND_DIALOGUE = [
             };
 
             const chooseAiPreset = (card) => {
-                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                if (aiDemoPreloaded.value || aiIsThinking.value || aiPartialRefundScriptActive.value) return;
                 if (card.scriptId === 'partial-refund') {
                     startPartialRefundScript(card);
                     return;
