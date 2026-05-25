@@ -1129,16 +1129,16 @@
     }
 
     function initDemoExistingApplicationFiles() {
-      if (isFromApplicationBot()) return
       const files = DEMO_EXISTING_APPLICATION_FILES
-      state.applicationSource = 'existingApplication'
-      state.hasUploadList = [createDemoPdfRecord(files.application)]
       state.catalogFiles = [createDemoPdfRecord(files.catalog)]
       state.evidenceUploads = files.evidenceGroups.map((group, index) => ({
         id: `demo_evidence_${index + 1}`,
         uploadList: group.map(createDemoPdfRecord),
         showError: false
       }))
+      if (isFromApplicationBot()) return
+      state.applicationSource = 'existingApplication'
+      state.hasUploadList = [createDemoPdfRecord(files.application)]
     }
 
     function escapeHtml(value) {
@@ -1152,6 +1152,10 @@
     }
 
     function createGeneratedApplicationHtml() {
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const day = String(now.getDate()).padStart(2, '0')
       return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1163,6 +1167,7 @@
     h1 { text-align: center; font-size: 28px; margin: 0 0 36px; letter-spacing: .08em; }
     h2 { font-size: 17px; margin: 28px 0 12px; border-left: 4px solid #1d4ed8; padding-left: 10px; }
     p { font-size: 15px; line-height: 1.9; margin: 8px 0; }
+    .meta { color: #374151; }
     .sign { margin-top: 44px; text-align: right; }
   </style>
 </head>
@@ -1170,17 +1175,19 @@
   <article class="paper">
     <h1>仲裁申请书</h1>
     <h2>一、当事人信息</h2>
-    <p>申请人：张三，身份证号：440100198805120011，联系电话：13800000000。</p>
-    <p>被申请人：广州某教育科技有限公司，统一社会信用代码：91440101MA0000000X。</p>
+    <p class="meta">申请人：陈某，男，27岁，身份证号：43011119981215073X，联系电话：19821648472，住所：广东省长沙市开福区（以材料补充页为准）。</p>
+    <p class="meta">被申请人：广州师大博学技术有限公司，统一社会信用代码、住所及联系电话以《网络教育咨询服务协议》载明信息为准。</p>
     <h2>二、仲裁请求</h2>
-    <p>1. 请求裁决被申请人退还培训服务费人民币 15800 元。</p>
-    <p>2. 请求裁决被申请人承担本案仲裁费用。</p>
+    <p>1. 请求裁决解除《网络教育咨询服务协议》。</p>
+    <p>2. 请求裁决被申请人退还课程费用人民币 18800.00 元。</p>
+    <p>3. 请求裁决被申请人承担本案仲裁费用。</p>
     <h2>三、事实与理由</h2>
-    <p>申请人与被申请人签订线上职业培训课程服务合同，并按约支付课程费用。后被申请人未按约安排核心课程，多次沟通退款未果，已影响合同目的实现。</p>
-    <p>申请人现依据合同约定及相关法律规定，向广州仲裁委员会申请仲裁，请依法支持申请人的仲裁请求。</p>
+    <p>申请人陈某与被申请人广州师大博学技术有限公司签订《网络教育咨询服务协议》，购买“VIP导师保障营”课程并支付课程费用 18800.00 元。协议约定因本合同产生的争议提交广州仲裁委员会仲裁。</p>
+    <p>签约付款后，被申请人未按约持续提供课程服务并多次延期。申请人提出退款后双方未协商一致。微信群延期通知、班主任微信聊天记录、退款申请截图等材料显示，课程履行过程中存在延期通知、退款申请以及课程冻结安排，冻结期限载明为 2025 年 1 月 2 日至 2026 年 1 月 2 日。</p>
+    <p>现申请人认为合同目的难以实现，依据合同约定及相关法律规定，向广州仲裁委员会申请仲裁，请依法支持申请人的仲裁请求。</p>
     <h2>四、证据及证明内容</h2>
-    <p>证据材料包括培训服务合同、付款凭证、沟通记录、退款申请记录等，用于证明合同关系、付款事实、履约争议及退款沟通过程。</p>
-    <p class="sign">此致<br>广州仲裁委员会<br><br>申请人：张三<br>日期：2026 年 5 月 18 日</p>
+    <p>证据材料包括：《证据-服务协议.pdf》《证据-课程宣传页和学习账号截图.pdf》《证据-微信群延期通知和班主任微信聊天记录.pdf》《证据-退款申请截图和微信聊天记录.pdf》等，用于证明合同关系、付款事实、课程延期、退款沟通及冻结安排。</p>
+    <p class="sign">此致<br>广州仲裁委员会<br><br>申请人：陈某<br>日期：${year} 年 ${month} 月 ${day} 日</p>
   </article>
 <\/body>
 <\/html>`

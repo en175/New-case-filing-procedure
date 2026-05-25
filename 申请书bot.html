@@ -332,11 +332,12 @@
             <div class="ai-prototype-panel">
                 <div class="ai-scroll-content custom-scrollbar" ref="aiScrollBody" @click="handleAiPanelClick" @change="handleAiPanelChange" @input="handleAiPanelInput">
                     <div class="ai-chat-body" ref="aiChatBody">
-                        <div v-for="message in aiMessages" :key="message.id" class="ai-message-row" :class="[message.role, { 'application-guide-row': message.type }]">
+                        <div v-for="message in aiMessages" :key="message.id" class="ai-message-row" :class="[message.role, message.type === 'user-upload' ? 'user-upload-row' : '', { 'application-guide-row': message.type && message.type !== 'user-upload' }]">
                             <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
                                 <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
                             </div>
-                            <div class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming }" v-html="message.content"></div>
+                            <div v-if="message.type === 'user-upload'" class="ai-user-upload-wrap" v-html="message.content"></div>
+                            <div v-else class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming }" v-html="message.content"></div>
                         </div>
                         <div v-if="aiIsThinking" class="ai-message-row">
                             <div class="ai-avatar ai-bot-mark compact">
@@ -488,6 +489,18 @@
                         <i class="fas fa-check-circle"></i>
                         <span>我已知晓</span>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="demoPdfPreview.show" class="demo-pdf-preview-mask" @click.self="closeDemoPdfPreview">
+            <div class="demo-pdf-preview-modal">
+                <div class="demo-pdf-preview-header">
+                    <div class="demo-pdf-preview-title">{{ demoPdfPreview.title }}</div>
+                    <button type="button" class="demo-pdf-preview-close" @click="closeDemoPdfPreview" aria-label="关闭">×</button>
+                </div>
+                <div class="demo-pdf-preview-body">
+                    <iframe class="demo-pdf-preview-frame" :src="demoPdfPreview.url" title="文件预览"></iframe>
                 </div>
             </div>
         </div>

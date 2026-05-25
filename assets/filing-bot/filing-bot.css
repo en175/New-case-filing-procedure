@@ -3727,6 +3727,71 @@
             gap: 20px;
             align-items: stretch;
         }
+        .diversion-stage-single {
+            grid-template-columns: minmax(0, 1fr);
+            width: min(1280px, calc(100vw - var(--demo-nav-width, 0px) - 80px));
+        }
+        .diversion-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+        .diversion-suggestions {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            padding: 0 2px;
+        }
+        .diversion-suggestion-chip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 56px;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #dbeafe;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+            cursor: pointer;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+        }
+        .diversion-suggestion-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, #eff6ff 0%, #e0ecff 100%);
+            color: #2563eb;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 15px;
+        }
+        .diversion-suggestion-label {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .diversion-suggestion-chip.is-display-only {
+            cursor: default;
+            pointer-events: none;
+        }
+        .diversion-suggestion-chip.is-display-only:hover {
+            transform: none;
+            border-color: #dbeafe;
+            background: #ffffff;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+        }
         .diversion-card {
             width: 100%;
             height: 100%;
@@ -3950,6 +4015,9 @@
         }
 
         @media (max-width: 1120px) {
+            .diversion-suggestions {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
             .diversion-stage {
                 width: min(1040px, calc(100vw - 48px));
                 height: auto;
@@ -3967,6 +4035,135 @@
             .diversion-side {
                 display: none;
             }
+        }
+
+        .ai-message-row.user-upload-row {
+            justify-content: flex-end;
+        }
+        .ai-user-upload-wrap {
+            max-width: min(680px, 92%);
+        }
+        .ai-user-upload-panel {
+            border: 2px solid #2563eb;
+            border-radius: 16px;
+            padding: 12px;
+            background: #fff;
+        }
+        .ai-chat-upload-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .ai-chat-upload-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            background: #fff;
+            color: #1f2937;
+        }
+        .ai-chat-upload-card-main {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            gap: 12px;
+            flex: 1;
+        }
+        .ai-chat-upload-icon {
+            color: #2563eb;
+            font-size: 24px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .ai-chat-upload-name {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #1f2937;
+            word-break: break-all;
+        }
+        .ai-chat-upload-preview {
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 0;
+        }
+        .ai-chat-upload-preview:hover {
+            color: #1d4ed8;
+        }
+        .ai-chat-upload-preview i {
+            font-size: 14px;
+        }
+        .demo-pdf-preview-mask {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .demo-pdf-preview-modal {
+            width: min(980px, calc(100vw - 40px));
+            height: min(760px, calc(100vh - 56px));
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .demo-pdf-preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid #e5edf8;
+        }
+        .demo-pdf-preview-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .demo-pdf-preview-close {
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+        }
+        .demo-pdf-preview-close:hover {
+            color: #6b7280;
+        }
+        .demo-pdf-preview-body {
+            flex: 1;
+            min-height: 0;
+            padding: 0 22px 22px;
+        }
+        .demo-pdf-preview-frame {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #dbe3ef;
+            border-radius: 14px;
+            background: #fff;
         }
 
     
