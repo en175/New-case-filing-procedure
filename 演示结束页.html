@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>演示结束</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root {
+      --blue-ink: #062f72;
+      --title-ink: #08245a;
+      --line-blue: rgba(80, 151, 220, 0.34);
+      --line-white: rgba(255, 255, 255, 0.9);
+      --gold: #c89a42;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      background: #eef8ff;
+      color: var(--blue-ink);
+    }
+
+    .ending-page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-height: 620px;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.72) 23%, transparent 48%),
+        radial-gradient(circle at 22% 16%, rgba(255,255,255,0.96) 0%, transparent 28%),
+        radial-gradient(circle at 82% 8%, rgba(92, 169, 231, 0.28) 0%, transparent 36%),
+        linear-gradient(116deg, #f7fcff 0%, #dff1ff 46%, #b9dcfb 100%);
+    }
+
+    .ending-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(53, 126, 198, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53, 126, 198, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.55) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.55) 1px, transparent 1px);
+      background-size: 72px 72px, 72px 72px, 18px 18px, 18px 18px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.42) 52%, transparent 82%);
+    }
+
+    .brand {
+      position: absolute;
+      top: clamp(30px, 4.8vw, 72px);
+      left: clamp(34px, 5.2vw, 84px);
+      z-index: 8;
+      display: inline-flex;
+      align-items: center;
+      gap: clamp(10px, 1vw, 16px);
+    }
+
+    .brand-logo {
+      width: clamp(44px, 3.6vw, 64px);
+      height: clamp(44px, 3.6vw, 64px);
+      object-fit: contain;
+      filter: drop-shadow(0 14px 24px rgba(38, 96, 158, 0.12));
+    }
+
+    .brand-name {
+      font-size: clamp(18px, 1.5vw, 27px);
+      line-height: 1;
+      font-weight: 900;
+      color: #043574;
+      letter-spacing: 0.02em;
+      text-shadow: 0 8px 22px rgba(42, 111, 184, 0.12);
+    }
+
+    .tech-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.84;
+    }
+
+    .tech-layer svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      display: grid;
+      place-items: center;
+      padding: 16vh 7vw 22vh;
+    }
+
+    .statement {
+      position: relative;
+      width: min(1040px, 76vw);
+      text-align: center;
+      transform: translateY(-1.5vh);
+    }
+
+    .statement::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(980px, 86vw);
+      height: min(520px, 54vh);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.76) 42%, transparent 72%);
+      filter: blur(4px);
+      z-index: -1;
+    }
+
+    .statement-text {
+      margin: 0;
+      color: var(--title-ink);
+      font-size: clamp(60px, 6.1vw, 116px);
+      line-height: 1.18;
+      font-weight: 700;
+      font-family: "STKaiti", "Kaiti SC", "KaiTi", "DFKai-SB", "Songti SC", serif;
+      letter-spacing: -0.045em;
+      text-shadow:
+        0 2px 0 rgba(255,255,255,0.95),
+        0 5px 0 rgba(8, 36, 90, 0.08),
+        0 20px 34px rgba(18, 83, 151, 0.24);
+    }
+
+    .statement-line {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .gold-rule {
+      position: relative;
+      width: min(450px, 32vw);
+      height: 18px;
+      margin: clamp(22px, 2.6vw, 42px) auto 0;
+    }
+
+    .gold-rule::before,
+    .gold-rule::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 18px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200, 154, 66, 0.82));
+    }
+
+    .gold-rule::before { left: 0; }
+    .gold-rule::after {
+      right: 0;
+      transform: scaleX(-1);
+    }
+
+    .gold-diamond {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      border: 3px solid rgba(200, 154, 66, 0.9);
+      transform: translate(-50%, -50%) rotate(45deg);
+      background: rgba(255,255,255,0.9);
+    }
+
+    .city {
+      position: absolute;
+      left: 0;
+      bottom: 13.5vh;
+      z-index: 3;
+      width: 33vw;
+      min-width: 420px;
+      height: 31vh;
+      opacity: 0.44;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, transparent 0 100%),
+        linear-gradient(180deg, rgba(77, 144, 208, 0.24), rgba(77, 144, 208, 0.08));
+      mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,0.86) 72%, transparent 100%);
+    }
+
+    .tower {
+      position: absolute;
+      left: 8.2vw;
+      bottom: 0;
+      width: 4.6vw;
+      min-width: 48px;
+      height: 23vh;
+      border-left: 2px solid rgba(74, 139, 202, 0.46);
+      border-right: 2px solid rgba(74, 139, 202, 0.32);
+      border-radius: 50% 50% 8% 8%;
+      transform: skewX(-5deg);
+    }
+
+    .tower::before,
+    .tower::after {
+      content: "";
+      position: absolute;
+      inset: 10% 27%;
+      border-left: 1px solid rgba(74, 139, 202, 0.5);
+      border-right: 1px solid rgba(74, 139, 202, 0.3);
+      transform: skewX(12deg);
+    }
+
+    .buildings {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 52%;
+      background:
+        linear-gradient(to top, rgba(77, 144, 208, 0.36), rgba(77, 144, 208, 0.08));
+      clip-path: polygon(
+        0 100%, 0 72%, 5% 72%, 5% 52%, 9% 52%, 9% 100%,
+        13% 100%, 13% 45%, 18% 45%, 18% 100%,
+        22% 100%, 22% 62%, 28% 62%, 28% 100%,
+        33% 100%, 33% 36%, 40% 36%, 40% 100%,
+        45% 100%, 45% 58%, 53% 58%, 53% 100%,
+        60% 100%, 60% 68%, 68% 68%, 68% 100%,
+        74% 100%, 74% 50%, 82% 50%, 82% 100%,
+        88% 100%, 88% 65%, 94% 65%, 94% 100%, 100% 100%
+      );
+    }
+
+    .mountains {
+      position: absolute;
+      right: -3vw;
+      bottom: 13vh;
+      z-index: 2;
+      width: 46vw;
+      height: 20vh;
+      opacity: 0.28;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(71, 138, 203, 0.34), rgba(71, 138, 203, 0.08));
+      clip-path: polygon(0 100%, 8% 66%, 16% 82%, 26% 48%, 36% 70%, 48% 35%, 60% 62%, 74% 30%, 88% 58%, 100% 42%, 100% 100%);
+      filter: blur(0.2px);
+    }
+
+    .courthouse {
+      position: absolute;
+      left: 50%;
+      bottom: 7.4vh;
+      z-index: 4;
+      width: min(430px, 26vw);
+      height: min(170px, 17vh);
+      transform: translateX(-50%);
+      opacity: 0.42;
+      pointer-events: none;
+      filter: drop-shadow(0 18px 30px rgba(70, 135, 204, 0.16));
+    }
+
+    .courthouse svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .light-trails {
+      position: absolute;
+      left: -4vw;
+      right: -4vw;
+      bottom: -1vh;
+      z-index: 6;
+      height: 36vh;
+      pointer-events: none;
+    }
+
+    .light-trails svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .floor-ring {
+      position: absolute;
+      left: 50%;
+      bottom: -6vh;
+      z-index: 1;
+      width: min(860px, 58vw);
+      aspect-ratio: 2.6 / 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow:
+        0 0 0 22px rgba(255,255,255,0.16),
+        0 0 0 44px rgba(79, 155, 226, 0.08),
+        inset 0 12px 26px rgba(76, 145, 211, 0.08);
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+      .ending-page { min-height: 560px; }
+      .brand { top: 24px; left: 24px; }
+      .statement {
+        width: min(720px, 88vw);
+        transform: translateY(-2vh);
+      }
+      .statement-text {
+        font-size: clamp(42px, 10.6vw, 74px);
+        white-space: normal;
+      }
+      .city { min-width: 310px; width: 58vw; bottom: 12vh; opacity: 0.3; }
+      .courthouse { width: 56vw; bottom: 8vh; }
+      .mountains { width: 72vw; }
+      .light-trails { height: 28vh; }
+    }
+
+    @media (max-width: 560px) {
+      .brand {
+        gap: 10px;
+      }
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+      }
+      .brand-name {
+        font-size: 17px;
+      }
+      .hero {
+        padding: 13vh 20px 25vh;
+      }
+      .statement-text {
+        font-size: 40px;
+        line-height: 1.26;
+        letter-spacing: -0.04em;
+      }
+      .statement-line {
+        white-space: normal;
+      }
+      .gold-rule {
+        width: 230px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+</head>
+<body>
+  <main class="ending-page" aria-label="演示结束页">
+    <header class="brand" aria-label="广州仲裁委员会">
+      <img class="brand-logo" src="./图片/广仲logo.png" alt="广仲 logo" />
+      <div class="brand-name">广州仲裁委员会</div>
+    </header>
+
+    <div class="tech-layer" aria-hidden="true">
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="techLine" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.12" />
+            <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.72" />
+            <stop offset="1" stop-color="#2b83cf" stop-opacity="0.12" />
+          </linearGradient>
+          <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <g fill="none" stroke="url(#techLine)" stroke-width="2">
+          <path d="M20 330 C210 390 302 488 456 520 S775 520 890 440" opacity="0.34" />
+          <path d="M1540 318 C1600 260 1735 292 1928 106" opacity="0.52" />
+          <path d="M1578 360 C1634 320 1760 385 1940 242" opacity="0.36" />
+          <path d="M1610 420 C1690 388 1782 454 1932 360" opacity="0.24" />
+          <path d="M1488 148 L1570 86 L1648 156 L1715 126 L1810 206 L1920 150" opacity="0.38" />
+          <path d="M288 210 L420 250 L560 222 L688 292" opacity="0.18" />
+        </g>
+        <g fill="#ffffff" opacity="0.72" filter="url(#softGlow)">
+          <circle cx="122" cy="260" r="5" />
+          <circle cx="290" cy="232" r="3" />
+          <circle cx="610" cy="246" r="3" />
+          <circle cx="1138" cy="235" r="4" />
+          <circle cx="1388" cy="90" r="6" />
+          <circle cx="1536" cy="160" r="5" />
+          <circle cx="1664" cy="250" r="5" />
+          <circle cx="1818" cy="466" r="4" />
+        </g>
+        <g stroke="#ffffff" stroke-width="1" opacity="0.28">
+          <path d="M125 240 V740" />
+          <path d="M365 116 V528" />
+          <path d="M1265 110 V650" />
+          <path d="M1810 86 V650" />
+          <path d="M1330 110 H1760" />
+        </g>
+      </svg>
+    </div>
+
+    <div class="city" aria-hidden="true">
+      <div class="tower"></div>
+      <div class="buildings"></div>
+    </div>
+    <div class="mountains" aria-hidden="true"></div>
+    <div class="floor-ring" aria-hidden="true"></div>
+
+    <div class="courthouse" aria-hidden="true">
+      <svg viewBox="0 0 520 220">
+        <defs>
+          <linearGradient id="courtFill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
+            <stop offset="1" stop-color="#6ea8df" stop-opacity="0.42" />
+          </linearGradient>
+        </defs>
+        <path d="M74 182H446V204H74z" fill="url(#courtFill)" />
+        <path d="M102 156H418V184H102z" fill="url(#courtFill)" />
+        <path d="M120 78H400V110H120z" fill="url(#courtFill)" />
+        <path d="M100 76L260 22L420 76H100z" fill="url(#courtFill)" stroke="#7fb6e7" stroke-opacity="0.38" />
+        <circle cx="260" cy="58" r="18" fill="#f8fcff" stroke="#7fb6e7" stroke-opacity="0.54" />
+        <path d="M143 110H176V156H143zM204 110H237V156H204zM283 110H316V156H283zM344 110H377V156H344z" fill="#f7fbff" stroke="#7fb6e7" stroke-opacity="0.35" />
+        <path d="M70 204H450" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.74" />
+      </svg>
+    </div>
+
+    <section class="hero" aria-label="收尾文案">
+      <div class="statement">
+        <h1 class="statement-text">
+          <span class="statement-line">努力为每一起纠纷</span>
+          <span class="statement-line">提供最佳解决方案</span>
+        </h1>
+        <div class="gold-rule" aria-hidden="true"><span class="gold-diamond"></span></div>
+      </div>
+    </section>
+
+    <div class="light-trails" aria-hidden="true">
+      <svg viewBox="0 0 1920 360" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="trailWhite" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
+            <stop offset="0.23" stop-color="#ffffff" stop-opacity="0.9" />
+            <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.44" />
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="trailBlue" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#2e80cf" stop-opacity="0.05" />
+            <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.72" />
+            <stop offset="1" stop-color="#2b83cf" stop-opacity="0.22" />
+          </linearGradient>
+          <filter id="trailGlow" x="-20%" y="-80%" width="140%" height="240%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <g fill="none" stroke-linecap="round" filter="url(#trailGlow)">
+          <path d="M-40 250 C340 340 560 292 820 244 C1110 190 1340 232 1960 28" stroke="url(#trailWhite)" stroke-width="9" opacity="0.9" />
+          <path d="M-40 286 C360 324 610 300 846 274 C1150 240 1450 252 1960 156" stroke="url(#trailBlue)" stroke-width="6" opacity="0.72" />
+          <path d="M-40 300 C348 356 608 326 830 306 C1160 278 1470 304 1960 246" stroke="#6aaee7" stroke-width="3" opacity="0.42" />
+          <path d="M1500 320 C1650 278 1780 220 1960 198" stroke="#d0a24d" stroke-width="2" opacity="0.8" />
+          <path d="M-40 196 C320 278 520 248 740 220 C910 198 1040 196 1210 210" stroke="#ffffff" stroke-width="4" opacity="0.5" />
+        </g>
+        <g fill="#ffffff" opacity="0.84">
+          <circle cx="110" cy="236" r="5" />
+          <circle cx="680" cy="294" r="4" />
+          <circle cx="1532" cy="250" r="3" />
+          <circle cx="1772" cy="212" r="5" />
+        </g>
+        <g fill="none" stroke="#ffffff" opacity="0.5">
+          <path d="M360 344 C600 280 850 274 1110 342" />
+          <path d="M510 328 C760 292 1000 294 1250 326" />
+        </g>
+      </svg>
+    </div>
+  </main>
+  <script src="./assets/demo-shell/demo-config.js"></script>
+  <script src="./assets/demo-shell/demo-nav.js"></script>
+</body>
+</html>

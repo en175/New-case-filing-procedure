@@ -116,7 +116,7 @@
     </div>
 
     <!-- 2. Overlay Panels (Forms, Reports, etc.) -->
-    <div v-if="showOverlayPanel" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" :class="{'pb-48': !['report', 'ai_consult'].includes(stage), 'pb-4': ['report', 'ai_consult'].includes(stage), 'ai-demo-overlay': stage === 'ai_consult'}">
+    <div v-if="showOverlayPanel" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" :class="{'pb-48': !['report', 'ai_consult'].includes(stage), 'pb-4': ['report', 'ai_consult'].includes(stage), 'ai-demo-overlay': stage === 'ai_consult', 'ppt-report-overlay': pptReportDemoMode && stage === 'report'}" @click="handlePptReportDemoClick">
         
 
 
@@ -377,6 +377,7 @@
             :report-data="currentReportData"
             :is-filing-completed="isFilingCompleted"
             :show-back-button="true"
+            :ppt-demo-mode="pptReportDemoMode"
             mediation-label="选择调解"
             @back="returnToAiConsultFromReport"
             @next="nextReportStep"

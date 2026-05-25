@@ -151,7 +151,11 @@
     <div
         v-if="showOverlayPanel"
         class="game-overlay-panel absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-        :class="{'pb-48': stage !== 'report', 'pb-4 report-overlay-panel': stage === 'report'}"
+        :class="{
+            'pb-48': stage !== 'report',
+            'pb-4 report-overlay-panel': stage === 'report',
+            'ppt-demo-qa': stage === 'qa'
+        }"
     >
         
 

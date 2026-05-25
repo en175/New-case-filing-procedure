@@ -117,6 +117,23 @@
         linear-gradient(135deg,#e9eef3 0%,#b9cbd0 46%,#6f8791 100%);
     }
 
+    /* PPT 演示：减少左右留白，内容更铺满大屏 */
+    body.ppt-demo-page .work-area {
+      padding: 18px 10px 36px;
+    }
+
+    body.ppt-demo-page .work-area::before {
+      inset: 10px 6px;
+    }
+
+    body.ppt-demo-page .route-shell {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 22px 14px;
+      border-radius: 20px;
+    }
+
     .work-area::before {
       content: ""; position: absolute; inset: 20px 34px; border-radius: 28px;
       background:
@@ -362,6 +379,42 @@
     .time-row.revealed .path-panel {
       pointer-events: auto; clip-path: none;
       /* opacity left to each panel's own rule: med-silent=0.72, others=1 */
+    }
+
+    /* PPT 演示：进入页面即全部展开，省略逐节点点击与展开动画 */
+    body.ppt-demo-page .time-row.ppt-auto-revealed {
+      opacity: 1;
+    }
+
+    body.ppt-demo-page .time-row.ppt-auto-revealed .path-panel {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      clip-path: none !important;
+      animation: none !important;
+    }
+
+    body.ppt-demo-page .time-row.pending .time-pill {
+      cursor: default;
+      animation: none;
+    }
+
+    body.ppt-demo-page .final-cta.show .final-cta-hint,
+    body.ppt-demo-page .final-cta.show .cta-arb,
+    body.ppt-demo-page .final-cta.show .cta-med {
+      opacity: 1;
+      animation: none;
+    }
+
+    body.ppt-demo-page .path-panel.med-complete.animate-glow {
+      animation: none;
+    }
+
+    body.ppt-demo-page .mediation-select-btn.pulse {
+      animation: none;
+    }
+
+    body.ppt-demo-page .timeline-board {
+      padding: 18px 14px 22px;
     }
 
     /* ─── Time node ─── */
@@ -715,7 +768,7 @@
         <div class="page-head">
           <div>
             <h1 class="page-title">了解<span>调解</span> / 仲裁路径</h1>
-            <p class="page-subtitle">同一案件、同一时间起点，两条办理路线对比展开。依次点击各时间节点，查看对应阶段发生的事项。</p>
+            <p class="page-subtitle" id="pageSubtitle">同一案件、同一时间起点，两条办理路线对比展开。依次点击各时间节点，查看对应阶段发生的事项。</p>
           </div>
           <a class="back-link" href="./立案提交后路径选择.html"><i class="fas fa-arrow-left"></i>返回路径选择</a>
         </div>
@@ -810,6 +863,16 @@
   </div>
 
   <script>
+    /** PPT 演示模式：进入页面后时间轴全部展开，省略点击交互与展开动画 */
+    const PPT_DEMO_MODE = true;
+    if (PPT_DEMO_MODE) {
+      document.body.classList.add('ppt-demo-page');
+      const subtitle = document.getElementById('pageSubtitle');
+      if (subtitle) {
+        subtitle.textContent = '同一案件、同一时间起点，两条办理路线完整对比展示。';
+      }
+    }
+
     /* ─── Data ─── */
     const NODES = [
       {
@@ -929,6 +992,42 @@
       </div>`;
     }
 
+    function buildMedPanel(node) {
+      if (node.medComplete) return buildMed(node.med, true);
+      if (node.med === null) return buildMedSilent();
+      return buildMed(node.med, false);
+    }
+
+    function buildRowHTML(idx) {
+      const node = NODES[idx];
+      return `<div class="time-row revealed ppt-auto-revealed" id="row-${idx}">
+          ${buildArb(node.arb)}
+          ${buildPill(node, false)}
+          ${buildMedPanel(node)}
+        </div>`;
+    }
+
+    function bootTimelinePpt() {
+      const glowLine = timeline.querySelector('.timeline-glow-line');
+      timeline.innerHTML = '';
+      if (glowLine) timeline.appendChild(glowLine);
+
+      silentIdx = 0;
+      NODES.forEach((_, idx) => {
+        timeline.insertAdjacentHTML('beforeend', buildRowHTML(idx));
+      });
+
+      const medCompleteNode = NODES.find(node => node.medComplete);
+      if (medCompleteNode) {
+        const panel = document.getElementById('medCompletePanel');
+        if (panel) panel.classList.add('animate-glow');
+        const btn = document.getElementById('selectMediationBtn');
+        if (btn) btn.classList.add('pulse');
+      }
+
+      document.getElementById('finalCta').classList.add('show');
+    }
+
     /* ─── State machine ─── */
     const timeline = document.getElementById('timeline');
 
@@ -1007,8 +1106,12 @@
       }, REVEAL_MS);
     }
 
-    // Boot: insert row 0 (auto-reveal, no click needed)
-    insertRow(0, false);
+    // Boot timeline
+    if (PPT_DEMO_MODE) {
+      bootTimelinePpt();
+    } else {
+      insertRow(0, false);
+    }
 
     /* ─── Confirm modal ─── */
     function showConfirm() { document.getElementById('confirmMask').classList.add('show'); }

@@ -1010,3 +1010,12 @@
                 transform: translateY(-2px);
             }
         }
+
+        /* PPT 演示：案情闯关任意点击推进 */
+        .game-overlay-panel.ppt-demo-qa {
+            cursor: pointer;
+        }
+
+        .game-overlay-panel.ppt-demo-qa .qa-card-header button {
+            cursor: pointer;
+        }
