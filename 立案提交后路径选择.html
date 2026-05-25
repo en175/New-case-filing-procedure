@@ -301,7 +301,7 @@
     }
 
     .head-actions {
-      display: flex;
+      display: none;
       align-items: center;
       gap: 14px;
     }
@@ -768,6 +768,26 @@
 
   <script>
     const STORAGE_KEY = 'filingDemoCompletedPaths';
+    const PPT_DEMO_MODE = true;
+    const PERSONA_PAGE = './当事人画像话术策略.html';
+
+    function goToPersonaPage() {
+      window.location.href = PERSONA_PAGE;
+    }
+
+    function handleOutsideCardGridClick(event) {
+      if (!PPT_DEMO_MODE) return;
+      if (event.target.closest('.card-grid')) return;
+      goToPersonaPage();
+    }
+
+    function handleOutsideCardGridKeydown(event) {
+      if (!PPT_DEMO_MODE || event.key !== 'ArrowRight') return;
+      goToPersonaPage();
+    }
+
+    document.querySelector('.work-area').addEventListener('click', handleOutsideCardGridClick);
+    document.addEventListener('keydown', handleOutsideCardGridKeydown);
 
     function markCompleted(path) {
       try {

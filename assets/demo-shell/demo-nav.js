@@ -16,7 +16,9 @@
         { key: 'followup', short: '路', title: '后续路径', desc: '路径选择卡片', href: './立案提交后路径选择.html' },
         { key: 'qa', short: '问', title: '答题关卡', desc: '普法问答', href: './游戏化问答.html' },
         { key: 'defense', short: '辩', title: '抗辩模拟', desc: '对方视角', href: './抗辩机器人.html' },
-        { key: 'path', short: '图', title: '案件路径图', desc: '仲裁调解对比', href: './案件路径图.html' }
+        { key: 'path', short: '图', title: '案件路径图', desc: '仲裁调解对比', href: './案件路径图.html' },
+        { key: 'persona', short: '策', title: '当事人画像', desc: '话术策略', href: './当事人画像话术策略.html' },
+        { key: 'ending', short: '终', title: '演示结束', desc: '收尾页', href: './演示结束页.html' }
       ]
     }
   ];
@@ -29,7 +31,9 @@
     '立案提交后路径选择.html': 'followup',
     '游戏化问答.html': 'qa',
     '抗辩机器人.html': 'defense',
-    '案件路径图.html': 'path'
+    '案件路径图.html': 'path',
+    '当事人画像话术策略.html': 'persona',
+    '演示结束页.html': 'ending'
   };
 
   function currentPageKey() {
