@@ -9,6 +9,7 @@
     { id: '3.4', key: 'material-split', title: '立案分流智能判断', href: './立案分流智能判断.html' },
     { id: '3.5', key: 'diversion', title: '纠纷化解引导', href: './调解&撤案引导bot.html' },
     { id: '3.6', key: 'defense', title: '抗辩模拟', href: './抗辩机器人.html' },
+    { id: '3.10', key: 'followup', title: '立案后路径选择', href: './立案提交后路径选择.html' },
     { id: '3.7', key: 'qa', title: '案情闯关', href: './游戏化问答.html' },
     { id: '3.8', key: 'path-map', title: '案件路径图', href: './案件路径图.html' },
     {
@@ -18,7 +19,6 @@
       href: './申请书bot.html?demoStage=report',
       openReport: true
     },
-    { id: '3.10', key: 'followup', title: '立案后路径选择', href: './立案提交后路径选择.html' },
     { id: '3.11', key: 'persona', title: '当事人画像话术', href: './当事人画像话术策略.html' },
     { id: '3.12', key: 'ending', title: '演示结束', href: './演示结束页.html', terminal: true }
   ];
