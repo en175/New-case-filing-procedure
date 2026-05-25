@@ -1507,7 +1507,7 @@
         }
 
         .ai-consult-card {
-            width: min(1180px, calc(100vw - 340px));
+            width: min(1280px, calc(100vw - 120px));
             height: min(860px, calc(100vh - 84px));
             border-radius: 28px;
             padding: 22px;
@@ -1631,6 +1631,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             padding-right: 4px;
+            cursor: pointer;
         }
         .ai-prototype-panel.is-filing-active .ai-chat-body {
             padding-top: 0;
@@ -1794,7 +1795,7 @@
             margin-bottom: 12px;
         }
         .ai-bubble {
-            max-width: min(720px, 86%);
+            max-width: min(820px, 88%);
             border-radius: 18px;
         }
         .ai-message-row.filing-form-row {
