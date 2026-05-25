@@ -1,5 +1,8 @@
-const { createApp, ref, computed, onMounted, nextTick } = Vue;
+const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
 const CaseAssessmentReport = window.CaseAssessmentReport;
+
+/** PPT 演示模式：案情闯关点击任意位置 / 右方向键逐题推进，最后一题后跳转路径图 */
+const PPT_DEMO_MODE = true;
 
     const app = createApp({
         components: CaseAssessmentReport
@@ -246,7 +249,10 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
 
                     case 'pre_qa':
                         stage.value = 'qa';
-                        speak("请根据实际情况回答屏幕上方的问题。", true);
+                        waitingForInteraction.value = false;
+                        if (!PPT_DEMO_MODE) {
+                            speak("请根据实际情况回答屏幕上方的问题。", true);
+                        }
                         break;
 
                     case 'qa_done':
@@ -573,12 +579,27 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                 }
             };
 
+            const finishPptQaFlow = () => {
+                try {
+                    const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
+                    completed.quiz = true;
+                    localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(completed));
+                } catch (error) {
+                    localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ quiz: true }));
+                }
+                window.location.href = './案件路径图.html';
+            };
+
+            let pptAdvanceLocked = false;
+
             const advanceQuestionLogic = () => {
                 if (currentQuestionIndex.value < questions.length - 1) {
                     currentQuestionIndex.value++;
 
                     const comment = npcComments[currentQuestionIndex.value] || "收到，请继续。";
-                    speak(comment + " 下一题...", true);
+                    speak(comment + " 下一题...", !PPT_DEMO_MODE);
+                } else if (PPT_DEMO_MODE) {
+                    finishPptQaFlow();
                 } else {
                     waitingForInteraction.value = false;
                     reportStep.value = 1;
@@ -587,7 +608,51 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                 }
             };
 
+            const advancePptQuestion = (event) => {
+                if (!PPT_DEMO_MODE || stage.value !== 'qa') return;
+                if (pptAdvanceLocked || showVideoModal.value || confirmModal.value.show || isBadgeDrawerOpen.value) {
+                    return;
+                }
+
+                pptAdvanceLocked = true;
+                window.setTimeout(() => {
+                    pptAdvanceLocked = false;
+                }, 280);
+
+                awardCurrentQuestionPoints(event);
+                checkMilestones();
+                waitingForInteraction.value = false;
+                advanceQuestionLogic();
+            };
+
+            const isPptAdvanceBlockedTarget = (target) => {
+                if (!target?.closest) return true;
+                if (target.closest('.qa-option-btn')) return false;
+                return !!target.closest(
+                    'button:not(.qa-option-btn), a, input, textarea, select, label, .badge-drawer, .demo-global-nav, .hud-bar, .points-hint-btn, video'
+                );
+            };
+
+            const handlePptDemoClick = (event) => {
+                if (!PPT_DEMO_MODE || stage.value !== 'qa') return;
+                if (isPptAdvanceBlockedTarget(event.target)) return;
+                advancePptQuestion(event);
+            };
+
+            const handlePptDemoKeydown = (event) => {
+                if (!PPT_DEMO_MODE || stage.value !== 'qa') return;
+                if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    advancePptQuestion(event);
+                }
+            };
+
             const answerQuestion = (option, event) => {
+                if (PPT_DEMO_MODE) {
+                    advancePptQuestion(event);
+                    return;
+                }
+
                 awardCurrentQuestionPoints(event);
                 checkMilestones();
 
@@ -723,6 +788,18 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                         maybeShowStartBadgeToast();
                     }
                 }, 900);
+
+                if (PPT_DEMO_MODE) {
+                    document.addEventListener('click', handlePptDemoClick);
+                    window.addEventListener('keydown', handlePptDemoKeydown);
+                }
+            });
+
+            onUnmounted(() => {
+                if (PPT_DEMO_MODE) {
+                    document.removeEventListener('click', handlePptDemoClick);
+                    window.removeEventListener('keydown', handlePptDemoKeydown);
+                }
             });
 
             return {
