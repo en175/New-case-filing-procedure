@@ -355,7 +355,7 @@
 
                 <div class="ai-input-area">
                     <div class="ai-input-shell">
-                            <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" placeholder=""></textarea>
+                            <textarea v-model="aiInput" readonly placeholder=""></textarea>
                         <div class="ai-input-options">
                             <button @click="triggerAiFileUpload" class="ai-attach-btn" :class="{ 'upload-needed': isCurrentUploadStep }" aria-label="上传附件">
                                 <i class="fas fa-paperclip"></i>
@@ -370,19 +370,6 @@
                 </div>
             </div>
         </div>
-        <aside v-if="stage === 'ai_consult'" class="ai-side-tools">
-            <div class="ai-side-title">辅助工具</div>
-            <div class="ai-preset-grid">
-                <button v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 0 }" :disabled="aiIsThinking">
-                    <div class="ai-preset-icon">
-                        <i :class="card.icon"></i>
-                    </div>
-                    <div class="ai-preset-title">{{ card.title }}</div>
-                    <div class="ai-preset-desc">{{ card.desc }}</div>
-                </button>
-            </div>
-        </aside>
-
         <case-assessment-report
             v-if="stage === 'report'"
             :report-step="reportStep"

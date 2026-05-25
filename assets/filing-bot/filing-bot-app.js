@@ -54,11 +54,11 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             // New Data for Analysis & Upload
             const analysisData = ref({
                 caseType: '教育培训合同纠纷',
-                amount: '15,800.00 元',
+                amount: '18,800.00 元',
                 applicantType: '自然人',
                 respondentType: '企业',
                 requests: [
-                    { amount: '15,800.00 元', content: '请求被申请人退还教育培训服务费 15,800.00 元。' },
+                    { amount: '18,800.00 元', content: '请求裁决被申请人退还课程费用 18,800.00 元。' },
                     { amount: '以实际发生为准', content: '请求被申请人承担本案仲裁费、保全费等因维权产生的合理费用。' }
                 ]
             });
@@ -358,6 +358,113 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     keywords: ['生成', '生成吧', '现在生成', '可以']
                 }
             ];
+            const applicationDemoFrames = [
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '您好，欢迎来到广州仲裁委员会，我将根据您的口述信息和上传的证据材料，协助生成仲裁申请书初稿。',
+                        steps: [
+                            '为保证申请书内容完整，我们会依次梳理以下内容：',
+                            '1. 申请人和被申请人信息；',
+                            '2. 仲裁请求和金额；',
+                            '3. 合同关系及仲裁条款；',
+                            '4. 事实经过和退款沟通情况；',
+                            '5. 证据材料清单。',
+                            '请先简单说明：本案大致是什么纠纷？例如培训退费、服务合同、借款、买卖合同等。'
+                        ]
+                    })
+                },
+                {
+                    role: 'user',
+                    content: '这是教育培训退费纠纷。我买了“VIP导师保障营”，交了18800.00元，但后面课程延期，我想申请仲裁要求退款。'
+                },
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '好的，已初步识别为教育培训合同退费纠纷。',
+                        steps: [
+                            '请先提供申请人信息；如果方便，也可以直接批量上传第一组材料：服务协议、课程宣传页、学习账号截图、付款凭证。'
+                        ]
+                    })
+                },
+                {
+                    role: 'user',
+                    content: '申请人是陈某。上传《证据-服务协议.pdf》《证据-课程宣传页和学习账号截图.pdf》'
+                },
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '已收到第一组材料。系统初步识别到：',
+                        steps: [
+                            '被申请人为广州师大博学技术有限公司；',
+                            '课程名称为“VIP导师保障营”；',
+                            '课程费用为18800.00元；',
+                            '合同约定争议提交广州仲裁委员会仲裁。',
+                            '请再补充上传付款凭证。'
+                        ]
+                    })
+                },
+                {
+                    role: 'user',
+                    content: '上传《证据-微信群延期通知和班主任微信聊天记录.pdf》《证据-退款申请截图和微信聊天记录.pdf》'
+                },
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '已收到第二组材料。系统识别到：',
+                        steps: [
+                            '1. 课程履行过程中存在延期通知；',
+                            '2. 申请人曾提出退款；',
+                            '3. 材料中存在课程冻结安排，冻结时间为2025年1月2日至2026年1月2日。',
+                            '请确认以上信息是否准确？'
+                        ]
+                    })
+                },
+                {
+                    role: 'user',
+                    content: '准确。'
+                },
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '请确认仲裁请求。根据您目前的描述，建议暂列为：',
+                        steps: [
+                            '第一，请求裁决解除《网络教育咨询服务协议》；',
+                            '第二，请求裁决被申请人退还课程费用18800.00元；',
+                            '第三，请求裁决被申请人承担本案仲裁费。'
+                        ]
+                    })
+                },
+                {
+                    role: 'user',
+                    content: '确认，只要退18800.00元，仲裁费由对方承担。'
+                },
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '好的，事实经过我已整理为：',
+                        steps: [
+                            '申请人陈某与广州师大博学技术有限公司签订《网络教育咨询服务协议》，购买“VIP导师保障营”课程并支付18800.00元。后续课程出现延期，申请人多次提出退款，双方沟通未果。现申请人认为合同目的难以实现，申请仲裁请求解除合同并退还课程费用。'
+                        ]
+                    })
+                },
+                {
+                    role: 'assistant',
+                    content: () => buildAiReply({
+                        lead: '材料已基本完整，我将根据您确认的信息生成仲裁申请书初稿。请您重点核对三项内容：',
+                        steps: [
+                            '一是申请人、被申请人信息；',
+                            '二是仲裁请求金额18800.00元；',
+                            '三是延期、退款和冻结安排的事实表述。',
+                            '请问是否现在生成？'
+                        ]
+                    })
+                },
+                {
+                    role: 'user',
+                    content: '生成吧。'
+                }
+            ];
             const filingDemoAnswers = {
                 applicant: '申请人是李明，身份证号是440106199008081234，电话是13800138000，地址是广州市天河区体育西路某小区。',
                 respondent: '我只知道公司叫广州启航教育咨询有限公司，其他信息合同里应该有。',
@@ -366,6 +473,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 evidence: '确认。'
             };
             const conversationStepIndex = ref(0);
+            const applicationDemoFrameIndex = ref(0);
             const applicationReady = ref(false);
             const showApplicationDemoStepButton = ref(false);
             const showApplicationAutoFillButton = ref(false);
@@ -416,24 +524,21 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 const docBlock = (field, value, className = '') => `
                     <div class="application-fill doc-fill doc-fill-block ${className}" contenteditable="true" data-required="true" data-field="${field}" data-placeholder="">${escapeHtml(value)}</div>
                 `;
-                const applicantName = '李明';
-                const applicantId = '440106199008081234';
-                const applicantGender = Number(applicantId.charAt(16)) % 2 === 1 ? '男' : '女';
-                const applicantBirthDate = new Date(`${applicantId.slice(6, 10)}-${applicantId.slice(10, 12)}-${applicantId.slice(12, 14)}`);
-                const applicantAge = String(Math.max(0, today.year - applicantBirthDate.getFullYear() - (
-                    new Date(`${today.year}-${today.month}-${today.day}`) < new Date(`${today.year}-${applicantId.slice(10, 12)}-${applicantId.slice(12, 14)}`) ? 1 : 0
-                )));
-                const applicantAddress = '广州市天河区体育西路某小区';
-                const applicantPhone = '13800138000';
-                const respondentName = '广州启航教育咨询有限公司';
-                const respondentCreditCode = '以《培训服务合同》及主体材料载明信息为准';
-                const respondentAddress = '以《培训服务合同》及主体材料载明信息为准';
-                const respondentPhone = '以《培训服务合同》及主体材料载明信息为准';
-                const claimOne = '请求裁决被申请人退还培训服务费15800元。';
-                const claimTwo = '请求裁决被申请人承担本案仲裁费。';
-                const claimThree = '申请人暂不主张违约金、利息、交通费或其他损失。';
-                const facts = '申请人与被申请人签订《培训服务合同》，合同金额为15800元，课程名称为“跨境电商运营实战班”，合同约定因本合同产生的争议提交广州仲裁委员会仲裁。被申请人承诺提供12周核心直播课、一对一导师辅导、作业点评、就业和接单指导等培训服务，原定于2025年10月10日开课。\n\n申请人已于2025年9月15日向被申请人支付培训费用15800元。付款后，被申请人仅为申请人开通学习账号并开放两节导学录播课，未按约安排核心直播课程、一对一导师辅导、作业点评、就业和接单指导等主要服务内容。\n\n被申请人曾于2025年10月8日、10月25日、11月12日多次通知课程延期，理由包括“讲师档期调整”“班级人数不足”“等待下一期开班”等，但始终未能明确实际开课时间。申请人于2025年11月21日首次提出解除合同并要求退还15800元培训费，被申请人表示可以继续等待下一期开班或转到其他课程，但不同意全额退款，并提出如坚持退款仅可扣除30%后退还70%。\n\n申请人认为，被申请人未按约提供核心课程及配套服务，导致合同目的无法实现。申请人多次要求退款未果，故向广州仲裁委员会申请仲裁，请求支持上述仲裁请求。';
-                const evidence = '证据目录包括：《培训服务合同》、微信付款截图、电子收据、课程宣传页、课程安排表、学习账号后台截图、微信群延期通知、班主任微信聊天记录、退款申请截图及微信聊天记录等。';
+                const applicantName = '陈某';
+                const applicantId = '以申请人身份证明材料为准';
+                const applicantGender = '以申请人身份证明材料为准';
+                const applicantAge = '以申请人身份证明材料为准';
+                const applicantAddress = '以申请人提交材料为准';
+                const applicantPhone = '以申请人提交材料为准';
+                const respondentName = '广州师大博学技术有限公司';
+                const respondentCreditCode = '以《网络教育咨询服务协议》及主体材料载明信息为准';
+                const respondentAddress = '以《网络教育咨询服务协议》及主体材料载明信息为准';
+                const respondentPhone = '以《网络教育咨询服务协议》及主体材料载明信息为准';
+                const claimOne = '请求裁决解除《网络教育咨询服务协议》。';
+                const claimTwo = '请求裁决被申请人退还课程费用18800.00元。';
+                const claimThree = '请求裁决被申请人承担本案仲裁费。';
+                const facts = '申请人陈某与被申请人广州师大博学技术有限公司签订《网络教育咨询服务协议》，购买“VIP导师保障营”课程并支付课程费用18800.00元。协议约定因本合同产生的争议提交广州仲裁委员会仲裁。\n\n合同履行过程中，课程出现延期。申请人提交的微信群延期通知、班主任微信聊天记录等材料显示，课程履行过程中存在延期通知；同时材料中存在课程冻结安排，冻结时间为2025年1月2日至2026年1月2日。\n\n申请人曾就课程延期、退款事宜与被申请人进行沟通，并提交退款申请截图及微信聊天记录。双方沟通未果，申请人认为合同目的难以实现，故向广州仲裁委员会申请仲裁，请求解除合同并退还课程费用18800.00元。';
+                const evidence = '证据目录包括：《证据-服务协议.pdf》《证据-课程宣传页和学习账号截图.pdf》《证据-微信群延期通知和班主任微信聊天记录.pdf》《证据-退款申请截图和微信聊天记录.pdf》等。';
                 return `
                     <div class="arbitration-flow-card" data-module="final-application-review">
                         <div class="flow-card-head">
@@ -1402,6 +1507,71 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 currentUploadContext.value = 'caseEvidence';
                 appendAiModule('final-application-review', buildFinalApplicationReviewHtml());
             };
+            const resolveDemoFrameContent = (frame) => {
+                return typeof frame.content === 'function' ? frame.content() : frame.content;
+            };
+            const appendApplicationDemoFrame = (frame) => {
+                if (!frame) return;
+                clearAiReplyTimer();
+                clearAiStreamTimer();
+                aiIsThinking.value = false;
+                aiMessages.value.push({
+                    id: ++aiMessageId,
+                    role: frame.role,
+                    type: frame.type,
+                    content: frame.role === 'user' ? escapeHtml(resolveDemoFrameContent(frame)) : resolveDemoFrameContent(frame),
+                    streaming: false
+                });
+                scrollAiChatToBottom();
+            };
+            const buildApplicationDemoMessages = () => {
+                const messages = applicationDemoFrames.map(frame => ({
+                    id: ++aiMessageId,
+                    role: frame.role,
+                    type: frame.type,
+                    content: frame.role === 'user' ? escapeHtml(resolveDemoFrameContent(frame)) : resolveDemoFrameContent(frame),
+                    streaming: false
+                }));
+                const generatedApplicationHtml = buildFinalApplicationReviewHtml()
+                    .replace('<div class="flow-card-status">AI已预填</div>', '<div class="flow-card-status">已生成</div>')
+                    .replace(/\s*<div class="flow-action-row final-review-actions">[\s\S]*?<\/div>\s*(?=<\/div>\s*$)/, '');
+                messages.push({
+                    id: ++aiMessageId,
+                    role: 'assistant',
+                    type: 'final-application-review',
+                    content: generatedApplicationHtml,
+                    streaming: false
+                });
+                messages.push({
+                    id: ++aiMessageId,
+                    role: 'assistant',
+                    content: buildStep2TransferReply(),
+                    streaming: false
+                });
+                return messages;
+            };
+            const advanceApplicationDemoFrame = () => {
+                if (stage.value !== 'ai_consult' || aiIsThinking.value) return;
+                if (applicationTransferReady.value) {
+                    goToStep2FromApplicationBot();
+                    return;
+                }
+                if (applicationReady.value) {
+                    if (document.querySelector('[data-module="final-application-review"]')) {
+                        confirmFinalApplicationReview();
+                    }
+                    return;
+                }
+                const frame = applicationDemoFrames[applicationDemoFrameIndex.value];
+                if (frame) {
+                    appendApplicationDemoFrame(frame);
+                    applicationDemoFrameIndex.value += 1;
+                    return;
+                }
+                applicationReady.value = true;
+                currentUploadContext.value = 'caseEvidence';
+                appendFinalApplicationReview();
+            };
             const markApplicationGeneratedForStep2 = () => {
                 applicationTransferReady.value = true;
                 try {
@@ -1553,6 +1723,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     const card = deleteEvidenceBtn.closest('[data-role="evidence-card"]');
                     if (card) card.remove();
                     if (module) refreshEvidenceLabels(module);
+                    return;
                 }
             };
             const handleAiPanelInput = (event) => {
@@ -1644,13 +1815,14 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             };
             const setAiStaticGreeting = () => {
                 applicationConfirmed.value = false;
-                applicationReady.value = false;
-                applicationTransferReady.value = false;
+                applicationReady.value = true;
+                applicationTransferReady.value = true;
                 finalReviewReady.value = false;
                 evidenceUploadStage.value = 'none';
                 evidenceCatalogFiles.value = [];
                 evidenceGroups.value = [];
                 conversationStepIndex.value = 0;
+                applicationDemoFrameIndex.value = applicationDemoFrames.length;
                 applicationDraft.value = {
                     applicant: '',
                     respondent: '',
@@ -1658,25 +1830,8 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     facts: '',
                     evidence: ''
                 };
-                aiMessages.value = [
-                    {
-                        id: ++aiMessageId,
-                        role: 'assistant',
-                        content: buildAiReply({
-                            lead: '您好，欢迎来到广州仲裁委员会，我将根据您的口述信息和上传的证据材料，协助生成仲裁申请书初稿。',
-                            steps: [
-                                '为保证申请书内容完整，我们会依次梳理以下内容：',
-                                '1.申请人和被申请人信息；',
-                                '2.仲裁请求和金额；',
-                                '3.合同关系及仲裁条款；',
-                                '4.事实经过和退款沟通情况；',
-                                '5.证据材料清单。',
-                                '请先简单说明：本案大致是什么纠纷？例如培训退费、服务合同、借款、买卖合同等。'
-                            ]
-                        }),
-                        streaming: false
-                    }
-                ];
+                aiMessages.value = buildApplicationDemoMessages();
+                markApplicationGeneratedForStep2();
                 aiIsThinking.value = false;
                 scrollAiChatToTop();
             };
@@ -1913,21 +2068,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             };
 
             const playDemoNextStep = () => {
-                if (aiIsThinking.value) return;
-                if (applicationTransferReady.value) {
-                    goToStep2FromApplicationBot();
-                    return;
+                if (applicationReady.value && document.querySelector('[data-module="final-application-review"]')) {
+                    confirmFinalApplicationReview();
                 }
-                if (applicationReady.value) {
-                    if (document.querySelector('[data-module="final-application-review"]')) {
-                        confirmFinalApplicationReview();
-                    }
-                    return;
-                }
-                const currentField = conversationFields[conversationStepIndex.value];
-                if (!currentField) return;
-                aiInput.value = currentField.demo || filingDemoAnswers[currentField.key] || `${currentField.label}：暂按演示材料补充。`;
-                sendAiMessage();
             };
             const autoFillApplicationTemplate = () => {
                 if (aiIsThinking.value) return;
@@ -2252,8 +2395,16 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             window.addEventListener('filing-demo-config-ready', event => syncApplicationDemoButtonConfig(event.detail || {}));
             window.addEventListener('filing-demo-config-change', event => syncApplicationDemoButtonConfig(event.detail || {}));
 
+            const handleApplicationDemoKeydown = (event) => {
+                if (stage.value !== 'ai_consult') return;
+                if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                }
+            };
+
             // Init
             onMounted(() => {
+                window.addEventListener('keydown', handleApplicationDemoKeydown);
                 // 演示模式：打开页面直接进入 AI 对话框，跳过前置答题流程。
                 filingStatus.value = {
                     answeredQuestions: [],
