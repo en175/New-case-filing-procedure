@@ -1085,6 +1085,22 @@
       applicationSource: ''
     }
 
+    const DEMO_PDF_BASE = './assets/pdf/'
+    const DEMO_EXISTING_APPLICATION_FILES = {
+      application: { name: '仲裁申请书.pdf', path: `${DEMO_PDF_BASE}仲裁申请书.pdf`, size: 1202237 },
+      catalog: { name: '证据目录.pdf', path: `${DEMO_PDF_BASE}证据目录.pdf`, size: 4288 },
+      evidenceGroups: [
+        [
+          { name: '证据-服务协议.pdf', path: `${DEMO_PDF_BASE}证据-服务协议.pdf`, size: 253219 },
+          { name: '证据-微信群延期通知和班主任微信聊天记录.pdf', path: `${DEMO_PDF_BASE}证据-微信群延期通知和班主任微信聊天记录.pdf`, size: 253219 }
+        ],
+        [
+          { name: '证据-课程宣传页和学习账号截图.pdf', path: `${DEMO_PDF_BASE}证据-课程宣传页和学习账号截图.pdf`, size: 169087 },
+          { name: '证据-退款申请截图和微信聊天记录.pdf', path: `${DEMO_PDF_BASE}证据-退款申请截图和微信聊天记录.pdf`, size: 126121 }
+        ]
+      ]
+    }
+
     function isFromApplicationBot() {
       const query = new URLSearchParams(window.location.search)
       if (query.get('from') === 'applicationBot') return true
@@ -1099,6 +1115,30 @@
       if (!isFromApplicationBot()) return
       state.applicationSource = 'applicationBot'
       state.hasUploadList = [createGeneratedApplicationRecord()]
+    }
+
+    function createDemoPdfRecord({ name, path, size }) {
+      return {
+        id: `demo_${encodeURIComponent(name)}`,
+        name,
+        size: size || 0,
+        type: 'application/pdf',
+        demo: true,
+        objectURL: path
+      }
+    }
+
+    function initDemoExistingApplicationFiles() {
+      if (isFromApplicationBot()) return
+      const files = DEMO_EXISTING_APPLICATION_FILES
+      state.applicationSource = 'existingApplication'
+      state.hasUploadList = [createDemoPdfRecord(files.application)]
+      state.catalogFiles = [createDemoPdfRecord(files.catalog)]
+      state.evidenceUploads = files.evidenceGroups.map((group, index) => ({
+        id: `demo_evidence_${index + 1}`,
+        uploadList: group.map(createDemoPdfRecord),
+        showError: false
+      }))
     }
 
     function escapeHtml(value) {
@@ -1209,7 +1249,7 @@
     }
 
     function revokeFileUrls(file) {
-      if (!file) return
+      if (!file || file.demo) return
       if (file.objectURL) URL.revokeObjectURL(file.objectURL)
       if (file.previewURL && file.previewURL !== file.objectURL) URL.revokeObjectURL(file.previewURL)
     }
@@ -1508,10 +1548,14 @@
     })
 
     initApplicationBotResult()
-    addEvidence()
-    addEvidence()
+    initDemoExistingApplicationFiles()
+    if (!state.evidenceUploads.length) {
+      addEvidence()
+      addEvidence()
+    }
     renderArbList()
     renderCatalogList()
+    renderEvidenceList()
   </script>
   <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
