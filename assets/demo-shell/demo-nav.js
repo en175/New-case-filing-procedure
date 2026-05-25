@@ -88,7 +88,7 @@
   }
 
   function createNav() {
-    const demoConfig = window.FilingDemoConfig?.load?.() || { isShowNavAside: 1 };
+    const demoConfig = window.FilingDemoConfig?.load?.() || { isShowNavAside: 0 };
     applyHudProgressConfig(demoConfig);
     if (!isConfigOn(demoConfig.isShowNavAside)) {
       teardownNav();

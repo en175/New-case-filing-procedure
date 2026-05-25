@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>演示设置</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./assets/demo-shell/demo-settings.css" />
+</head>
+<body>
+  <div class="demo-settings-page">
+    <div class="demo-settings-shell">
+      <header class="demo-settings-header">
+        <h1>演示设置</h1>
+        <p>在此修改演示模式开关与 PPT 翻页键位，配置会写入 localStorage，刷新后仍生效。</p>
+      </header>
+
+      <div id="demoSettingsSections"></div>
+
+      <footer class="demo-settings-footer">
+        <button type="button" class="demo-settings-btn demo-settings-btn-secondary" id="demoSettingsReset">恢复默认</button>
+        <a class="demo-settings-link" href="./index.html">返回演示入口</a>
+      </footer>
+    </div>
+  </div>
+
+  <div class="demo-settings-toast" id="demoSettingsToast" aria-live="polite"></div>
+
+  <script src="./assets/demo-shell/demo-config.js"></script>
+  <script src="./assets/demo-shell/demo-settings.js"></script>
+</body>
+</html>
