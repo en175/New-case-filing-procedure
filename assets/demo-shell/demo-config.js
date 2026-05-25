@@ -15,10 +15,10 @@
     isShowApplicationAutoFillBtn: 0,
     /** 是否显示 PPT 页级前进 / 后退控件 */
     isShowPptNavControls: 0,
-    /** PPT 下一页键位 keyCode，默认右方向键 39 */
-    pptNavKeyCodeNext: 39,
-    /** PPT 上一页键位 keyCode，默认左方向键 37 */
-    pptNavKeyCodePrev: 37
+    /** PPT 下一页键位 keyCode，默认 D 键 68 */
+    pptNavKeyCodeNext: 68,
+    /** PPT 上一页键位 keyCode，默认 A 键 65 */
+    pptNavKeyCodePrev: 65
   };
 
   /** 开关类字段统一用 0/1 存储，便于在 LS 里直接改 */

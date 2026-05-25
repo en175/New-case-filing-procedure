@@ -2513,7 +2513,9 @@ const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
 
             const handleApplicationDemoKeydown = (event) => {
                 if (stage.value !== 'ai_consult') return;
-                if (event.key === 'ArrowRight') {
+                const keyCodes = window.DemoPptNav?.getKeyCodes?.();
+                const code = event.keyCode || event.which;
+                if (keyCodes && code === keyCodes.next) {
                     event.preventDefault();
                 }
             };

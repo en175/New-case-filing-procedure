@@ -27,8 +27,8 @@
   const LS_KEY_PREV = 'pptNavKeyCodePrev';
   const LS_KEY_SHOW = 'isShowPptNavControls';
 
-  const DEFAULT_KEY_NEXT = 39;
-  const DEFAULT_KEY_PREV = 37;
+  const DEFAULT_KEY_NEXT = 68; // D
+  const DEFAULT_KEY_PREV = 65; // A
 
   const innerKeyHandlers = new Set();
 
