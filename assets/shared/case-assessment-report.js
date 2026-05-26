@@ -143,43 +143,6 @@ window.CaseAssessmentReport = {
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white rounded-xl p-6 shadow-sm border-t-4 border-green-400 relative overflow-hidden flex flex-col h-full">
-                                <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-xs px-2 py-1 rounded font-bold">推荐方案</div>
-                                <h4 class="text-lg font-bold text-green-700 mb-4 flex items-center"><i class="fas fa-handshake mr-2"></i>在线调解</h4>
-
-                                <div class="flex-1 space-y-6">
-                                    <div class="bg-green-50/50 p-4 rounded-lg border border-green-100">
-                                        <div class="text-xs font-bold text-green-600 mb-3 flex items-center uppercase tracking-wider"><i class="fas fa-clock mr-1"></i> 时间成本</div>
-                                        <div class="space-y-3 text-sm">
-                                            <div class="flex justify-between"><span class="text-slate-500">预计调解周期</span><span class="font-bold text-slate-800">15-30天</span></div>
-                                            <div class="flex justify-between"><span class="text-slate-500">平均处理时长</span><span class="font-bold text-slate-800">2-4小时</span></div>
-                                            <div class="flex justify-between"><span class="text-slate-500">调解轮次</span><span class="font-bold text-slate-800">1-3轮</span></div>
-                                            <div class="flex justify-between"><span class="text-slate-500">案件排队等待</span><span class="font-bold text-slate-800">1-3天</span></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-green-50/50 p-4 rounded-lg border border-green-100">
-                                        <div class="text-xs font-bold text-green-600 mb-3 flex items-center uppercase tracking-wider"><i class="fas fa-coins mr-1"></i> 经济成本</div>
-                                        <div class="space-y-3 text-sm">
-                                            <div class="flex justify-between"><span class="text-slate-500">调解服务费</span><span class="font-bold text-slate-800">500-1,500元</span></div>
-                                            <div class="flex justify-between"><span class="text-slate-500">平台使用费</span><span class="font-bold text-green-600">免费</span></div>
-                                            <div class="flex justify-between"><span class="text-slate-500">差旅费用</span><span class="font-bold text-slate-800">0元</span></div>
-                                            <div class="flex justify-between"><span class="text-slate-500">律师费用</span><span class="font-bold text-slate-800">可选</span></div>
-                                            <div class="pt-3 border-t border-green-100 flex justify-between items-center mt-3">
-                                                <span class="font-bold text-slate-700">预估总费用</span>
-                                                <span class="text-xl font-bold text-green-600">500-1,500元</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="bg-green-50 rounded-lg p-3 text-xs text-green-800 space-y-1 mt-6">
-                                    <div class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>在线进行，无往返奔波及额外支出</div>
-                                    <div class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>灵活安排时间，无误工损失</div>
-                                    <div class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>快速响应，调解费用相对较低</div>
-                                </div>
-                            </div>
-
                             <div class="bg-white rounded-xl p-6 shadow-sm border-t-4 border-orange-400 relative flex flex-col h-full">
                                 <div class="absolute top-4 right-4 bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded font-bold">对比参考</div>
                                 <h4 class="text-lg font-bold text-orange-700 mb-4 flex items-center"><i class="fas fa-gavel mr-2"></i>传统仲裁程序</h4>
@@ -214,6 +177,43 @@ window.CaseAssessmentReport = {
                                     <div>需要多次出庭、准备材料</div>
                                     <div>包含差旅费、误工费、律师费等</div>
                                     <div>程序较为复杂，各项费用累计较高</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border-t-4 border-green-400 relative overflow-hidden flex flex-col h-full">
+                                <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-xs px-2 py-1 rounded font-bold">推荐方案</div>
+                                <h4 class="text-lg font-bold text-green-700 mb-4 flex items-center"><i class="fas fa-handshake mr-2"></i>在线调解</h4>
+
+                                <div class="flex-1 space-y-6">
+                                    <div class="bg-green-50/50 p-4 rounded-lg border border-green-100">
+                                        <div class="text-xs font-bold text-green-600 mb-3 flex items-center uppercase tracking-wider"><i class="fas fa-clock mr-1"></i> 时间成本</div>
+                                        <div class="space-y-3 text-sm">
+                                            <div class="flex justify-between"><span class="text-slate-500">预计调解周期</span><span class="font-bold text-slate-800">15-30天</span></div>
+                                            <div class="flex justify-between"><span class="text-slate-500">平均处理时长</span><span class="font-bold text-slate-800">2-4小时</span></div>
+                                            <div class="flex justify-between"><span class="text-slate-500">调解轮次</span><span class="font-bold text-slate-800">1-3轮</span></div>
+                                            <div class="flex justify-between"><span class="text-slate-500">案件排队等待</span><span class="font-bold text-slate-800">1-3天</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-green-50/50 p-4 rounded-lg border border-green-100">
+                                        <div class="text-xs font-bold text-green-600 mb-3 flex items-center uppercase tracking-wider"><i class="fas fa-coins mr-1"></i> 经济成本</div>
+                                        <div class="space-y-3 text-sm">
+                                            <div class="flex justify-between"><span class="text-slate-500">调解服务费</span><span class="font-bold text-slate-800">500-1,500元</span></div>
+                                            <div class="flex justify-between"><span class="text-slate-500">平台使用费</span><span class="font-bold text-green-600">免费</span></div>
+                                            <div class="flex justify-between"><span class="text-slate-500">差旅费用</span><span class="font-bold text-slate-800">0元</span></div>
+                                            <div class="flex justify-between"><span class="text-slate-500">律师费用</span><span class="font-bold text-slate-800">可选</span></div>
+                                            <div class="pt-3 border-t border-green-100 flex justify-between items-center mt-3">
+                                                <span class="font-bold text-slate-700">预估总费用</span>
+                                                <span class="text-xl font-bold text-green-600">500-1,500元</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-green-50 rounded-lg p-3 text-xs text-green-800 space-y-1 mt-6">
+                                    <div class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>在线进行，无往返奔波及额外支出</div>
+                                    <div class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>灵活安排时间，无误工损失</div>
+                                    <div class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>快速响应，调解费用相对较低</div>
                                 </div>
                             </div>
                         </div>
