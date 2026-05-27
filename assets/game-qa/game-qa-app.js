@@ -755,6 +755,20 @@ const PPT_DEMO_MODE = true;
             };
 
             let unregisterPptPageInnerNav = null;
+            let disposePptDemoClick = null;
+
+            const bindPptDemoClick = () => {
+                disposePptDemoClick?.();
+                if (typeof window.clickAnywhere !== 'function') return;
+                disposePptDemoClick = window.clickAnywhere(handlePptDemoClick, {
+                    ignore(target) {
+                        if (!PPT_DEMO_MODE || stage.value !== 'qa') return true;
+                        if (showVideoModal.value || confirmModal.value.show || isBadgeDrawerOpen.value) return true;
+                        return isPptAdvanceBlockedTarget(target);
+                    }
+                });
+            };
+
             const syncPptPageInnerNav = () => {
                 unregisterPptPageInnerNav?.();
                 unregisterPptPageInnerNav = bindPptPageInnerNav();
@@ -933,7 +947,7 @@ const PPT_DEMO_MODE = true;
                 }
 
                 if (PPT_DEMO_MODE) {
-                    document.addEventListener('click', handlePptDemoClick);
+                    bindPptDemoClick();
                     syncPptPageInnerNav();
                     window.addEventListener('demo-ppt-nav-ready', syncPptPageInnerNav);
                 }
@@ -942,7 +956,8 @@ const PPT_DEMO_MODE = true;
             onUnmounted(() => {
                 teardownVideoModalClickOutside();
                 if (PPT_DEMO_MODE) {
-                    document.removeEventListener('click', handlePptDemoClick);
+                    disposePptDemoClick?.();
+                    disposePptDemoClick = null;
                     unregisterPptPageInnerNav?.();
                     window.removeEventListener('demo-ppt-nav-ready', syncPptPageInnerNav);
                 }

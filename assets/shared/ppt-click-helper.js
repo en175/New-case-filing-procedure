@@ -94,14 +94,33 @@
     );
   }
 
+  /**
+   * 点击屏幕任意位置时触发 PPT 下一页，等同于当前配置的“下一页”键。
+   * @param {{ ignore?: (target: EventTarget | null) => boolean }} [options]
+   * @returns {() => void} dispose
+   */
+  function clickAnywhereToNext(options) {
+    return clickAnywhere((event) => {
+      if (options?.ignore && options.ignore(event.target)) return;
+      const nav = global.DemoPptNav;
+      if (!nav?.goNext) return;
+      event.preventDefault();
+      nav.goNext();
+    }, {
+      ignore: options?.ignore
+    });
+  }
+
   const PptClickHelper = {
     clickOutside,
     clickInside,
-    clickAnywhere
+    clickAnywhere,
+    clickAnywhereToNext
   };
 
   global.clickOutside = clickOutside;
   global.clickInside = clickInside;
   global.clickAnywhere = clickAnywhere;
+  global.clickAnywhereToNext = clickAnywhereToNext;
   global.PptClickHelper = PptClickHelper;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -769,21 +769,6 @@
 
   <script>
     const STORAGE_KEY = 'filingDemoCompletedPaths';
-    const PPT_DEMO_MODE = true;
-    const PERSONA_PAGE = './当事人画像话术策略.html';
-
-    function goToPersonaPage() {
-      window.location.href = PERSONA_PAGE;
-    }
-
-    function handleOutsideCardGridClick(event) {
-      if (!PPT_DEMO_MODE) return;
-      if (event.target.closest('.card-grid')) return;
-      if (event.target.closest('.demo-ppt-nav')) return;
-      goToPersonaPage();
-    }
-
-    document.querySelector('.work-area').addEventListener('click', handleOutsideCardGridClick);
 
     function markCompleted(path) {
       try {
@@ -799,8 +784,22 @@
       link.addEventListener('click', () => markCompleted(link.dataset.enter));
     });
   </script>
+  <script src="./assets/shared/ppt-click-helper.js"></script>
   <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
   <script src="./assets/demo-shell/demo-ppt-nav.js"></script>
+  <script>
+    (function () {
+      if (typeof window.clickAnywhereToNext !== 'function') return;
+
+      window.clickAnywhereToNext({
+        ignore(target) {
+          return !!target?.closest?.(
+            '.demo-global-nav, .demo-ppt-nav, button, a, input, textarea, select, [contenteditable="true"], .card-grid'
+          );
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
