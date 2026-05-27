@@ -588,7 +588,7 @@ const PPT_DEMO_MODE = true;
                     window.DemoPptNav.goNext();
                     return;
                 }
-                window.location.href = './案件路径图.html';
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
             };
 
             const closeVideo = () => {
@@ -661,7 +661,11 @@ const PPT_DEMO_MODE = true;
                 } catch (error) {
                     localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ quiz: true }));
                 }
-                window.location.href = './案件路径图.html';
+                if (window.DemoPptNav?.goNext) {
+                    window.DemoPptNav.goNext();
+                    return;
+                }
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
             };
 
             let pptAdvanceLocked = false;
@@ -814,7 +818,7 @@ const PPT_DEMO_MODE = true;
                     window.location.href = './申请书bot.html?fromAux=quiz';
                     return;
                 }
-                window.location.href = './立案提交后路径选择.html';
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
             };
 
             const returnToDraftList = () => {
@@ -886,7 +890,7 @@ const PPT_DEMO_MODE = true;
             };
 
             const returnToPathChoice = () => {
-                window.location.href = './立案提交后路径选择.html';
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
             };
 
             const enterQaStageDirectly = () => {

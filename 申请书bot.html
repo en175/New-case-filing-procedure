@@ -519,7 +519,13 @@
 <script src="./assets/shared/themed-notice-modal.js"></script>
 <script src="./assets/filing-bot/filing-bot-app.js"></script>
 <script>
-    ThemedNoticeModal.init({ theme: 'aiService', delay: 180 });
+    ThemedNoticeModal.init({
+        theme: 'aiService',
+        delay: 180,
+        when: function () {
+            return new URLSearchParams(window.location.search).get('demoStage') !== 'report';
+        }
+    });
 </script>
 <script>
     (function () {
