@@ -1,8 +1,9 @@
 (function () {
   /**
-   * PPT 演示页顺序，与 AgentDoc/PPT演示重构文档.md 3.1–3.12 一一对应。
+   * PPT 演示页顺序，与 AgentDoc/PPT演示重构文档.md 3.0–3.12 一一对应。
    */
   const PPT_PAGES = [
+    { id: '3.0', key: 'login', title: '登录', href: './login.html' },
     { id: '3.1', key: 'index', title: '演示入口', href: './index.html' },
     { id: '3.2', key: 'filing-bot', title: '申请书生成', href: './申请书bot.html' },
     { id: '3.3', key: 'step2', title: '材料智能提取', href: './Step2SmartExtraction.html' },

@@ -15,6 +15,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./assets/filing-bot/filing-bot.css">
+    <link rel="stylesheet" href="./assets/shared/themed-notice-modal.css">
   <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
   <link rel="stylesheet" href="./assets/demo-shell/demo-ppt-nav.css">
 </head>
@@ -515,7 +516,11 @@
 <script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/shared/case-assessment-report-data.js"></script>
 <script src="./assets/shared/case-assessment-report.js"></script>
+<script src="./assets/shared/themed-notice-modal.js"></script>
 <script src="./assets/filing-bot/filing-bot-app.js"></script>
+<script>
+    ThemedNoticeModal.init({ theme: 'aiService', delay: 180 });
+</script>
 <script>
     (function () {
         if (!window.WebSocket || window.__filingBotStableLiveReload) return;
