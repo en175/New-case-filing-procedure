@@ -1,41 +1,36 @@
 (function () {
   const navItems = [
-    {
-      group: '主流程',
-      items: [
-        { key: 'index', short: '1', title: '第一步', desc: '申请书准备方式', href: './index.html' },
-        { key: 'step2', short: '2', title: '材料提取', desc: 'AI 解析核对', href: './Step2SmartExtraction.html' },
-        { key: 'diversion', short: '3', title: '调解与撤案引导', desc: '路径确认', href: './调解&撤案引导bot.html' },
-        { key: 'filing', short: '4', title: '智能立案助手', desc: '生成申请书', href: './申请书bot.html' },
-        { key: 'report', short: '5', title: '评估报告', desc: '风险与路径建议', href: './申请书bot.html?demoStage=report', openReport: true }
-      ]
-    },
-    {
-      group: '辅助流程',
-      items: [
-        { key: 'followup', short: '路', title: '后续路径', desc: '路径选择卡片', href: './立案提交后路径选择.html' },
-        { key: 'qa', short: '问', title: '答题关卡', desc: '普法问答', href: './游戏化问答.html' },
-        { key: 'defense', short: '辩', title: '抗辩模拟', desc: '对方视角', href: './抗辩机器人.html' },
-        { key: 'path', short: '图', title: '案件路径图', desc: '仲裁调解对比', href: './案件路径图.html' }
-      ]
-    }
+    { key: 'index', short: '1', title: '申请书准备方式', href: './index.html' },
+    { key: 'filing', short: '2', title: 'AI生成申请书', href: './申请书bot.html' },
+    { key: 'step2', short: '3', title: '材料提取', href: './Step2SmartExtraction.html' },
+    { key: 'step3', short: '4', title: '申请人信息', href: './Step3PartyConfirmation.html' },
+    { key: 'step4', short: '5', title: '被申请人信息', href: './Step4RespondentConfirmation.html' },
+    { key: 'qa', short: '6', title: '答题关卡', href: './游戏化问答.html' },
+    { key: 'defense', short: '7', title: 'AI模拟被申请人', href: './抗辩机器人.html' },
+    { key: 'path', short: '8', title: '调解/仲裁路径对比', href: './案件路径图.html' },
+    { key: 'step5', short: '9', title: '案件信息确认', href: './Step5CaseInfoConfirmation.html' },
+    { key: 'step6', short: '10', title: '送达地址确认', href: './Step6DeliveryAddressConfirmation.html' },
+    { key: 'reportLoading', short: '11', title: '报告加载', href: './案件评估报告加载.html' },
+    { key: 'report', short: '12', title: '案件评估报告', href: './案件评估报告.html' }
   ];
 
   const pageKeyByFile = {
     'index.html': 'index',
-    'Step2SmartExtraction.html': 'step2',
-    '调解&撤案引导bot.html': 'diversion',
     '申请书bot.html': 'filing',
-    '立案提交后路径选择.html': 'followup',
+    'Step2SmartExtraction.html': 'step2',
+    'Step3PartyConfirmation.html': 'step3',
+    'Step4RespondentConfirmation.html': 'step4',
     '游戏化问答.html': 'qa',
     '抗辩机器人.html': 'defense',
-    '案件路径图.html': 'path'
+    '案件路径图.html': 'path',
+    'Step5CaseInfoConfirmation.html': 'step5',
+    'Step6DeliveryAddressConfirmation.html': 'step6',
+    '案件评估报告加载.html': 'reportLoading',
+    '案件评估报告.html': 'report'
   };
 
   function currentPageKey() {
     const file = decodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
-    const query = new URLSearchParams(window.location.search);
-    if (file === '申请书bot.html' && query.get('demoStage') === 'report') return 'report';
     return pageKeyByFile[file] || '';
   }
 
@@ -78,19 +73,12 @@
     nav.className = 'demo-global-nav';
     nav.setAttribute('aria-label', '新立案流程演示导航');
 
-    const groups = navItems.map(group => {
-      const links = group.items.map(item => {
-        const active = item.key === activeKey ? ' active' : '';
-        const attrs = item.openReport ? ' data-open-report="1"' : '';
-        return `<a class="demo-nav-link${active}" href="${item.href}" data-key="${item.key}"${attrs} title="${item.title}">
-          <span class="demo-nav-index">${item.short}</span>
-          <span class="demo-nav-copy"><strong>${item.title}</strong><span>${item.desc}</span></span>
-        </a>`;
-      }).join('');
-      return `<section class="demo-nav-group">
-        <div class="demo-nav-group-title">${group.group}</div>
-        ${links}
-      </section>`;
+    const links = navItems.map(item => {
+      const active = item.key === activeKey ? ' active' : '';
+      return `<a class="demo-nav-link${active}" href="${item.href}" data-key="${item.key}" title="${item.title}">
+        <span class="demo-nav-index">${item.short}</span>
+        <span class="demo-nav-copy"><strong>${item.title}</strong></span>
+      </a>`;
     }).join('');
 
     nav.innerHTML = `
@@ -105,18 +93,11 @@
         <div class="demo-nav-title"><strong>新立案流程</strong><span>演示导航</span></div>
       </div>
       <button class="demo-nav-toggle" type="button" aria-label="展开或收起演示导航"><span>‹</span></button>
-      <div class="demo-nav-scroll">${groups}</div>
+      <div class="demo-nav-scroll">${links}</div>
     `;
 
     nav.querySelector('.demo-nav-toggle').addEventListener('click', () => {
       setExpanded(!document.body.classList.contains('demo-nav-expanded'));
-    });
-    nav.addEventListener('click', event => {
-      const link = event.target.closest('a[data-open-report]');
-      if (!link) return;
-      try {
-        localStorage.setItem('filingDemoOpenReport', 'filingBot');
-      } catch (error) {}
     });
 
     document.body.appendChild(nav);

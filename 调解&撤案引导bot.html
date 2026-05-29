@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./assets/filing-bot/filing-bot.css">
-    <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+    <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
 </head>
 <body class="h-screen w-screen bg-gray-100">
 <div id="app" class="relative h-full w-full overflow-hidden">
@@ -126,6 +126,34 @@
                     </div>
 
                     <div class="ai-input-area">
+                        <div class="diversion-guidance" aria-label="对话引导">
+                            <div class="diversion-guidance-grid">
+                                <div class="diversion-guidance-card">
+                                    <div class="diversion-guidance-icon"><i class="fas fa-scale-balanced"></i></div>
+                                    <div class="diversion-guidance-copy">
+                                        <strong>我该仲裁还是调解</strong>
+                                    </div>
+                                </div>
+                                <div class="diversion-guidance-card">
+                                    <div class="diversion-guidance-icon"><i class="fas fa-circle-question"></i></div>
+                                    <div class="diversion-guidance-copy">
+                                        <strong>我的证据够不够</strong>
+                                    </div>
+                                </div>
+                                <div class="diversion-guidance-card">
+                                    <div class="diversion-guidance-icon"><i class="fas fa-file-signature"></i></div>
+                                    <div class="diversion-guidance-copy">
+                                        <strong>我的请求是否合理</strong>
+                                    </div>
+                                </div>
+                                <div class="diversion-guidance-card">
+                                    <div class="diversion-guidance-icon"><i class="fas fa-message"></i></div>
+                                    <div class="diversion-guidance-copy">
+                                        <strong>对方会不会履行</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="ai-input-shell" :class="{ 'has-diversion-attachments': uploadedFiles.length }">
                             <div v-if="uploadedFiles.length" class="diversion-attachment-list" aria-label="已选择附件">
                                 <div v-for="file in uploadedFiles" :key="file.id" class="diversion-attachment-item">
@@ -188,7 +216,7 @@
 </div>
 <script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/filing-bot/diversion-bot-app.js"></script>
-<script src="./assets/demo-shell/demo-config.js"></script>
-<script src="./assets/demo-shell/demo-nav.js"></script>
+<script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+<script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
 </body>
 </html>

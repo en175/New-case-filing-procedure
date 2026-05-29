@@ -13,7 +13,7 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
             const mapImage = ref('./图片/智能服务大厅背景.png');
 
             // Game State
-            const stage = ref('intro'); // intro, parsing, analysis_result, pre_qa, qa, enter_apply, success
+            const stage = ref('intro'); // intro, parsing, analysis_result, pre_qa, qa, route_choice, enter_apply, success
             const subStage = ref(0);
             const showDialog = ref(true);
             const waitingForInteraction = ref(false); // If true, dialog click won't advance, must interact with panel
@@ -141,7 +141,7 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
             ];
 
             const currentMapNodeIndex = computed(() => {
-                if (['report', 'enter_apply', 'success'].includes(stage.value)) {
+                if (['report', 'route_choice', 'enter_apply', 'success'].includes(stage.value)) {
                     return 1; // 智能分析
                 }
                 return 0; // 案情收集
@@ -163,6 +163,7 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                 if (stage.value === 'qa') return true;
                 if (stage.value === 'report') return true;
                 
+                if (stage.value === 'route_choice') return true;
                 return ['parsing', 'enter_apply', 'success', 'analysis_result'].includes(stage.value) && waitingForInteraction.value;
             });
 
@@ -250,9 +251,7 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                         break;
 
                     case 'qa_done':
-                        reportStep.value = 1;
-                        stage.value = 'report';
-                        speak("问答已完成，已为您生成案件评估报告，请查阅。", true);
+                        showGameExperienceChoice();
                         break;
                 }
             };
@@ -417,21 +416,6 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
 
             const reportStep = ref(1);
 
-            const currentReportType = ref('default');
-
-            const currentReportData = computed(() => {
-                return window.getCaseAssessmentReportData(currentReportType.value);
-            });
-
-            const nextReportStep = () => {
-                reportStep.value = 2;
-                speak('广州仲裁委员会秉持“为每一起纠纷提供最佳解决方案”的目标愿景，在您排队等待仲裁立案的过程中，我们向您提供了一个更为快速、便捷、低成本的解决方式：调解，让您足不出户，一键解纷。点击“<span class="font-bold text-red-500">参与调解</span>”进入多元解纷调解平台。', true);
-            };
-
-            const prevReportStep = () => {
-                reportStep.value = 1;
-            };
-
             const markFilingCompleted = (path) => {
                 selectedReportPath.value = path;
                 isFilingCompleted.value = true;
@@ -580,10 +564,7 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                     const comment = npcComments[currentQuestionIndex.value] || "收到，请继续。";
                     speak(comment + " 下一题...", true);
                 } else {
-                    waitingForInteraction.value = false;
-                    reportStep.value = 1;
-                    stage.value = 'report';
-                    speak("所有问题已回答完毕，已为您生成案件评估报告，请查阅。", true);
+                    showGameExperienceChoice();
                 }
             };
 
@@ -628,6 +609,10 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
             };
 
             const finishQaFlow = () => {
+                showGameExperienceChoice();
+            };
+
+            const markQuizCompleted = () => {
                 try {
                     const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
                     completed.quiz = true;
@@ -635,12 +620,29 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                 } catch (error) {
                     localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ quiz: true }));
                 }
-                if (localStorage.getItem('filingDemoAuxReturn') === 'report') {
-                    localStorage.setItem('filingDemoOpenReport', 'auxTool');
-                    window.location.href = './申请书bot.html?fromAux=quiz';
+            };
+
+            const showGameExperienceChoice = () => {
+                waitingForInteraction.value = false;
+                showDialog.value = false;
+                markQuizCompleted();
+                stage.value = 'route_choice';
+            };
+
+            const openExperiencePath = (path) => {
+                markQuizCompleted();
+                if (path === 'defense') {
+                    window.location.href = './抗辩机器人.html';
                     return;
                 }
-                window.location.href = './立案提交后路径选择.html';
+                if (path === 'route') {
+                    window.location.href = './案件路径图.html';
+                }
+            };
+
+            const continueNextInfo = () => {
+                markQuizCompleted();
+                window.location.href = './Step5CaseInfoConfirmation.html';
             };
 
             const returnToDraftList = () => {
@@ -703,7 +705,8 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
             };
 
             const returnToPathChoice = () => {
-                window.location.href = './立案提交后路径选择.html';
+                stage.value = 'route_choice';
+                showDialog.value = false;
             };
 
             // Init
@@ -736,15 +739,14 @@ const CaseAssessmentReport = window.CaseAssessmentReport;
                 optionNumber,
                 choosePath, finalDest, resetGame, finishQaFlow,
                 returnToPathChoice,
+                showGameExperienceChoice, openExperiencePath, continueNextInfo,
                 applyChannel, submitFinalApply, pathLength, pathOffset,
                 analysisData, filingMeta, confirmAnalysis,
                 showCaseTypeBadge, scorePopups, contactService,
                 showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
                 confirmModal, showConfirmModal, closeConfirmModal, executeConfirmAction,
                 score, badges, earnedBadges, toggleBadgeDrawer, isBadgeDrawerOpen,
-                reportStep, nextReportStep, prevReportStep,
                 isFilingCompleted, selectedReportPath,
-                currentReportType, currentReportData,
                 newBadgeCount, currentMilestone, flyingScores, scoreDisplay, scoreAnimate
             };
         }

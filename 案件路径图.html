@@ -49,44 +49,6 @@
     .top-actions { gap: 18px; color: #13233a; font-weight: 900; }
     .score { gap: 8px; color: #f59e0b; }
 
-    .flow-progress {
-      flex: 1; max-width: 1040px; margin: 0 22px;
-      display: grid; grid-template-columns: repeat(4,minmax(112px,1fr));
-      align-items: center; gap: 7px;
-    }
-
-    .flow-step {
-      position: relative; display: flex; align-items: center; gap: 6px;
-      min-width: 0; color: #64748b; font-size: 11px; font-weight: 900; white-space: nowrap;
-    }
-
-    .flow-step::after {
-      content: ""; position: absolute; left: calc(100% - 2px); top: 50%;
-      width: 9px; height: 2px; background: #dbe4f0; transform: translateY(-50%);
-    }
-
-    .flow-step:last-child::after { display: none; }
-
-    .flow-index {
-      width: 23px; height: 23px; border-radius: 999px;
-      display: inline-flex; align-items: center; justify-content: center;
-      border: 1px solid #bfdbfe; background: #eff6ff; color: #2367e8;
-      font-size: 11px; font-weight: 900; flex: 0 0 auto;
-      animation: flowPulse 1.8s ease-in-out infinite;
-    }
-
-    .flow-label { overflow: hidden; text-overflow: ellipsis; }
-    .flow-step.done { color: #0f766e; }
-    .flow-step.done::after { background: #38bdf8; }
-    .flow-step.done .flow-index { color: #0f766e; border-color: #99f6e4; background: #ecfdf5; animation: none; }
-    .flow-step.active { color: #1d4ed8; }
-    .flow-step.active .flow-index { color: #fff; border-color: #2367e8; background: #2367e8; box-shadow: 0 0 0 6px rgba(35,103,232,.12); animation: none; }
-
-    @keyframes flowPulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(35,103,232,.18); }
-      50%      { box-shadow: 0 0 0 5px rgba(35,103,232,.08); }
-    }
-
     .brand-mark {
       width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
       color: #fff; background: linear-gradient(145deg,#2367e8,#1746b3);
@@ -155,23 +117,22 @@
     .back-link:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(37,99,235,.1); }
 
     .case-card {
-      display: grid; grid-template-columns: 260px 1fr; gap: 22px; align-items: stretch;
+      display: grid; grid-template-columns: 1fr; gap: 0; align-items: stretch;
       padding: 18px; border-radius: 20px; border: 1px solid #dce7f2;
       background: linear-gradient(90deg,#f8fbff,#f6fbfa),
         radial-gradient(circle at right center,rgba(16,161,147,.12),transparent 30%);
       margin-bottom: 20px;
     }
 
-    .case-id { display: flex; align-items: center; gap: 14px; padding-right: 20px; border-right: 1px solid #d9e5f0; }
+    .case-id { display: flex; align-items: center; gap: 14px; padding-right: 0; border-right: 0; }
 
     .case-icon {
       width: 58px; height: 58px; border-radius: 17px; display: grid; place-items: center;
       color: var(--teal); background: var(--teal-soft); font-size: 24px;
     }
 
-    .case-id span, .case-focus span { display: block; color: var(--soft); font-size: 12px; font-weight: 900; }
+    .case-id span { display: block; color: var(--soft); font-size: 12px; font-weight: 900; }
     .case-id strong { display: block; margin-top: 6px; font-size: 18px; line-height: 1.35; font-weight: 900; }
-    .case-focus { align-self: center; color: #40526a; font-size: 14px; line-height: 1.75; }
 
     /* ─── Timeline board ─── */
     .timeline-board {
@@ -221,27 +182,6 @@
     }
 
     .track-title.mediation i { background: #fff; }
-
-    .track-title-wrap { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
-
-    .mediation-select-btn {
-      height: 42px; padding: 0 16px; border-radius: 14px; border: 1px solid #93c5fd;
-      color: #fff; background: linear-gradient(135deg,#2563eb,#1746b3);
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      font-size: 13px; font-weight: 900; font-family: inherit;
-      box-shadow: 0 16px 30px rgba(37,99,235,.24);
-      transition: transform .18s, box-shadow .18s;
-      white-space: nowrap; cursor: pointer;
-    }
-
-    .mediation-select-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(37,99,235,.32); }
-
-    @keyframes ctaPulse {
-      0%,100% { box-shadow: 0 16px 30px rgba(37,99,235,.24); transform: scale(1); }
-      50%      { box-shadow: 0 0 0 8px rgba(37,99,235,.14), 0 20px 40px rgba(37,99,235,.32); transform: scale(1.04); }
-    }
-
-    .mediation-select-btn.pulse { animation: ctaPulse 1.4s ease-in-out 3; }
 
     .center-label { text-align: center; color: #64748b; font-size: 12px; line-height: 1.5; font-weight: 900; }
 
@@ -498,175 +438,19 @@
       50%      { box-shadow: 0 0 0 9px rgba(217,119,6,.0); background: #fef3c7; }
     }
 
-    /* ─── Final CTA (shown after all rows revealed) ─── */
-    .final-cta {
-      display: none; flex-direction: column; align-items: center;
-      gap: 14px; padding: 36px 24px 8px;
-    }
-
-    .final-cta.show { display: flex; }
-
-    .final-cta-hint {
-      margin: 0; color: var(--muted); font-size: 14px; font-weight: 900;
-      opacity: 0; animation: none;
-    }
-
-    .final-cta-btns {
-      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-    }
-
-    .cta-arb {
-      height: 52px; padding: 0 28px; border-radius: 16px;
-      border: 1.5px solid #d9e3f0; background: #fff;
-      color: #475569; font-size: 15px; font-weight: 900;
-      cursor: pointer; font-family: inherit;
-      display: inline-flex; align-items: center; gap: 9px;
-      transition: border-color .18s, box-shadow .18s, color .18s;
-      opacity: 0;
-    }
-
-    .cta-arb:hover {
-      border-color: #94a3b8; color: #1e293b;
-      box-shadow: 0 8px 24px rgba(15,23,42,.1);
-    }
-
-    .cta-med {
-      height: 52px; padding: 0 32px; border-radius: 16px; border: 0;
-      background: linear-gradient(135deg,#2563eb,#1746b3); color: #fff;
-      font-size: 15px; font-weight: 900; cursor: pointer; font-family: inherit;
-      display: inline-flex; align-items: center; gap: 9px;
-      box-shadow: 0 16px 32px rgba(37,99,235,.28);
-      transition: transform .18s, box-shadow .18s;
-      opacity: 0;
-    }
-
-    .cta-med:hover { transform: translateY(-2px); box-shadow: 0 22px 40px rgba(37,99,235,.34); }
-
-    @keyframes ctaRise {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .final-cta.show .final-cta-hint { animation: ctaRise 0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
-    .final-cta.show .cta-arb        { animation: ctaRise 0.5s cubic-bezier(0.22,1,0.36,1) .12s forwards; }
-    .final-cta.show .cta-med        { animation: ctaRise 0.5s cubic-bezier(0.22,1,0.36,1) .22s forwards; }
-
-    /* ─── Confirm modal ─── */
-    .confirm-mask {
-      position: fixed; inset: 0; z-index: 30;
-      display: none; align-items: center; justify-content: center;
-      background: rgba(15,23,42,.42); backdrop-filter: blur(14px); padding: 24px;
-    }
-
-    .confirm-mask.show { display: flex; }
-
-    .confirm-card {
-      width: min(360px,100%); padding: 32px 28px 28px;
-      border-radius: 24px; background: #fff;
-      box-shadow: 0 32px 80px rgba(15,23,42,.24); text-align: center;
-    }
-
-    .confirm-icon {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: linear-gradient(135deg,#e9f1ff,#dbeafe);
-      display: grid; place-items: center; font-size: 30px; color: #2563eb; margin: 0 auto 20px;
-    }
-
-    .confirm-card h2 { margin: 0 0 10px; font-size: 22px; font-weight: 900; }
-    .confirm-card p  { margin: 0 0 24px; color: var(--muted); font-size: 14px; line-height: 1.7; }
-
-    .confirm-btns { display: flex; gap: 12px; }
-
-    .confirm-cancel {
-      flex: 1; height: 48px; border-radius: 14px; border: 1px solid #d9e3f0;
-      background: #f8fbff; color: #64748b; font-size: 14px; font-weight: 900;
-      cursor: pointer; font-family: inherit; transition: background .15s;
-    }
-
-    .confirm-cancel:hover { background: #eff6ff; }
-
-    .confirm-ok {
-      flex: 1; height: 48px; border-radius: 14px; border: 0;
-      background: linear-gradient(135deg,#2563eb,#1746b3); color: #fff;
-      font-size: 14px; font-weight: 900; cursor: pointer; font-family: inherit;
-      box-shadow: 0 12px 24px rgba(37,99,235,.28); transition: transform .15s, box-shadow .15s;
-    }
-
-    .confirm-ok:hover { transform: translateY(-1px); box-shadow: 0 16px 30px rgba(37,99,235,.34); }
-
-    /* ─── Summary modal ─── */
-    .completion-mask {
-      position: fixed; inset: 0; z-index: 20;
-      display: none; align-items: center; justify-content: center;
-      background: rgba(15,23,42,.4); backdrop-filter: blur(14px); padding: 24px;
-    }
-
-    .completion-mask.show { display: flex; }
-
-    .summary-card {
-      width: min(560px,100%); padding: 32px; border-radius: 26px;
-      border: 1px solid #dce7f2; background: #fff;
-      box-shadow: 0 32px 90px rgba(15,23,42,.24);
-    }
-
-    .summary-head { margin-bottom: 22px; text-align: center; }
-    .summary-head h2 { margin: 0 0 6px; font-size: 26px; font-weight: 900; }
-    .summary-head p  { margin: 0; color: var(--muted); font-size: 14px; }
-
-    .summary-table { border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; margin-bottom: 18px; }
-
-    .summary-row { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid #f1f5f9; }
-    .summary-row:last-child { border-bottom: 0; }
-    .summary-row > div { padding: 12px 14px; font-size: 13px; font-weight: 900; color: var(--ink); }
-    .summary-row.hd > div { background: #f8fafc; color: var(--soft); font-size: 11px; }
-    .summary-row > .col-arb { color: #047857; border-left: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; }
-    .summary-row > .col-med { color: #1d4ed8; }
-    .summary-row.hd > .col-arb, .summary-row.hd > .col-med { color: var(--soft); }
-    .col-med.win { color: #047857; }
-    .col-med.win::before { content: "✦ "; }
-
-    .summary-note {
-      padding: 12px 16px; border-radius: 14px; background: #f0fdf4;
-      border: 1px solid #bbf7d0; color: #047857; font-size: 13px; font-weight: 900;
-      margin-bottom: 20px; line-height: 1.6;
-    }
-
-    .summary-note i { margin-right: 6px; }
-    .summary-actions { display: flex; gap: 12px; }
-
-    .summary-actions a {
-      flex: 1; height: 48px; border-radius: 16px; display: inline-flex;
-      align-items: center; justify-content: center; gap: 9px; color: #fff;
-      background: linear-gradient(135deg,#2563eb,#1746b3); font-size: 14px; font-weight: 900;
-      text-decoration: none; box-shadow: 0 16px 30px rgba(37,99,235,.24);
-      transition: transform .18s;
-    }
-
-    .summary-actions a:hover { transform: translateY(-2px); }
-
-    .summary-actions button {
-      height: 48px; padding: 0 18px; border-radius: 16px; border: 1px solid #d9e3f0;
-      background: #f8fbff; color: #1d4ed8; font-size: 13px; font-weight: 900;
-      cursor: pointer; font-family: inherit; transition: background .15s;
-    }
-
-    .summary-actions button:hover { background: #eff6ff; }
-
     /* ─── Responsive ─── */
     @media (max-width: 1080px) {
       .work-area { padding: 20px 14px 40px; }
       .route-shell { padding: 24px 18px; }
       .case-card { grid-template-columns: 1fr; }
-      .case-id { border-right: 0; border-bottom: 1px solid #d9e5f0; padding-right: 0; padding-bottom: 16px; }
+      .case-id { border-right: 0; padding-right: 0; }
       .timeline-head, .time-row { grid-template-columns: 1fr; }
       .timeline::before { left: 24px; }
       .center-label { display: none; }
       .time-node { justify-items: start; }
       .time-pill { width: 100%; min-height: 0; display: flex; align-items: center; gap: 12px; text-align: left; }
       .path-panel::before { display: none; }
-      .track-title-wrap { grid-template-columns: 1fr; }
       .system-topbar { height: auto; min-height: 86px; align-items: flex-start; padding: 10px 14px; }
-      .flow-progress { grid-template-columns: repeat(2,minmax(120px,1fr)); margin: 0 12px; }
       .time-row.revealing .path-panel.arbitration,
       .time-row.revealing .path-panel.med-silent,
       .time-row.revealing .path-panel.mediation,
@@ -679,13 +463,9 @@
       .page-head { flex-direction: column; }
       .page-title { font-size: 30px; }
       .timeline-board { padding: 16px; }
-      .summary-card { padding: 22px 18px; }
-      .summary-row { grid-template-columns: 1fr 1fr; }
-      .summary-row.hd > div:first-child,
-      .summary-row > div:first-child { display: none; }
     }
   </style>
-  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
 </head>
 <body>
   <div class="system-page">
@@ -697,12 +477,6 @@
           <div class="brand-title">立案服务部</div>
         </div>
       </div>
-      <nav class="flow-progress">
-        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">AI对话辅助立案</span></div>
-        <div class="flow-step done"><span class="flow-index"><i class="fas fa-check"></i></span><span class="flow-label">案件评估报告</span></div>
-        <div class="flow-step active"><span class="flow-index">3</span><span class="flow-label">后续路径选择</span></div>
-        <div class="flow-step"><span class="flow-index">4</span><span class="flow-label">完成立案</span></div>
-      </nav>
       <div class="top-actions">
         <div class="score"><i class="fas fa-star"></i><span>10</span></div>
         <button class="score-pill" type="button">获取积分</button>
@@ -715,9 +489,9 @@
         <div class="page-head">
           <div>
             <h1 class="page-title">了解<span>调解</span> / 仲裁路径</h1>
-            <p class="page-subtitle">同一案件、同一时间起点，两条办理路线对比展开。依次点击各时间节点，查看对应阶段发生的事项。</p>
+            <p class="page-subtitle">依次点击各时间节点，查看对应阶段发生的事项。</p>
           </div>
-          <a class="back-link" href="./立案提交后路径选择.html"><i class="fas fa-arrow-left"></i>返回路径选择</a>
+          <a class="back-link" href="./立案提交后路径选择.html"><i class="fas fa-arrow-left"></i>返回</a>
         </div>
 
         <section class="case-card">
@@ -728,85 +502,21 @@
               <strong>教育培训服务合同退费纠纷</strong>
             </div>
           </div>
-          <div class="case-focus">
-            <span>对比口径</span>
-            围绕课程是否实际履行、退款条款是否充分提示、未消耗课程费用如何处理、销售承诺与合同约定是否一致，以及机构是否仍具备继续履行能力等问题，对“调解”与“仲裁”两条路径进行对比。
-          </div>
         </section>
 
         <section class="timeline-board">
           <div class="timeline-head">
             <div class="track-title arbitration"><i class="fas fa-gavel"></i>仲裁</div>
-            <div class="center-label">同一案件<br>同一时间起点</div>
-            <div class="track-title-wrap">
-              <div class="track-title mediation"><i class="fas fa-handshake"></i>调解</div>
-              <button class="mediation-select-btn" id="selectMediationBtn" type="button">
-                <i class="fas fa-arrow-right"></i>选择调解
-              </button>
-            </div>
+            <div class="center-label">路径时间轴</div>
+            <div class="track-title mediation"><i class="fas fa-handshake"></i>调解</div>
           </div>
 
           <div class="timeline" id="timeline">
             <div class="timeline-glow-line" aria-hidden="true"></div>
           </div>
-
-          <!-- Appears after all 8 rows revealed -->
-          <div class="final-cta" id="finalCta">
-            <p class="final-cta-hint">已了解两条路径的全貌，请选择后续方向</p>
-            <div class="final-cta-btns">
-              <button class="cta-arb" id="arbSelectBtn" type="button">
-                <i class="fas fa-gavel"></i>选择仲裁
-              </button>
-              <button class="cta-med" id="medSelectFinalBtn" type="button">
-                <i class="fas fa-handshake"></i>选择调解
-              </button>
-            </div>
-          </div>
         </section>
       </section>
     </main>
-  </div>
-
-  <!-- Confirm modal -->
-  <div class="confirm-mask" id="confirmMask" role="dialog" aria-modal="true">
-    <div class="confirm-card">
-      <div class="confirm-icon"><i class="fas fa-handshake"></i></div>
-      <h2>确认参与调解？</h2>
-      <p>您的案件将优先进入调解意向登记和沟通环节；调解以双方自愿为前提，若对方不同意或调解不成，仍可保留仲裁路径。</p>
-      <div class="confirm-btns">
-        <button class="confirm-cancel" id="confirmCancelBtn" type="button">再想想</button>
-        <button class="confirm-ok" id="confirmOkBtn" type="button">确认</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Summary modal -->
-  <div class="completion-mask" id="completionMask" role="dialog" aria-modal="true">
-    <div class="summary-card">
-      <div class="summary-head">
-        <h2>路径对比结算</h2>
-        <p>以本案争议金额 15,800 元为例，展示调解与仲裁在时间和费用上的差异</p>
-      </div>
-      <div class="summary-table">
-        <div class="summary-row hd">
-          <div>对比维度</div>
-          <div class="col-arb"><i class="fas fa-gavel" style="margin-right:5px"></i>仲裁</div>
-          <div class="col-med"><i class="fas fa-handshake" style="margin-right:5px"></i>调解</div>
-        </div>
-        <div class="summary-row"><div>示例费用</div><div class="col-arb"><span class="hi">约 5,840 元</span>预缴仲裁费</div><div class="col-med win"><span class="hi">先不进入完整审理成本</span></div></div>
-        <div class="summary-row"><div>首次结果</div><div class="col-arb">通常先经历受理、送达、答辩、组庭</div><div class="col-med win"><span class="hi">同意调解后可先集中沟通方案</span></div></div>
-        <div class="summary-row"><div>期限口径</div><div class="col-arb">普通程序通常按组庭后<span class="hi">4个月内</span>裁决</div><div class="col-med win">取决于对方意愿和协商进展，可能更早形成结果</div></div>
-        <div class="summary-row"><div>时间成本</div><div class="col-arb">可能经历开庭、质证、补充材料</div><div class="col-med win"><span class="hi">可减少后续庭审和举证交换成本</span></div></div>
-        <div class="summary-row"><div>不成处理</div><div class="col-arb">继续仲裁程序</div><div class="col-med win">恢复或转入仲裁程序，材料继续复用</div></div>
-      </div>
-      <div class="summary-note">
-        <i class="fas fa-shield-halved"></i>本页用于演示规则路径，具体期限会受受理、送达、组庭、案件复杂程度和双方配合情况影响。
-      </div>
-      <div class="summary-actions">
-        <a href="#" id="summaryMediationLink"><i class="fas fa-handshake"></i>选择调解，立即启动</a>
-        <button id="closeSummaryBtn" type="button">继续查看说明</button>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -878,7 +588,7 @@
         body:"若已调解成功，本阶段主要按协议或调解书履行；若调解不成，后续重点回到仲裁审理准备。",
         tags:["不强行并行","回到仲裁主线"] },
       { title:"调解侧进入履行或救济",
-        body:"达成调解结果后，重点是履行确认；未履行或未达成的，再结合既有材料选择仲裁或其他救济路径。",
+        body:"达成调解结果后，重点是履行确认；未履行或未达成的，再结合既有材料考虑仲裁或其他救济路径。",
         tags:["履行确认","保留救济"] }
     ];
 
@@ -981,13 +691,10 @@
           setTimeout(() => {
             const panel = document.getElementById('medCompletePanel');
             if (panel) panel.classList.add('animate-glow');
-            const btn = document.getElementById('selectMediationBtn');
-            btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
-            btn.addEventListener('animationend', () => btn.classList.remove('pulse'), { once: true });
           }, 300);
         }
 
-        // Insert next row or show final CTA
+        // Insert next row.
         if (idx + 1 < NODES.length) {
           setTimeout(() => {
             insertRow(idx + 1, true);
@@ -996,13 +703,6 @@
               if (next) next.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 420);
           }, 120);
-        } else {
-          // All rows revealed — show final CTA
-          setTimeout(() => {
-            const cta = document.getElementById('finalCta');
-            cta.classList.add('show');
-            setTimeout(() => cta.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
-          }, 320);
         }
       }, REVEAL_MS);
     }
@@ -1010,56 +710,8 @@
     // Boot: insert row 0 (auto-reveal, no click needed)
     insertRow(0, false);
 
-    /* ─── Confirm modal ─── */
-    function showConfirm() { document.getElementById('confirmMask').classList.add('show'); }
-    function returnAuxReport(source) {
-      if (localStorage.getItem('filingDemoAuxReturn') === 'report') {
-        localStorage.setItem('filingDemoOpenReport', 'auxTool');
-        window.location.href = './申请书bot.html?fromAux=' + source;
-        return true;
-      }
-      return false;
-    }
-
-    function doConfirm() {
-      try {
-        const d = JSON.parse(localStorage.getItem('filingDemoCompletedPaths')||'{}');
-        d.mediation = true;
-        localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(d));
-      } catch(e) {}
-      localStorage.setItem('filingDemoSelectedRoute','mediation');
-      if (returnAuxReport('path-mediation')) return;
-      window.location.href = './调解申请提交结果.html';
-    }
-
-    document.getElementById('selectMediationBtn').addEventListener('click', showConfirm);
-    document.getElementById('medSelectFinalBtn').addEventListener('click', showConfirm);
-    document.getElementById('arbSelectBtn').addEventListener('click', () => {
-      try {
-        const d = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
-        d.arbitration = true;
-        localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(d));
-      } catch(e) {}
-      localStorage.setItem('filingDemoSelectedRoute', 'arbitration');
-      if (returnAuxReport('path-arbitration')) return;
-      window.location.href = './仲裁申请提交结果.html';
-    });
-    document.getElementById('summaryMediationLink').addEventListener('click', e => {
-      e.preventDefault();
-      document.getElementById('completionMask').classList.remove('show');
-      showConfirm();
-    });
-    document.getElementById('confirmCancelBtn').addEventListener('click', () =>
-      document.getElementById('confirmMask').classList.remove('show'));
-    document.getElementById('confirmOkBtn').addEventListener('click', doConfirm);
-    document.getElementById('confirmMask').addEventListener('click', e => {
-      if (e.target === document.getElementById('confirmMask'))
-        document.getElementById('confirmMask').classList.remove('show');
-    });
-    document.getElementById('closeSummaryBtn').addEventListener('click', () =>
-      document.getElementById('completionMask').classList.remove('show'));
   </script>
-  <script src="./assets/demo-shell/demo-config.js"></script>
-  <script src="./assets/demo-shell/demo-nav.js"></script>
+  <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
 </body>
 </html>
