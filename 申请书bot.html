@@ -335,7 +335,7 @@
                     <div class="application-workbench-head">
                         <div>
                             <div class="application-workbench-title">{{ applicationGenerated ? '仲裁申请书（已生成）' : '仲裁申请书（模板）' }}</div>
-                            <div class="application-workbench-sub">{{ applicationGenerated ? (applicationEditable ? '当前可编辑，请核对修正后确认进入下一步' : '当前为只读预览，可点击编辑后修改') : '示例参考' }}</div>
+                            <div class="application-workbench-sub">{{ applicationGenerated ? '当前为只读预览，请下载后进入下一步' : '示例参考' }}</div>
                         </div>
                         <div class="ai-model-badge">
                             <span>已接入 DeepSeek V4 Pro</span>
@@ -349,12 +349,12 @@
                                 <span></span>
                             </div>
                             <div class="application-generation-title">正在生成仲裁申请书</div>
-                            <div class="application-generation-desc">系统正在整理主体信息、仲裁请求、事实理由和证据目录。</div>
+                            <div class="application-generation-desc">系统正在整理主体信息、仲裁请求、事实理由…</div>
                         </div>
                         <div v-else class="application-paper doc-template application-paper-workbench" :class="{ 'is-template': !applicationGenerated, 'is-generated': applicationGenerated, 'is-editing': applicationEditable }" v-html="finalApplicationHtml || applicationTemplateHtml"></div>
                     </div>
                     <div v-if="applicationGenerated && !applicationGenerating" class="application-doc-actions">
-                        <button type="button" class="flow-primary-btn" @click="confirmGeneratedApplicationAndNext">确认并下一步</button>
+                        <button type="button" class="flow-primary-btn" @click="downloadGeneratedApplicationAndNext">下载并下一步</button>
                     </div>
                 </section>
 

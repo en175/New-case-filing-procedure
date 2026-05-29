@@ -17,8 +17,12 @@ createApp({
         const chatScroll = ref(null);
         const stepIndex = ref(0);
         const showDemoStepButton = ref(false);
+        const guideRoundCount = ref(0);
+        const finishTooltipVisible = ref(false);
+        const requiredGuideRounds = 3;
         let messageId = 0;
         let messageTypewriter = null;
+        let finishTooltipTimer = null;
 
         const flowSteps = [
             {
@@ -103,7 +107,7 @@ createApp({
                 guide: '请确认优先调解金额。',
                 placeholder: '请确认是否接受 14500 元作为优先调解金额',
                 demo: '可以。只要对方5个工作日内退14500元，我可以接受调解结案。',
-                reply: '好的，已记录。下面给出本轮分流建议。'
+                reply: '好的，已记录。下面给出本轮智能分析建议。'
             }
         ];
 
@@ -164,6 +168,7 @@ createApp({
         const currentStep = computed(() => flowSteps[Math.min(stepIndex.value, flowSteps.length - 1)]);
         const currentGuide = computed(() => resultReady.value ? '本轮分析已完成，请选择后续路径。' : currentStep.value.guide);
         const currentPlaceholder = computed(() => '');
+        const canFinishGuideConsult = computed(() => guideRoundCount.value >= requiredGuideRounds || resultReady.value);
         const formatFileSize = (size) => {
             if (!Number.isFinite(size)) return '';
             if (size < 1024) return `${size}B`;
@@ -200,6 +205,7 @@ createApp({
             if (!text || aiIsThinking.value || resultReady.value) return;
             const step = currentStep.value;
             addUser(text);
+            guideRoundCount.value += 1;
             inputText.value = '';
             aiIsThinking.value = true;
             scheduleAssistantReply(step.reply, () => {
@@ -216,6 +222,58 @@ createApp({
             if (aiIsThinking.value || resultReady.value) return;
             inputText.value = currentStep.value.demo;
             sendMessage();
+        };
+
+        const showFinishTooltip = () => {
+            finishTooltipVisible.value = true;
+            if (finishTooltipTimer) window.clearTimeout(finishTooltipTimer);
+            finishTooltipTimer = window.setTimeout(() => {
+                finishTooltipVisible.value = false;
+                finishTooltipTimer = null;
+            }, 2200);
+        };
+
+        const stopCurrentReply = () => {
+            if (messageTypewriter) messageTypewriter.clear();
+            aiIsThinking.value = false;
+        };
+
+        const markGuideCompleted = () => {
+            try {
+                const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
+                completed.diversion = true;
+                localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(completed));
+            } catch (error) {
+                localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ diversion: true }));
+            }
+        };
+
+        const goToStep5 = () => {
+            markGuideCompleted();
+            window.location.href = './Step5CaseInfoConfirmation.html';
+        };
+
+        const finishGuideConsult = () => {
+            if (!canFinishGuideConsult.value || aiIsThinking.value) {
+                showFinishTooltip();
+                return;
+            }
+            stopCurrentReply();
+            goToStep5();
+        };
+
+        const goToStep5Direct = () => {
+            stopCurrentReply();
+            goToStep5();
+        };
+
+        const handleFinishButtonClick = (event) => {
+            if (!canFinishGuideConsult.value || aiIsThinking.value) {
+                event?.preventDefault?.();
+                showFinishTooltip();
+                return;
+            }
+            finishGuideConsult();
         };
 
         const showConfirmModal = (type) => {
@@ -299,6 +357,9 @@ createApp({
             confirmModal,
             chatScroll,
             showDemoStepButton,
+            guideRoundCount,
+            canFinishGuideConsult,
+            finishTooltipVisible,
             currentGuide,
             currentPlaceholder,
             formatFileSize,
@@ -307,6 +368,9 @@ createApp({
             removeAttachment,
             sendMessage,
             playDemoNextStep,
+            finishGuideConsult,
+            goToStep5Direct,
+            handleFinishButtonClick,
             showConfirmModal,
             chooseArbitration,
             closeConfirmModal,

@@ -187,6 +187,34 @@
 
     /* ─── Timeline ─── */
     .timeline { position: relative; display: grid; gap: 26px; }
+    .route-next-actions {
+      display: none;
+      justify-content: flex-end;
+      margin-top: 22px;
+      position: relative;
+      z-index: 2;
+    }
+    .route-next-actions.show {
+      display: flex;
+      animation: fadeInUp .35s ease both;
+    }
+    .route-next-btn {
+      border: none;
+      border-radius: 12px;
+      background: #153f95;
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 13px 20px;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(21, 63, 149, .22);
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    .route-next-btn:hover {
+      transform: translateY(-1px);
+      background: #1d4db1;
+      box-shadow: 0 18px 36px rgba(21, 63, 149, .28);
+    }
 
     /* Flowing light line (separate element for overflow:hidden clipping) */
     .timeline-glow-line {
@@ -514,6 +542,9 @@
           <div class="timeline" id="timeline">
             <div class="timeline-glow-line" aria-hidden="true"></div>
           </div>
+          <div class="route-next-actions" id="routeNextActions">
+            <button class="route-next-btn" type="button" id="routeNextBtn">继续下一步填写</button>
+          </div>
         </section>
       </section>
     </main>
@@ -703,12 +734,18 @@
               if (next) next.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 420);
           }, 120);
+        } else {
+          const actions = document.getElementById('routeNextActions');
+          if (actions) actions.classList.add('show');
         }
       }, REVEAL_MS);
     }
 
     // Boot: insert row 0 (auto-reveal, no click needed)
     insertRow(0, false);
+    document.getElementById('routeNextBtn')?.addEventListener('click', () => {
+      window.location.href = './Step5CaseInfoConfirmation.html';
+    });
 
   </script>
   <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>

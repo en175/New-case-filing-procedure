@@ -63,19 +63,86 @@
           :show-top-hint="true"
           bottom-action-hint="立案流程最后一步，请在下方选择后续处理方式"
           mediation-label="参与调解"
+          @confirm="showConfirmModal"
         ></case-assessment-report>
+      </div>
+    </div>
+
+    <div v-if="withdrawDone" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-7 text-center animate__animated animate__bounceIn">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-amber-100 text-amber-600">
+          <i class="fas fa-folder-open text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">已撤回案件</h3>
+        <p class="text-sm text-slate-500 mb-6">已为您撤回本次仲裁立案申请，案件将移入草稿箱。</p>
+        <button type="button" @click="withdrawDone = false" class="w-full px-4 py-2.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors">返回报告</button>
+      </div>
+    </div>
+
+    <div v-if="confirmModal.show" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm animate__animated animate__fadeIn">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 m-4 transform transition-all">
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4"
+               :class="confirmModal.type === 'mediation' ? 'bg-teal-100 text-teal-600' : 'bg-amber-100 text-amber-600'">
+            <i class="fas text-3xl" :class="confirmModal.type === 'mediation' ? 'fa-handshake' : 'fa-exclamation-triangle'"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 mb-2">{{ confirmModal.title }}</h3>
+          <p class="text-sm text-slate-500 mb-6">{{ confirmModal.message }}</p>
+        </div>
+        <div class="flex space-x-3">
+          <button type="button" @click="closeConfirmModal" class="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">再想想</button>
+          <button type="button" @click="executeConfirmAction" class="flex-1 px-4 py-2.5 text-white font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5"
+                  :class="confirmModal.type === 'mediation' ? 'bg-[#2FA39A] hover:bg-[#258e86] shadow-teal-500/30' : 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/30'">确认</button>
+        </div>
       </div>
     </div>
   </div>
   <script src="./assets/shared/case-assessment-report-data.js"></script>
   <script src="./assets/shared/case-assessment-report.js"></script>
   <script>
-    const { createApp } = Vue;
+    const { createApp, ref } = Vue;
     const app = createApp({
       setup() {
         const reportStep = 1;
         const reportData = window.getCaseAssessmentReportData('default');
-        return { reportStep, reportData };
+        const withdrawDone = ref(false);
+        const confirmModal = ref({
+          show: false,
+          type: '',
+          title: '',
+          message: ''
+        });
+        const showConfirmModal = (type) => {
+          confirmModal.value.type = type;
+          if (type === 'mediation') {
+            confirmModal.value.title = '确认参与调解？';
+            confirmModal.value.message = '您的案件将进入快速调解通道，三个工作日内会有调解员与您联系。';
+          } else if (type === 'withdraw') {
+            confirmModal.value.title = '确认撤回案件？';
+            confirmModal.value.message = '是否撤回本案件的仲裁立案申请，撤回后本案件将移入草稿箱。';
+          } else if (type === 'arbitration') {
+            confirmModal.value.title = '联系客服仲裁？';
+            confirmModal.value.message = '是否确认联系客服进行仲裁，确认后三个工作日内会有工作人员与您联系。';
+          }
+          confirmModal.value.show = true;
+        };
+        const closeConfirmModal = () => {
+          confirmModal.value.show = false;
+        };
+        const executeConfirmAction = () => {
+          const type = confirmModal.value.type;
+          closeConfirmModal();
+          if (type === 'mediation') {
+            window.location.href = './调解申请提交结果.html';
+            return;
+          }
+          if (type === 'arbitration') {
+            window.location.href = './仲裁申请提交结果.html';
+            return;
+          }
+          withdrawDone.value = true;
+        };
+        return { reportStep, reportData, confirmModal, withdrawDone, showConfirmModal, closeConfirmModal, executeConfirmAction };
       }
     });
     app.component('case-assessment-report', window.CaseAssessmentReport);

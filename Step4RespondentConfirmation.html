@@ -852,8 +852,8 @@
   <div class="route-loading-mask" id="routeLoadingMask" hidden>
     <div class="route-loading-card">
       <div class="route-loading-ring"></div>
-      <div class="route-loading-title">正在分流办理路径</div>
-      <div class="route-loading-desc">系统正在根据您当前确认的案件信息，加载适合的后续办理方式。</div>
+      <div class="route-loading-title">AI 正在分析案件办理建议</div>
+      <div class="route-loading-desc">系统正在结合当事人信息、请求金额和案件类型，为您准备后续辅助办理页面。</div>
     </div>
   </div>
   <div class="route-choice-mask" id="routeChoiceMask" hidden>
@@ -1463,9 +1463,8 @@
       routeLoadingMask.hidden = false
       routeChoiceMask.hidden = true
       window.setTimeout(() => {
-        routeLoadingMask.hidden = true
-        routeChoiceMask.hidden = false
-      }, 1200)
+        window.location.href = './调解&撤案引导bot.html'
+      }, 900)
     }
     document.getElementById('nextStepBtn').onclick = showRouteChoice
     const STORAGE_KEY = 'filingDemoCompletedPaths'

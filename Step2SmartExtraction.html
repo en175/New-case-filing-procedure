@@ -1096,9 +1096,8 @@
     }
 
     function initApplicationBotResult() {
-      if (!isFromApplicationBot()) return
-      state.applicationSource = 'applicationBot'
-      state.hasUploadList = [createGeneratedApplicationRecord()]
+      state.applicationSource = ''
+      state.hasUploadList = []
     }
 
     function escapeHtml(value) {
@@ -1111,56 +1110,6 @@
       }[match]))
     }
 
-    function createGeneratedApplicationHtml() {
-      return `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>仲裁申请书</title>
-  <style>
-    body { margin: 0; padding: 48px; background: #f8fafc; color: #111827; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
-    .paper { max-width: 860px; margin: 0 auto; background: #fff; padding: 56px 64px; border: 1px solid #e5e7eb; box-shadow: 0 18px 45px rgba(15,23,42,.08); }
-    h1 { text-align: center; font-size: 28px; margin: 0 0 36px; letter-spacing: .08em; }
-    h2 { font-size: 17px; margin: 28px 0 12px; border-left: 4px solid #1d4ed8; padding-left: 10px; }
-    p { font-size: 15px; line-height: 1.9; margin: 8px 0; }
-    .sign { margin-top: 44px; text-align: right; }
-  </style>
-</head>
-<body>
-  <article class="paper">
-    <h1>仲裁申请书</h1>
-    <h2>一、当事人信息</h2>
-    <p>申请人：张三，身份证号：440100198805120011，联系电话：13800000000。</p>
-    <p>被申请人：广州某教育科技有限公司，统一社会信用代码：91440101MA0000000X。</p>
-    <h2>二、仲裁请求</h2>
-    <p>1. 请求裁决被申请人退还培训服务费人民币 15800 元。</p>
-    <p>2. 请求裁决被申请人承担本案仲裁费用。</p>
-    <h2>三、事实与理由</h2>
-    <p>申请人与被申请人签订线上职业培训课程服务合同，并按约支付课程费用。后被申请人未按约安排核心课程，多次沟通退款未果，已影响合同目的实现。</p>
-    <p>申请人现依据合同约定及相关法律规定，向广州仲裁委员会申请仲裁，请依法支持申请人的仲裁请求。</p>
-    <h2>四、证据及证明内容</h2>
-    <p>证据材料包括培训服务合同、付款凭证、沟通记录、退款申请记录等，用于证明合同关系、付款事实、履约争议及退款沟通过程。</p>
-    <p class="sign">此致<br>广州仲裁委员会<br><br>申请人：张三<br>日期：2026 年 5 月 18 日</p>
-  </article>
-<\/body>
-<\/html>`
-    }
-
-    function createGeneratedApplicationRecord() {
-      const html = createGeneratedApplicationHtml()
-      const docBlob = new Blob([html], { type: 'application/msword;charset=utf-8' })
-      const previewBlob = new Blob([html], { type: 'text/html;charset=utf-8' })
-      return {
-        id: 'application_bot_generated_doc',
-        name: '仲裁申请书（智能立案助手生成）.doc',
-        size: docBlob.size,
-        type: docBlob.type,
-        generated: true,
-        objectURL: URL.createObjectURL(docBlob),
-        previewURL: URL.createObjectURL(previewBlob)
-      }
-    }
-
     function createLocalFileRecord(file) {
       return {
         id: `${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -1170,6 +1119,14 @@
         raw: file,
         objectURL: URL.createObjectURL(file)
       }
+    }
+    function pickPdfFiles(fileList) {
+      const files = Array.from(fileList || [])
+      const pdfFiles = files.filter(file => /\.pdf$/i.test(file.name || '') || file.type === 'application/pdf')
+      if (files.length && pdfFiles.length !== files.length) {
+        alert('仅支持上传 PDF 格式文件')
+      }
+      return pdfFiles
     }
 
     function formatFileSize(size) {
@@ -1229,23 +1186,13 @@
 
     function renderArbList() {
       const box = document.getElementById('arbUploadList')
-      const sourceBanner = state.applicationSource === 'applicationBot'
-        ? `<div class="application-source-banner">
-            <div class="application-source-icon"><i class="el-icon-check"></i></div>
-            <div>
-              <div class="application-source-title">已由智能立案助手生成仲裁申请书</div>
-              <div class="application-source-text">请继续上传证据目录和证据材料。</div>
-            </div>
-          </div>`
-        : ''
       const uploadButton = document.getElementById('openUploadDialogBtn')
-      if (uploadButton) uploadButton.textContent = state.applicationSource === 'applicationBot' ? '替换仲裁申请书' : '上传仲裁申请书'
+      if (uploadButton) uploadButton.textContent = '上传仲裁申请书'
       if (!state.hasUploadList.length) {
-        box.innerHTML = `${sourceBanner}<div class="no-evidence">暂未上传仲裁申请书，请点击右上角“上传仲裁申请书”</div>`
+        box.innerHTML = '<div class="no-evidence">暂未上传仲裁申请书，请点击右上角“上传仲裁申请书”</div>'
         return
       }
       box.innerHTML = `
-        ${sourceBanner}
         <div class="uploaded-files">
           <div class="uploaded-files-title">已上传的仲裁申请书：</div>
           ${state.hasUploadList.map(file => `<div class="uploaded-file-item" data-id="${file.id}">
@@ -1400,7 +1347,7 @@
         const triggerBtn = el.querySelector('[data-action="trigger-evidence-input"]')
         triggerBtn.onclick = () => input.click()
         input.onchange = (e) => {
-          const files = Array.from(e.target.files || []).map(createLocalFileRecord)
+          const files = pickPdfFiles(e.target.files).map(createLocalFileRecord)
           evidence.uploadList.push(...files)
           evidence.showError = false
           renderEvidenceList()
@@ -1476,7 +1423,7 @@
       renderArbList()
     })
     document.getElementById('arbInput').addEventListener('change', (e) => {
-      const files = Array.from(e.target.files || []).map(createLocalFileRecord)
+      const files = pickPdfFiles(e.target.files).map(createLocalFileRecord)
       state.tempArbList.push(...files)
       renderTempArbList()
       e.target.value = ''
@@ -1488,7 +1435,7 @@
       document.getElementById('catalogInput').click()
     })
     document.getElementById('catalogInput').addEventListener('change', (e) => {
-      const files = Array.from(e.target.files || []).map(createLocalFileRecord)
+      const files = pickPdfFiles(e.target.files).map(createLocalFileRecord)
       state.catalogFiles.push(...files)
       renderCatalogList()
       e.target.value = ''

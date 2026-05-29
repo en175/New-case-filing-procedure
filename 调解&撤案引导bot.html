@@ -12,6 +12,93 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./assets/filing-bot/filing-bot.css">
     <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
+    <style>
+        .diversion-finish-float {
+            position: fixed;
+            right: 28px;
+            bottom: 26px;
+            z-index: 70;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        .diversion-finish-float .ai-finish-tooltip {
+            max-width: 320px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.92);
+            color: #f8fafc;
+            font-size: 12px;
+            line-height: 1.5;
+            box-shadow: 0 16px 28px rgba(15, 23, 42, 0.2);
+            opacity: 0;
+            transform: translateY(6px);
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        .diversion-finish-float .ai-finish-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .diversion-finish-float .ai-finish-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            min-width: 240px;
+            height: 44px;
+            margin: 0;
+            padding: 0 18px;
+            border: none;
+            border-radius: 14px;
+            background-size: 190% 100%;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 900;
+            box-shadow: 0 14px 30px rgba(96, 165, 250, 0.24);
+            transition: transform 0.24s ease, box-shadow 0.24s ease, background-position 0.45s ease;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .diversion-finish-float .ai-finish-btn.ready {
+            background: linear-gradient(120deg, #dbeafe 0%, #93c5fd 38%, #60a5fa 70%, #38bdf8 100%);
+        }
+        .diversion-finish-float .ai-finish-btn.locked {
+            background: linear-gradient(120deg, #e2e8f0 0%, #cbd5e1 60%, #e2e8f0 100%);
+            color: #475569;
+            box-shadow: 0 12px 22px rgba(148, 163, 184, 0.18);
+        }
+        .diversion-finish-float .ai-finish-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -70%;
+            width: 55%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.62), transparent);
+            transform: skewX(-22deg);
+            transition: left 0.48s ease;
+        }
+        .diversion-finish-float .ai-finish-btn span,
+        .diversion-finish-float .ai-finish-btn i {
+            position: relative;
+            z-index: 1;
+        }
+        .diversion-finish-float .ai-finish-btn:hover {
+            transform: translateY(-2px);
+            background-position: 100% 0;
+            box-shadow: 0 20px 44px rgba(59, 130, 246, 0.3);
+        }
+        .diversion-finish-float .ai-finish-btn.ready:hover::before {
+            left: 118%;
+        }
+        .diversion-finish-float .ai-finish-btn.locked::before {
+            display: none;
+        }
+    </style>
 </head>
 <body class="h-screen w-screen bg-gray-100">
 <div id="app" class="relative h-full w-full overflow-hidden">
@@ -33,15 +120,15 @@
             </div>
             <div class="filing-hud-step active">
                 <span class="filing-hud-index">2</span>
-                <span class="filing-hud-label">智能分流</span>
+                <span class="filing-hud-label">智能分析</span>
             </div>
             <div class="filing-hud-step">
                 <span class="filing-hud-index">3</span>
-                <span class="filing-hud-label">继续立案</span>
+                <span class="filing-hud-label">继续填写</span>
             </div>
             <div class="filing-hud-step">
                 <span class="filing-hud-index">4</span>
-                <span class="filing-hud-label">后续路径</span>
+                <span class="filing-hud-label">评估报告</span>
             </div>
         </div>
 
@@ -201,6 +288,30 @@
                 </div>
             </aside>
         </main>
+    </div>
+    <div class="diversion-finish-float">
+        <div class="ai-finish-tooltip" :class="{ 'show': finishTooltipVisible }">
+            为了后续为您提供更加个性化的AI服务，请完成 3 轮对话后可进入下一步
+        </div>
+        <button
+            type="button"
+            class="ai-finish-btn ready"
+            style="min-width: 180px;"
+            @click="goToStep5Direct"
+        >
+            <i class="fas fa-forward-step"></i>
+            <span>直接进入下一步</span>
+        </button>
+        <button
+            type="button"
+            class="ai-finish-btn"
+            :class="{ 'ready': canFinishGuideConsult, 'locked': !canFinishGuideConsult }"
+            @click="handleFinishButtonClick"
+            :aria-disabled="!canFinishGuideConsult"
+        >
+            <i class="fas" :class="canFinishGuideConsult ? 'fa-circle-check' : 'fa-lock'"></i>
+            <span>结束对话，进入下一步</span>
+        </button>
     </div>
     <div class="diversion-confirm-mask" v-if="confirmModal.show" role="dialog" aria-modal="true">
         <div class="diversion-confirm-card">

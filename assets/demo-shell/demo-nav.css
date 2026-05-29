@@ -1,7 +1,7 @@
 /* Shared demo navigation. Keep this module independent from page business styles. */
 :root {
   --demo-nav-collapsed-width: 76px;
-  --demo-nav-expanded-width: 238px;
+  --demo-nav-expanded-width: 266px;
   --demo-nav-width: var(--demo-nav-collapsed-width);
   --demo-body-pad-left: 0px;
 }
@@ -188,9 +188,14 @@ body.demo-nav-expanded .demo-nav-toggle span {
 }
 
 .demo-nav-copy {
+  flex: 1 1 auto;
   min-width: 0;
   opacity: 0;
   transform: translateX(-4px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
@@ -202,12 +207,39 @@ body.demo-nav-expanded .demo-nav-copy {
 .demo-nav-copy strong {
   display: block;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .demo-nav-copy strong {
   color: inherit;
   font-size: 13px;
   line-height: 1.25;
+}
+
+.demo-nav-bot-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #0f766e;
+  background: rgba(240, 253, 250, 0.92);
+  border: 1px solid rgba(153, 246, 228, 0.92);
+}
+
+.demo-nav-bot-icon svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.demo-nav-link.active .demo-nav-bot-icon {
+  color: #0f766e;
+  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.86);
 }
 
 @media (max-width: 900px) {

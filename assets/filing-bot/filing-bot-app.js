@@ -240,159 +240,39 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 const value = applicationDraft.value[key];
                 return escapeHtml(value && String(value).trim() ? value : fallback);
             };
-            const buildFilledField = (field, value, className = 'short', placeholder = '请核对并补充') => `
-                <div class="application-fill ${className}" contenteditable="true" data-required="true" data-field="${field}" data-placeholder="${placeholder}">${value}</div>
-            `;
-            const buildApplicationTemplatePreviewHtml = () => {
-                const docField = (field, value, className = '') => `
-                    <span class="application-fill doc-fill ${className}" data-field="${field}" data-placeholder="">${escapeHtml(value)}</span>
-                `;
-                const docBlock = (field, value, className = '') => `
-                    <div class="application-fill doc-fill doc-fill-block ${className}" data-field="${field}" data-placeholder="">${escapeHtml(value)}</div>
-                `;
-                return `
-                    <section class="doc-page doc-page-compact">
-                        <div class="doc-crop top-left"></div>
-                        <div class="doc-crop top-right"></div>
-                        <div class="doc-crop bottom-left"></div>
-                        <div class="doc-crop bottom-right"></div>
-                        <div class="doc-title">仲裁申请书</div>
-                        <div class="doc-row"><strong>申请人：</strong>${docField('申请人姓名', '陈某（已脱敏）', 'w-name')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>性别：${docField('申请人性别', '男', 'w-xs')}</span>
-                            <span>年龄：${docField('申请人年龄', '34岁', 'w-xs')}</span>
-                        </div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>职业：${docField('申请人职业', '自由职业', 'w-sm')}</span>
-                            <span>工作单位：${docField('申请人工作单位', '无固定工作单位', 'w-md')}</span>
-                        </div>
-                        <div class="doc-row">身份证号码：${docField('申请人身份证号码', '440***************', 'w-id')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>住所：${docField('申请人住所', '广东省广州市********', 'w-line')}</span>
-                            <span>联系电话：${docField('申请人联系电话', '138****0000', 'w-phone')}</span>
-                        </div>
-                        <div class="doc-row"><strong>被申请人：</strong>${docField('被申请人名称', '广州某教育科技有限公司', 'w-name-long')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>法定代表人/负责人：${docField('法定代表人或负责人', '林某某', 'w-md')}</span>
-                            <span>职务：${docField('职务', '执行董事', 'w-sm')}</span>
-                        </div>
-                        <div class="doc-row">统一社会信用代码：${docField('统一社会信用代码', '9144**************', 'w-code')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>住所：${docField('被申请人住所', '广东省广州市********', 'w-line')}</span>
-                            <span>联系电话：${docField('被申请人联系电话', '020-********', 'w-phone')}</span>
-                        </div>
-                        <div class="doc-section-title">仲裁请求：</div>
-                        <div class="doc-request-line">（一）${docField('仲裁请求一', '请求解除课程服务协议。', 'w-request')}</div>
-                        <div class="doc-request-line">（二）${docField('仲裁请求二', '请求退还课程费用18800.00元。', 'w-request')}</div>
-                        <div class="doc-request-line">（三）${docField('仲裁请求三', '请求承担本案仲裁费。', 'w-request')}</div>
-                        <div class="doc-request-line">（四）${docField('仲裁请求四', '暂不主张违约金及其他损失。', 'w-request')}</div>
-                        <div class="doc-section-title">事实与理由：</div>
-                        ${docBlock('事实与理由', '申请人与被申请人于2024年5月7日签署《网络教育咨询服务协议》，约定由被申请人向申请人提供“VIP导师保障营”课程服务，课程费用为18800.00元，协议同时约定争议提交广州仲裁委员会解决。申请人已依约支付课程费用。履行过程中，被申请人多次出现课程延期、安排调整等情况，申请人据此认为其未按约持续、完整提供课程服务。双方后续虽就课程冻结事项作出安排，但延期与退款争议仍未得到解决。申请人曾通过微信及退款申请材料提出解除合同、退还课程费用的请求，未与被申请人达成一致。现申请人依据双方仲裁条款申请仲裁，请求支持上述仲裁请求。', 'doc-facts')}
-                        <div class="doc-section-title">证据目录（摘要）：</div>
-                        ${docBlock('证据目录说明', '1.《网络教育咨询服务协议》及仲裁条款；2.课程宣传页、学习账号截图及付款凭证；3.延期通知、微信沟通记录及退款申请材料；4.课程冻结申请及其他补充证明。', 'doc-evidence-block')}
-                        <div class="doc-closing">
-                            <div>此致</div>
-                            <div>广州仲裁委员会</div>
-                        </div>
-                        <div class="doc-signature">
-                            <div>申请人：${docField('落款申请人', '陈某', 'w-sm')}</div>
-                            <div>（签名或盖章）</div>
-                            <div class="doc-date">
-                                ${docField('落款年份', '2026', 'w-year')}年
-                                ${docField('落款月份', '5', 'w-date-part')}月
-                                ${docField('落款日期', '29', 'w-date-part')}日
-                            </div>
-                        </div>
-                    </section>
-                `;
-            };
-            const buildFinalApplicationDocumentHtml = ({ editable = true } = {}) => {
-                const today = getTodayParts();
-                const editableAttr = editable ? 'contenteditable="true"' : '';
-                const docField = (field, value, className = '') => `
-                    <span class="application-fill doc-fill ${className}" ${editableAttr} data-required="true" data-field="${field}" data-placeholder="">${escapeHtml(value)}</span>
-                `;
-                const docBlock = (field, value, className = '') => `
-                    <div class="application-fill doc-fill doc-fill-block ${className}" ${editableAttr} data-required="true" data-field="${field}" data-placeholder="">${escapeHtml(value)}</div>
-                `;
-                const applicantName = '陈某';
-                const applicantId = '440***************';
-                const applicantGender = '男';
-                const applicantAge = '34岁';
-                const applicantAddress = '广东省广州市天河区********';
-                const applicantPhone = '138****0000';
-                const respondentName = '广州师大博学技术有限公司';
-                const respondentCreditCode = '9144**************';
-                const respondentAddress = '广州市白云区********';
-                const respondentPhone = '020-********';
-                const facts = '申请人与被申请人于2024年5月7日签署《网络教育咨询服务协议》，约定由被申请人向申请人提供“VIP导师保障营”课程服务，课程费用为18800.00元，协议同时约定争议提交广州仲裁委员会解决。\n\n申请人已按约支付课程费用。根据课程宣传页、学习账号截图及相关材料，被申请人已为申请人开通学习账号，但在后续履行过程中多次出现课程延期、安排调整等情况。申请人据此认为，被申请人未能持续、完整提供约定课程服务。\n\n双方后续另就课程冻结事项作出安排，冻结期限为2025年1月2日至2026年1月2日。尽管如此，课程延期与退款争议仍未得到解决。申请人曾通过微信及退款申请材料向被申请人提出解除合同、退还课程费用的请求，但双方未就全额退费方案达成一致。\n\n申请人认为，被申请人未按约履行课程服务，且在申请人提出退款后未能妥善处理，现依据双方仲裁条款向广州仲裁委员会申请仲裁，请求支持上述仲裁请求。';
-                const evidence = '1.《网络教育咨询服务协议》及仲裁条款；2.课程宣传页、学习账号截图及付款凭证；3.延期通知、微信沟通记录及退款申请材料；4.课程冻结申请及其他补充证明。';
-                return `
-                    <section class="doc-page doc-page-compact">
-                        <div class="doc-crop top-left"></div>
-                        <div class="doc-crop top-right"></div>
-                        <div class="doc-crop bottom-left"></div>
-                        <div class="doc-crop bottom-right"></div>
-                        <div class="doc-title">仲裁申请书</div>
-                        <div class="doc-row"><strong>申请人：</strong>${docField('申请人姓名', applicantName, 'w-name')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>性别：${docField('申请人性别', applicantGender, 'w-xs')}</span>
-                            <span>年龄：${docField('申请人年龄', applicantAge, 'w-xs')}</span>
-                        </div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>职业：${docField('申请人职业', '自由职业', 'w-sm')}</span>
-                            <span>工作单位：${docField('申请人工作单位', '无固定工作单位', 'w-md')}</span>
-                        </div>
-                        <div class="doc-row">身份证号码：${docField('申请人身份证号码', applicantId, 'w-id')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>住所：${docField('申请人住所', applicantAddress, 'w-line')}</span>
-                            <span>联系电话：${docField('申请人联系电话', applicantPhone, 'w-phone')}</span>
-                        </div>
-                        <div class="doc-row"><strong>被申请人：</strong>${docField('被申请人名称', respondentName, 'w-name-long')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>法定代表人/负责人：${docField('法定代表人或负责人', '林某某', 'w-md')}</span>
-                            <span>职务：${docField('职务', '执行董事', 'w-sm')}</span>
-                        </div>
-                        <div class="doc-row">统一社会信用代码：${docField('统一社会信用代码', respondentCreditCode, 'w-code')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>住所：${docField('被申请人住所', respondentAddress, 'w-line')}</span>
-                            <span>联系电话：${docField('被申请人联系电话', respondentPhone, 'w-phone')}</span>
-                        </div>
-                        <div class="doc-section-title">仲裁请求：</div>
-                        <div class="doc-request-line">（一）${docField('仲裁请求一', '请求裁决解除《网络教育咨询服务协议》。', 'w-request')}</div>
-                        <div class="doc-request-line">（二）${docField('仲裁请求二', '请求裁决被申请人退还课程费用18800.00元。', 'w-request')}</div>
-                        <div class="doc-request-line">（三）${docField('仲裁请求三', '请求裁决被申请人承担本案仲裁费。', 'w-request')}</div>
-                        <div class="doc-request-line">（四）${docField('仲裁请求四', '申请人暂不主张违约金、利息等其他损失。', 'w-request')}</div>
-                        <div class="doc-section-title">事实与理由：</div>
-                        ${docBlock('事实与理由', facts, 'doc-facts')}
-                        <div class="doc-section-title">证据目录（摘要）：</div>
-                        ${docBlock('证据目录说明', evidence, 'doc-evidence-block')}
-                        <div class="doc-closing">
-                            <div>此致</div>
-                            <div>广州仲裁委员会</div>
-                        </div>
-                        <div class="doc-signature">
-                            <div>申请人：${docField('落款申请人', applicantName, 'w-sm')}</div>
-                            <div>（签名或盖章）</div>
-                            <div class="doc-date">
-                                ${docField('落款年份', '2026', 'w-year')}年
-                                ${docField('落款月份', '5', 'w-date-part')}月
-                                ${docField('落款日期', '29', 'w-date-part')}日
-                            </div>
-                        </div>
-                    </section>
-                `;
-            };
-            const buildDemoApplicationDocumentHtml = (sourceText = '', { editable = false } = {}) => {
+            const buildApplicationDocumentHtml = (sourceText = '', { template = false } = {}) => {
                 const source = String(sourceText || '').trim();
-                const editableAttr = editable ? 'contenteditable="true"' : '';
-                const field = (className, value, name = '') => `<span class="application-fill doc-fill ${className}" ${editableAttr} data-field="${name}">${escapeHtml(value)}</span>`;
-                const block = (className, value, name = '') => `<div class="application-fill doc-fill doc-fill-block ${className}" ${editableAttr} data-field="${name}">${escapeHtml(value).replace(/\n/g, '<br>')}</div>`;
-                const factsLead = source
-                    ? `申请人与被申请人就教育培训退费事宜发生争议。申请人通过本次对话提出生成申请书的需求，系统据此生成一份用于演示的仲裁申请书草稿。原始输入为：${source}。`
-                    : '申请人与被申请人就教育培训退费事宜发生争议，申请人现依据双方仲裁条款申请仲裁。';
-                const facts = `${factsLead}\n\n申请人已按约支付课程费用。根据课程宣传页、学习账号截图及相关材料，被申请人已为申请人开通学习账号，但在后续履行过程中多次出现课程延期、安排调整等情况。申请人据此认为，被申请人未能持续、完整提供约定课程服务。\n\n双方后续另就课程冻结事项作出安排，冻结期限为2025年1月2日至2026年1月2日。尽管如此，课程延期与退款争议仍未得到解决。申请人曾通过微信及退款申请材料向被申请人提出解除合同、退还课程费用的请求，但双方未就全额退费方案达成一致。\n\n申请人认为，被申请人未按约履行课程服务，且在申请人提出退款后未能妥善处理，现依据双方仲裁条款向广州仲裁委员会申请仲裁，请求支持上述仲裁请求。`;
-                const evidence = '1.《网络教育咨询服务协议》及仲裁条款；2.课程宣传页、学习账号截图及付款凭证；3.延期通知、微信沟通记录及退款申请材料；4.课程冻结申请及其他补充证明。';
+                const fill = (value, maskedValue = value) => escapeHtml(template ? maskedValue : value);
+                const structured = {
+                    applicantName: fill('陈晓文', '陈某文'),
+                    applicantId: fill('440106199001018765', '440106********8765'),
+                    applicantAddress: fill('广东省广州市天河区体育西路100号1402房', '广东省广州市天河区体育西路某号某室'),
+                    applicantPhone: fill('13800001234', '138****1234'),
+                    applicantLegalRep: fill('无'),
+                    applicantAgent: fill('无'),
+                    respondentName: fill('广州师大博学技术有限公司', '广州某某教育科技有限公司'),
+                    respondentId: fill('91440101MA9XX8AB3Q', '91440101MA9****B3Q'),
+                    respondentAddress: fill('广州市白云区云城街道云城东路168号', '广州市白云区云城街道某路某号'),
+                    respondentPhone: fill('020-88886666', '020-****6666'),
+                    respondentLegalRep: fill('林志远', '林某某'),
+                    claims: template
+                        ? [
+                            '请求裁决解除申请人与被申请人签署的《网络教育咨询服务协议》。',
+                            '请求裁决被申请人向申请人退还课程服务费用18800.00元。',
+                            '请求裁决被申请人承担本案仲裁费。'
+                        ]
+                        : [
+                            '请求裁决解除《网络教育咨询服务协议》。',
+                            '请求裁决被申请人退还课程费用18800.00元。',
+                            '请求裁决被申请人承担本案仲裁费。'
+                        ],
+                    facts: template
+                        ? '申请人与被申请人于2024年5月签署《网络教育咨询服务协议》，约定由被申请人向申请人提供线上培训课程服务，课程服务费用为18800.00元，协议约定争议提交广州仲裁委员会解决。申请人已按约支付全部课程费用。履行过程中，被申请人多次调整课程安排并出现服务延期情形，未能按约持续、完整提供课程服务。申请人就解除协议、退还课程费用等事项与被申请人沟通未果，现依据双方仲裁条款向广州仲裁委员会申请仲裁，请求支持上述仲裁请求。'
+                        : `${source ? `根据您输入的内容：${source}\n\n` : ''}申请人与被申请人于2024年5月7日签署《网络教育咨询服务协议》，约定由被申请人向申请人提供“VIP导师保障营”课程服务，课程费用为18800.00元，协议同时约定争议提交广州仲裁委员会解决。申请人已按约支付课程费用。履行过程中，被申请人多次出现课程延期、安排调整等情况，申请人认为其未按约持续、完整提供课程服务。双方就退款事宜协商未果，现依据双方仲裁条款申请仲裁，请求支持上述仲裁请求。`
+                };
+                const docField = (value, className = '') => `<span class="application-fill doc-fill ${className}">${value}</span>`;
+                const docRow = (label, value, className = '') => `<div class="doc-row">${label}：${docField(value, className)}</div>`;
+                const docBlock = (value, className = '') => `<div class="application-fill doc-fill doc-fill-block ${className}">${escapeHtml(value).replace(/\n/g, '<br>')}</div>`;
                 return `
                     <section class="doc-page doc-page-compact">
                         <div class="doc-crop top-left"></div>
@@ -400,67 +280,43 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         <div class="doc-crop bottom-left"></div>
                         <div class="doc-crop bottom-right"></div>
                         <div class="doc-title">仲裁申请书</div>
-                        <div class="doc-row"><strong>申请人：</strong>${field('w-name', '陈某', '申请人')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>性别：${field('w-xs', '男', '性别')}</span>
-                            <span>年龄：${field('w-xs', '34岁', '年龄')}</span>
-                        </div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>职业：${field('w-sm', '自由职业', '职业')}</span>
-                            <span>工作单位：${field('w-md', '无固定工作单位', '工作单位')}</span>
-                        </div>
-                        <div class="doc-row">身份证号码：${field('w-id', '440***************', '身份证号码')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>住所：${field('w-line', '广东省广州市天河区********', '申请人住所')}</span>
-                            <span>联系电话：${field('w-phone', '138****0000', '申请人电话')}</span>
-                        </div>
-                        <div class="doc-row"><strong>被申请人：</strong>${field('w-name-long', '广州师大博学技术有限公司', '被申请人')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>法定代表人/负责人：${field('w-md', '林某某', '法定代表人')}</span>
-                            <span>职务：${field('w-sm', '执行董事', '职务')}</span>
-                        </div>
-                        <div class="doc-row">统一社会信用代码：${field('w-code', '9144**************', '统一社会信用代码')}</div>
-                        <div class="doc-row doc-row-grid compact-two-col">
-                            <span>住所：${field('w-line', '广州市白云区********', '被申请人住所')}</span>
-                            <span>联系电话：${field('w-phone', '020-********', '被申请人电话')}</span>
-                        </div>
-                    </section>
-                    <section class="doc-page doc-page-compact">
-                        <div class="doc-crop top-left"></div>
-                        <div class="doc-crop top-right"></div>
-                        <div class="doc-crop bottom-left"></div>
-                        <div class="doc-crop bottom-right"></div>
+                        <div class="doc-section-title">申请人：</div>
+                        ${docRow('姓名/名称', structured.applicantName, 'w-name')}
+                        ${docRow('证件号/统一社会信用代码', structured.applicantId, 'w-id')}
+                        ${docRow('住所地', structured.applicantAddress, 'w-line')}
+                        ${docRow('联系电话', structured.applicantPhone, 'w-phone')}
+                        ${docRow('法定代表人/负责人', structured.applicantLegalRep, 'w-md')}
+                        ${docRow('委托代理人', structured.applicantAgent, 'w-md')}
+                        <div class="doc-section-title">被申请人：</div>
+                        ${docRow('姓名/名称', structured.respondentName, 'w-name-long')}
+                        ${docRow('证件号/统一社会信用代码', structured.respondentId, 'w-code')}
+                        ${docRow('住所地', structured.respondentAddress, 'w-line')}
+                        ${docRow('联系电话', structured.respondentPhone, 'w-phone')}
+                        ${docRow('法定代表人/负责人', structured.respondentLegalRep, 'w-md')}
                         <div class="doc-section-title">仲裁请求：</div>
-                        <div class="doc-request-line">（一）${field('w-request', '请求裁决解除《网络教育咨询服务协议》。', '仲裁请求一')}</div>
-                        <div class="doc-request-line">（二）${field('w-request', '请求裁决被申请人退还课程费用18800.00元。', '仲裁请求二')}</div>
-                        <div class="doc-request-line">（三）${field('w-request', '请求裁决被申请人承担本案仲裁费。', '仲裁请求三')}</div>
-                        <div class="doc-request-line">（四）${field('w-request', '申请人暂不主张违约金、利息等其他损失。', '仲裁请求四')}</div>
+                        ${structured.claims.map((claim, index) => `<div class="doc-request-line">（${index + 1}）${docField(escapeHtml(claim), 'w-request')}</div>`).join('')}
                         <div class="doc-section-title">事实与理由：</div>
-                        ${block('doc-facts', facts, '事实与理由')}
-                        <div class="doc-section-title">证据目录（摘要）：</div>
-                        ${block('doc-evidence-block', evidence, '证据目录')}
+                        ${docBlock(structured.facts, 'doc-facts')}
                         <div class="doc-closing">
                             <div>此致</div>
                             <div>广州仲裁委员会</div>
                         </div>
                         <div class="doc-signature">
-                            <div>申请人：${field('w-sm', '陈某', '落款申请人')}</div>
-                            <div>（签名或盖章）</div>
-                            <div class="doc-date">
-                                ${field('w-year', '2026', '落款年份')}年
-                                ${field('w-date-part', '5', '落款月份')}月
-                                ${field('w-date-part', '29', '落款日期')}日
-                            </div>
+                            <div>申请人：${docField(structured.applicantName, 'w-sm')}</div>
+                            <div>日期：${docField(`${getTodayParts().year}年${getTodayParts().month}月${getTodayParts().day}日`, 'w-date')}</div>
                         </div>
                     </section>
                 `;
             };
-            const applicationTemplateHtml = computed(() => buildDemoApplicationDocumentHtml('', { editable: false }));
+            const buildApplicationTemplatePreviewHtml = () => buildApplicationDocumentHtml('', { template: true });
+            const buildFinalApplicationDocumentHtml = ({ editable = false } = {}) => buildApplicationDocumentHtml('', { template: false });
+            const buildDemoApplicationDocumentHtml = (sourceText = '', { editable = false } = {}) => buildApplicationDocumentHtml(sourceText, { template: false });
+            const applicationTemplateHtml = computed(() => buildApplicationDocumentHtml('', { template: true }));
             const buildFinalApplicationReviewHtml = () => {
                 return `
                     <div class="application-generate-card" data-module="final-application-review">
-                        <div class="application-generate-title">申请书初稿已生成</div>
-                        <div class="application-generate-desc">系统已在左侧生成《仲裁申请书》初稿。请在左侧文书区核对，必要时点击“编辑”，确认无误后点击“确认并下一步”。</div>
+                        <div class="application-generate-title">申请书已生成</div>
+                        <div class="application-generate-desc">系统已在左侧生成《仲裁申请书》。该文书为只读预览，下载 docx 后可进入下一步材料提交。</div>
                     </div>
                 `;
             };
@@ -469,9 +325,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     key: 'facts',
                     label: '案件基本情况',
                     context: 'caseEvidence',
-                    demo: '教育培训退费纠纷，申请人要求解除协议并退还18800.00元。',
+                    demo: '教育培训退费纠纷，申请人要求解除协议并退还18800元。',
                     final: true,
-                    keywords: ['生成', '申请书', '仲裁', '退费', '退款', '合同', '培训', '纠纷']
+                    keywords: ['申请书', '仲裁', '退费', '退款', '合同', '培训', '纠纷', '教育', '服务']
                 }
             ];
             const buildArbitrationApplicationHtml = () => `
@@ -489,19 +345,19 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                             <div class="paper-field-grid">
                                 <div class="paper-field">
                                     <label>姓名/名称</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="申请人姓名/名称" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="申请人姓名/名称" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>证件号/统一社会信用代码</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="申请人证件号或统一社会信用代码" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="申请人证件号或统一社会信用代码" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field full">
                                     <label>住所/联系地址</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="申请人住所" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="申请人住所" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>联系电话</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="申请人联系电话" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="申请人联系电话" data-placeholder="请输入"></div>
                                 </div>
                             </div>
                         </div>
@@ -510,19 +366,19 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                             <div class="paper-field-grid">
                                 <div class="paper-field">
                                     <label>姓名/名称</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="被申请人姓名/名称" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="被申请人姓名/名称" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>证件号/统一社会信用代码</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="被申请人证件号或统一社会信用代码" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="被申请人证件号或统一社会信用代码" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field full">
                                     <label>住所/联系地址</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="被申请人住所" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="被申请人住所" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>联系电话</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="被申请人联系电话" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="被申请人联系电话" data-placeholder="请输入"></div>
                                 </div>
                             </div>
                         </div>
@@ -531,15 +387,15 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                             <div class="paper-field-grid">
                                 <div class="paper-field full">
                                     <label>请求事项</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="仲裁请求事项" data-placeholder="请分项填写，如请求退还培训费、支付违约金等。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="仲裁请求事项" data-placeholder="请分项填写，如请求退还培训费、支付违约金等。"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>请求金额/计算方式</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="请求金额或计算方式" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="请求金额或计算方式" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>仲裁费用承担</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="仲裁费用承担" data-placeholder="例如由被申请人承担"></div>
+                                    <div class="application-fill short" data-required="true" data-field="仲裁费用承担" data-placeholder="例如由被申请人承担"></div>
                                 </div>
                             </div>
                         </div>
@@ -548,11 +404,11 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                             <div class="paper-field-grid">
                                 <div class="paper-field">
                                     <label>合同/协议名称</label>
-                                    <div class="application-fill short" contenteditable="true" data-required="true" data-field="合同或协议名称" data-placeholder="请输入"></div>
+                                    <div class="application-fill short" data-required="true" data-field="合同或协议名称" data-placeholder="请输入"></div>
                                 </div>
                                 <div class="paper-field full">
                                     <label>仲裁条款/仲裁协议内容</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="仲裁条款或仲裁协议内容" data-placeholder="请填写约定提交广州仲裁委员会仲裁的条款内容。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="仲裁条款或仲裁协议内容" data-placeholder="请填写约定提交广州仲裁委员会仲裁的条款内容。"></div>
                                 </div>
                             </div>
                         </div>
@@ -561,15 +417,15 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                             <div class="paper-field-grid">
                                 <div class="paper-field">
                                     <label>合同/订单情况</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="合同或订单情况" data-placeholder="请说明签订时间、服务内容、合同主要约定。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="合同或订单情况" data-placeholder="请说明签订时间、服务内容、合同主要约定。"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>付款/履行情况</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="付款或履行情况" data-placeholder="请说明付款金额、付款时间、服务履行情况。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="付款或履行情况" data-placeholder="请说明付款金额、付款时间、服务履行情况。"></div>
                                 </div>
                                 <div class="paper-field full">
                                     <label>争议事实与沟通过程</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="争议事实与沟通过程" data-placeholder="请说明对方违约、退款沟通、协商未果等事实。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="争议事实与沟通过程" data-placeholder="请说明对方违约、退款沟通、协商未果等事实。"></div>
                                 </div>
                             </div>
                         </div>
@@ -578,11 +434,11 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                             <div class="paper-field-grid">
                                 <div class="paper-field">
                                     <label>证据名称</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="证据名称" data-placeholder="如合同、付款凭证、聊天记录等。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="证据名称" data-placeholder="如合同、付款凭证、聊天记录等。"></div>
                                 </div>
                                 <div class="paper-field">
                                     <label>证明内容</label>
-                                    <div class="application-fill tall" contenteditable="true" data-required="true" data-field="证据证明内容" data-placeholder="请说明每类证据拟证明的事实。"></div>
+                                    <div class="application-fill tall" data-required="true" data-field="证据证明内容" data-placeholder="请说明每类证据拟证明的事实。"></div>
                                 </div>
                             </div>
                         </div>
@@ -593,9 +449,9 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         <div class="paper-sign">
                             <div class="date-line">
                                 <span class="date-title">日期</span>
-                                <span class="date-part"><span class="application-fill" contenteditable="true" data-required="true" data-field="落款年份" data-placeholder=""></span>年</span>
-                                <span class="date-part"><span class="application-fill" contenteditable="true" data-required="true" data-field="落款月份" data-placeholder=""></span>月</span>
-                                <span class="date-part"><span class="application-fill" contenteditable="true" data-required="true" data-field="落款日期" data-placeholder=""></span>日</span>
+                                <span class="date-part"><span class="application-fill" data-required="true" data-field="落款年份" data-placeholder=""></span>年</span>
+                                <span class="date-part"><span class="application-fill" data-required="true" data-field="落款月份" data-placeholder=""></span>月</span>
+                                <span class="date-part"><span class="application-fill" data-required="true" data-field="落款日期" data-placeholder=""></span>日</span>
                             </div>
                         </div>
                     </article>
@@ -1446,7 +1302,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 currentUploadContext.value = 'caseEvidence';
                 finalApplicationHtml.value = sourceText
                     ? buildDemoApplicationDocumentHtml(sourceText, { editable: false })
-                    : buildFinalApplicationDocumentHtml({ editable: true });
+                    : buildFinalApplicationDocumentHtml({ editable: false });
                 finalApplicationSaved.value = false;
                 appendAiModule('final-application-review', buildFinalApplicationReviewHtml());
             };
@@ -1463,10 +1319,10 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 aiIsThinking.value = true;
                 scrollAiChatToBottom();
                 window.setTimeout(() => {
-                    finalApplicationHtml.value = buildDemoApplicationDocumentHtml(source, { editable: true });
+                    finalApplicationHtml.value = buildDemoApplicationDocumentHtml(source, { editable: false });
                     applicationGenerating.value = false;
                     applicationGenerated.value = true;
-                    applicationEditable.value = true;
+                    applicationEditable.value = false;
                     finalApplicationSaved.value = false;
                     aiIsThinking.value = false;
                     aiMessages.value.push({
@@ -1475,8 +1331,8 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         content: buildAiReply({
                             lead: '仲裁申请书已生成，请在左侧文书区核对。',
                             rows: [
-                                { label: '文书状态', value: '当前已进入可编辑状态。' },
-                                { label: '后续操作', value: '如需修改，可直接在左侧文书区编辑；确认无误后点击“确认并下一步”。' }
+                                { label: '文书状态', value: '当前为只读预览。' },
+                                { label: '后续操作', value: '请点击“下载并下一步”，下载 docx 文件后继续提交案件材料。' }
                             ]
                         }),
                         streaming: false
@@ -1498,6 +1354,143 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
             const confirmGeneratedApplicationAndNext = () => {
                 if (!applicationGenerated.value || applicationGenerating.value) return;
                 showConfirmModal('applicationNext');
+            };
+            const crcTable = (() => {
+                const table = new Uint32Array(256);
+                for (let i = 0; i < 256; i += 1) {
+                    let c = i;
+                    for (let k = 0; k < 8; k += 1) {
+                        c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+                    }
+                    table[i] = c >>> 0;
+                }
+                return table;
+            })();
+            const crc32 = (bytes) => {
+                let crc = 0xffffffff;
+                for (let i = 0; i < bytes.length; i += 1) {
+                    crc = crcTable[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+                }
+                return (crc ^ 0xffffffff) >>> 0;
+            };
+            const encodeUtf8 = (text) => new TextEncoder().encode(text);
+            const writeUint16 = (arr, value) => {
+                arr.push(value & 0xff, (value >>> 8) & 0xff);
+            };
+            const writeUint32 = (arr, value) => {
+                arr.push(value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, (value >>> 24) & 0xff);
+            };
+            const getDosDateTime = () => {
+                const now = new Date();
+                const time = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+                const date = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+                return { time, date };
+            };
+            const createStoredZipBlob = (files, mimeType) => {
+                const chunks = [];
+                const central = [];
+                let offset = 0;
+                const { time, date } = getDosDateTime();
+                files.forEach(file => {
+                    const nameBytes = encodeUtf8(file.name);
+                    const dataBytes = encodeUtf8(file.content);
+                    const crc = crc32(dataBytes);
+                    const local = [];
+                    writeUint32(local, 0x04034b50);
+                    writeUint16(local, 20);
+                    writeUint16(local, 0x0800);
+                    writeUint16(local, 0);
+                    writeUint16(local, time);
+                    writeUint16(local, date);
+                    writeUint32(local, crc);
+                    writeUint32(local, dataBytes.length);
+                    writeUint32(local, dataBytes.length);
+                    writeUint16(local, nameBytes.length);
+                    writeUint16(local, 0);
+                    chunks.push(new Uint8Array(local), nameBytes, dataBytes);
+
+                    const dir = [];
+                    writeUint32(dir, 0x02014b50);
+                    writeUint16(dir, 20);
+                    writeUint16(dir, 20);
+                    writeUint16(dir, 0x0800);
+                    writeUint16(dir, 0);
+                    writeUint16(dir, time);
+                    writeUint16(dir, date);
+                    writeUint32(dir, crc);
+                    writeUint32(dir, dataBytes.length);
+                    writeUint32(dir, dataBytes.length);
+                    writeUint16(dir, nameBytes.length);
+                    writeUint16(dir, 0);
+                    writeUint16(dir, 0);
+                    writeUint16(dir, 0);
+                    writeUint16(dir, 0);
+                    writeUint32(dir, 0);
+                    writeUint32(dir, offset);
+                    central.push(new Uint8Array(dir), nameBytes);
+                    offset += local.length + nameBytes.length + dataBytes.length;
+                });
+                const centralSize = central.reduce((sum, part) => sum + part.length, 0);
+                const end = [];
+                writeUint32(end, 0x06054b50);
+                writeUint16(end, 0);
+                writeUint16(end, 0);
+                writeUint16(end, files.length);
+                writeUint16(end, files.length);
+                writeUint32(end, centralSize);
+                writeUint32(end, offset);
+                writeUint16(end, 0);
+                return new Blob([...chunks, ...central, new Uint8Array(end)], { type: mimeType });
+            };
+            const escapeXml = (value) => String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+            const buildGeneratedApplicationDocHtml = () => {
+                const paper = document.querySelector('.application-paper-workbench');
+                const body = paper ? paper.innerText : '仲裁申请书';
+                return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>仲裁申请书</title></head><body><pre style="font-family: SimSun, serif; white-space: pre-wrap; line-height: 1.8;">${escapeHtml(body)}</pre></body></html>`;
+            };
+            const buildGeneratedApplicationDocxBlob = () => {
+                const paper = document.querySelector('.application-paper-workbench');
+                const body = paper ? paper.innerText : '仲裁申请书';
+                const paragraphs = body
+                    .split(/\n+/)
+                    .map(line => line.trim())
+                    .filter(Boolean)
+                    .map(line => `<w:p><w:r><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`)
+                    .join('');
+                const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${paragraphs}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`;
+                return createStoredZipBlob([
+                    { name: '[Content_Types].xml', content: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>' },
+                    { name: '_rels/.rels', content: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>' },
+                    { name: 'word/document.xml', content: documentXml }
+                ], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            };
+            const downloadGeneratedApplicationDocx = () => {
+                if (!applicationGenerated.value || applicationGenerating.value) return;
+                const blob = buildGeneratedApplicationDocxBlob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '仲裁申请书.docx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            };
+            const downloadGeneratedApplicationAndNext = () => {
+                if (!applicationGenerated.value || applicationGenerating.value) return;
+                downloadGeneratedApplicationDocx();
+                applicationConfirmed.value = true;
+                finalApplicationSaved.value = true;
+                markApplicationGeneratedForStep2();
+                window.setTimeout(() => {
+                    goToStep2FromApplicationBot();
+                }, 350);
             };
             const markApplicationGeneratedForStep2 = () => {
                 applicationTransferReady.value = true;
@@ -1773,10 +1766,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         id: ++aiMessageId,
                         role: 'assistant',
                         content: buildAiReply({
-                            lead: '您好,欢迎来到广州仲裁委员会,我将根据您的口述信息和上传的证据材料,协助生成仲裁申请书初稿。\n\n为保证申请书内容完整,我们会依次梳理以下内容:\n1.申请人及被申请人主体信息;\n2.仲裁条款;\n3.仲裁请求及金额;\n4.合同履行相关情况;\n5.证据材料。\n请您先简单说明:本案大致是什么纠纷?例如培训退费、服务合同、借款、买卖合同等。',
-                            rows: [
-                                { label: '当前步骤', value: '请先说明纠纷类型。' }
-                            ]
+                            lead: '您好，欢迎来到广州仲裁委员会。我可以根据您的一句话描述，先为您生成一份仲裁申请书。\n\n请直接说明：本案是什么纠纷、您希望对方承担什么责任、涉及金额大概是多少。例如：教育培训退费纠纷，已付款18800元，要求解除协议并退还培训费。'
                         }),
                         streaming: false
                     }
@@ -1974,12 +1964,11 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                     applicationReady.value = true;
                     currentUploadContext.value = 'caseEvidence';
                     return buildAiReply({
-                        lead: '材料已基本完整，可以生成仲裁申请书初稿。',
+                        lead: '材料已基本完整，系统将为您生成仲裁申请书。',
                         rows: [
                             { label: '生成范围', value: '当事人信息、仲裁请求、事实理由、仲裁依据和证据目录。' },
-                            { label: '后续操作', value: '点击下方按钮后，申请书将在左侧模板区生成，并支持编辑确认。' }
-                        ],
-                        note: '<button class="flow-primary-btn" type="button" data-action="generate-final-application">生成申请书</button>'
+                            { label: '后续操作', value: '生成后可下载 docx 文件并进入下一步。' }
+                        ]
                     });
                 }
                 const nextIndex = conversationStepIndex.value + 1;
@@ -2012,7 +2001,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 aiIsThinking.value = true;
                 scrollAiChatToBottom();
 
-                if (stage.value === 'ai_consult' && !finalApplicationSaved.value) {
+                if (stage.value === 'ai_consult' && !applicationReady.value) {
                     generateApplicationFromConversation(text);
                     return;
                 }
@@ -2024,10 +2013,16 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                         return;
                     }
                     const recordedField = recordConversationAnswer(text);
-                    scheduleAiReply(
-                        () => buildNextCollectionReply(recordedField, text),
-                        recordedField.final ? randomTemplateRenderDelay() : randomTextReplyDelay()
-                    );
+                    const replyDelay = recordedField.final ? randomTextReplyDelay() : randomTextReplyDelay();
+                    scheduleAiReply(() => buildNextCollectionReply(recordedField, text), replyDelay);
+                    if (recordedField.final) {
+                        window.setTimeout(() => {
+                            const source = conversationFields
+                                .map(field => `${field.label}：${applicationDraft.value[field.key] || ''}`)
+                                .join('\n');
+                            generateApplicationFromConversation(source);
+                        }, replyDelay + 450);
+                    }
                     return;
                 }
 
@@ -2454,7 +2449,7 @@ const { createApp, ref, computed, onMounted, nextTick } = Vue;
                 showApplicationDemoStepButton, showApplicationAutoFillButton,
                 showFloatingFinalReportButton,
                 sendAiMessage, playDemoNextStep, autoFillApplicationTemplate, chooseAiPreset, triggerAiFileUpload, triggerUploadBlock, handleAiFileChange, finishAiConsult,
-                confirmFinalApplication, goToStep2FromApplicationBot, editGeneratedApplication, confirmGeneratedApplicationAndNext,
+                confirmFinalApplication, goToStep2FromApplicationBot, editGeneratedApplication, confirmGeneratedApplicationAndNext, downloadGeneratedApplicationDocx, downloadGeneratedApplicationAndNext,
                 handleAiPanelClick, handleAiPanelChange, handleAiPanelInput,
                 confirmModal, showConfirmModal, closeConfirmModal, executeConfirmAction,
                 score, badges, earnedBadges, toggleBadgeDrawer, isBadgeDrawerOpen,
