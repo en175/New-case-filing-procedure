@@ -694,8 +694,18 @@
         }
         .qa-option-btn.selected-glow {
             background-color: #eff6ff;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            border-color: #2367E8;
+            box-shadow: 0 0 0 4px rgba(35, 103, 232, 0.24);
+        }
+
+        .qa-option-btn.selected-glow > span:first-child {
+            background-color: #2367E8;
+            color: #fff;
+        }
+
+        .qa-option-btn.selected-glow > span:last-child {
+            color: #2367E8;
+            font-weight: 700;
         }
 
         .qa-complete-card {

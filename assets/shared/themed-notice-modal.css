@@ -1,0 +1,118 @@
+/* Themed notice modal — mask + dialog */
+.tnm-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+  cursor: pointer;
+}
+
+.tnm-mask.tnm-mask--show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tnm-dialog {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  transform: translateY(8px) scale(0.98);
+  transition: transform 0.22s ease;
+}
+
+.tnm-mask.tnm-mask--show .tnm-dialog {
+  transform: translateY(0) scale(1);
+}
+
+.tnm-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 28px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tnm-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+}
+
+.tnm-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+}
+
+.tnm-body {
+  padding: 18px 28px 8px;
+}
+
+.tnm-body p {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #475569;
+}
+
+.tnm-body p:last-child {
+  margin-bottom: 0;
+}
+
+.tnm-footer {
+  padding: 20px 28px 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tnm-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.tnm-btn:hover {
+  transform: translateY(-1px);
+}
+
+.tnm-btn:active {
+  transform: translateY(0);
+}
+
+/* Theme: AI service notice */
+.tnm-theme--ai-service .tnm-icon {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.tnm-theme--ai-service .tnm-btn {
+  background: #2563eb;
+}
+
+.tnm-theme--ai-service .tnm-btn:hover {
+  background: #1d4ed8;
+}

@@ -1106,7 +1106,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                     window.location.href = './申请书bot.html?fromAux=defense';
                     return;
                 }
-                window.location.href = './立案提交后路径选择.html';
+                window.location.href = './立案提交后路径选择.html?pptVisit=3';
             };
 
             const advanceQuestionLogic = () => {

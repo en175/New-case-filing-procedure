@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="./assets/shared/case-assessment-report-data.js"></script>
     <script src="./assets/shared/case-assessment-report.js"></script>
+    <script src="./assets/shared/ppt-click-helper.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Animate.css -->
@@ -331,7 +332,8 @@
                 <div class="space-y-4">
                     <button type="button" v-for="(opt, idx) in currentQuestion.options" :key="idx" 
                             @click="answerQuestion(opt, $event)"
-                            class="w-full text-left p-4 rounded-xl qa-option-btn flex items-center group relative">
+                            class="w-full text-left p-4 rounded-xl qa-option-btn flex items-center group relative"
+                            :class="{ 'selected-glow': selectedOptionIndex === idx }">
                         <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-4 group-hover:bg-[#2367E8] group-hover:text-white font-bold text-sm transition-colors">{{ optionNumber(idx) }}</span>
                         <span class="text-slate-700 group-hover:text-[#2367E8] font-medium">{{ opt }}</span>
                     </button>
@@ -427,9 +429,9 @@
         </div>
     </div>
 
-<!-- Video Modal -->
-        <div v-if="showVideoModal" class="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 animate__animated animate__fadeIn">
-            <div class="bg-slate-900 rounded-2xl overflow-hidden shadow-2xl w-full max-w-5xl relative border border-slate-700">
+<!-- Video Modal：点击遮罩（面板外）在 PPT 演示下跳转下一页 -->
+        <div v-if="showVideoModal" class="qa-video-modal-overlay fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 animate__animated animate__fadeIn">
+            <div ref="videoModalPanel" class="qa-video-modal-panel bg-slate-900 rounded-2xl overflow-hidden shadow-2xl w-full max-w-5xl relative border border-slate-700">
                 <!-- Header -->
                 <div class="absolute top-0 left-0 w-full p-4 bg-gradient-to-b from-black/80 to-transparent z-20 flex justify-between items-start pointer-events-none">
                      <span class="text-white/80 font-bold px-3 py-1 bg-black/50 rounded-full backdrop-blur-sm pointer-events-auto text-sm">

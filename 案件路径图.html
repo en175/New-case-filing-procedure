@@ -1163,8 +1163,23 @@
     document.getElementById('closeSummaryBtn').addEventListener('click', () =>
       document.getElementById('completionMask').classList.remove('show'));
   </script>
+  <script src="./assets/shared/ppt-click-helper.js"></script>
   <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
   <script src="./assets/demo-shell/demo-ppt-nav.js"></script>
+  <script>
+    (function () {
+      if (typeof window.clickAnywhereToNext !== 'function') return;
+
+      window.clickAnywhereToNext({
+        ignore(target) {
+          if (document.querySelector('.confirm-mask.show, .completion-mask.show')) return true;
+          return !!target?.closest?.(
+            '.demo-global-nav, .demo-ppt-nav, button, a, input, textarea, select, [contenteditable="true"]'
+          );
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

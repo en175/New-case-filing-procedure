@@ -485,30 +485,22 @@
     </div>
 
 
+  <script src="./assets/shared/ppt-click-helper.js"></script>
   <script src="./assets/demo-shell/demo-config.js"></script>
   <script src="./assets/demo-shell/demo-nav.js"></script>
+  <script src="./assets/demo-shell/demo-ppt-nav.js"></script>
   <script>
     (function () {
-      const PPT_DEMO_MODE = true;
-      const ENDING_PAGE = './演示结束页.html';
-      let advanceLocked = false;
+      if (typeof window.clickAnywhereToNext !== 'function') return;
 
-      function goToEndingPage() {
-        if (advanceLocked) return;
-        advanceLocked = true;
-        window.location.href = ENDING_PAGE;
-      }
-
-      function shouldIgnoreClick(event) {
-        return event.target.closest('.demo-global-nav, .demo-ppt-nav');
-      }
-
-      document.addEventListener('click', (event) => {
-        if (!PPT_DEMO_MODE || shouldIgnoreClick(event)) return;
-        goToEndingPage();
+      window.clickAnywhereToNext({
+        ignore(target) {
+          return !!target?.closest?.(
+            '.demo-global-nav, .demo-ppt-nav, button, a, input, textarea, select, [contenteditable="true"]'
+          );
+        }
       });
     })();
   </script>
-  <script src="./assets/demo-shell/demo-ppt-nav.js"></script>
 </body>
 </html>

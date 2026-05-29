@@ -1,7 +1,7 @@
-const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
+const { createApp, ref, computed, watch, onMounted, onUnmounted, nextTick } = Vue;
 const CaseAssessmentReport = window.CaseAssessmentReport;
 
-/** PPT 演示模式：案情闯关点击任意位置 / 右方向键逐题推进，最后一题后跳转路径图 */
+/** PPT 演示模式：进入即第 1 题；左键选中首项并播视频；关视频后任意点击/下一页键走 DemoPptNav.goNext */
 const PPT_DEMO_MODE = true;
 
     const app = createApp({
@@ -491,7 +491,12 @@ const PPT_DEMO_MODE = true;
             const videoBasePath = './视频/';
             const videoSpeed = ref(1.0);
             const videoPlayer = ref(null);
+            const videoModalPanel = ref(null);
             const pendingNextQuestion = ref(false);
+            const selectedOptionIndex = ref(-1);
+            const qaDemoFirstClickDone = ref(false);
+            const question1FirstOptionVideo = 'step1.mp4';
+            let disposeVideoModalClickOutside = null;
 
             // Confirm Modal Logic
             const confirmModal = ref({
@@ -566,17 +571,86 @@ const PPT_DEMO_MODE = true;
                 }
             };
 
+            const teardownVideoModalClickOutside = () => {
+                disposeVideoModalClickOutside?.();
+                disposeVideoModalClickOutside = null;
+            };
+
+            const goPptNextPage = () => {
+                try {
+                    const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
+                    completed.quiz = true;
+                    localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(completed));
+                } catch (error) {
+                    localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ quiz: true }));
+                }
+                if (window.DemoPptNav?.goNext) {
+                    window.DemoPptNav.goNext();
+                    return;
+                }
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
+            };
+
             const closeVideo = () => {
+                const wasPptFirstQuestionVideo =
+                    PPT_DEMO_MODE && pendingNextQuestion.value && currentQuestionIndex.value === 0;
+
+                teardownVideoModalClickOutside();
                 showVideoModal.value = false;
                 videoSpeed.value = 1.0;
                 if (videoPlayer.value) {
                     videoPlayer.value.pause();
                     videoPlayer.value.currentTime = 0;
                 }
+
+                if (wasPptFirstQuestionVideo) {
+                    pendingNextQuestion.value = false;
+                    goPptNextPage();
+                    return;
+                }
+
                 if (pendingNextQuestion.value) {
                     pendingNextQuestion.value = false;
+                    selectedOptionIndex.value = -1;
                     advanceQuestionLogic();
+                    return;
                 }
+                selectedOptionIndex.value = -1;
+            };
+
+            const handleVideoModalOutsideClick = () => {
+                if (!showVideoModal.value || !PPT_DEMO_MODE) return;
+                closeVideo();
+            };
+
+            const bindVideoModalClickOutside = async () => {
+                teardownVideoModalClickOutside();
+                if (!showVideoModal.value || !PPT_DEMO_MODE) return;
+                await nextTick();
+                const panel = videoModalPanel.value;
+                if (!panel || typeof window.clickOutside !== 'function') return;
+                disposeVideoModalClickOutside = window.clickOutside(panel, handleVideoModalOutsideClick);
+            };
+
+            watch(showVideoModal, (visible) => {
+                if (visible && PPT_DEMO_MODE) {
+                    bindVideoModalClickOutside();
+                } else {
+                    teardownVideoModalClickOutside();
+                }
+            });
+
+            const playFirstQuestionDemoVideo = (event) => {
+                selectedOptionIndex.value = 0;
+                awardCurrentQuestionPoints(event);
+                checkMilestones();
+                window.setTimeout(() => {
+                    qaDemoFirstClickDone.value = true;
+                    videoSrc.value = `${videoBasePath}${question1FirstOptionVideo}`;
+                    showVideoModal.value = true;
+                    pendingNextQuestion.value = true;
+                    pptAdvanceLocked = false;
+                }, 420);
             };
 
             const finishPptQaFlow = () => {
@@ -587,12 +661,17 @@ const PPT_DEMO_MODE = true;
                 } catch (error) {
                     localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ quiz: true }));
                 }
-                window.location.href = './案件路径图.html';
+                if (window.DemoPptNav?.goNext) {
+                    window.DemoPptNav.goNext();
+                    return;
+                }
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
             };
 
             let pptAdvanceLocked = false;
 
             const advanceQuestionLogic = () => {
+                selectedOptionIndex.value = -1;
                 if (currentQuestionIndex.value < questions.length - 1) {
                     currentQuestionIndex.value++;
 
@@ -635,19 +714,39 @@ const PPT_DEMO_MODE = true;
 
             const handlePptDemoClick = (event) => {
                 if (!PPT_DEMO_MODE || stage.value !== 'qa') return;
+                if (event.button !== 0) return;
+                if (showVideoModal.value) return;
                 if (isPptAdvanceBlockedTarget(event.target)) return;
-                advancePptQuestion(event);
+
+                if (currentQuestionIndex.value === 0 && !qaDemoFirstClickDone.value) {
+                    if (pptAdvanceLocked || selectedOptionIndex.value >= 0) return;
+                    pptAdvanceLocked = true;
+                    playFirstQuestionDemoVideo(event);
+                }
             };
 
             const handlePptDemoInnerKey = (event) => {
                 if (!PPT_DEMO_MODE || stage.value !== 'qa') return false;
+                if (showVideoModal.value) return false;
                 const keyCodes = window.DemoPptNav?.getKeyCodes?.();
                 if (!keyCodes) return false;
                 const code = event.keyCode || event.which;
                 if (code !== keyCodes.next) return false;
                 event.preventDefault();
-                advancePptQuestion(event);
-                return true;
+
+                if (showVideoModal.value) {
+                    closeVideo();
+                    return true;
+                }
+
+                if (currentQuestionIndex.value === 0 && !qaDemoFirstClickDone.value) {
+                    if (pptAdvanceLocked || selectedOptionIndex.value >= 0) return true;
+                    pptAdvanceLocked = true;
+                    playFirstQuestionDemoVideo(event);
+                    return true;
+                }
+
+                return false;
             };
 
             const bindPptPageInnerNav = () => {
@@ -656,6 +755,20 @@ const PPT_DEMO_MODE = true;
             };
 
             let unregisterPptPageInnerNav = null;
+            let disposePptDemoClick = null;
+
+            const bindPptDemoClick = () => {
+                disposePptDemoClick?.();
+                if (typeof window.clickAnywhere !== 'function') return;
+                disposePptDemoClick = window.clickAnywhere(handlePptDemoClick, {
+                    ignore(target) {
+                        if (!PPT_DEMO_MODE || stage.value !== 'qa') return true;
+                        if (showVideoModal.value || confirmModal.value.show || isBadgeDrawerOpen.value) return true;
+                        return isPptAdvanceBlockedTarget(target);
+                    }
+                });
+            };
+
             const syncPptPageInnerNav = () => {
                 unregisterPptPageInnerNav?.();
                 unregisterPptPageInnerNav = bindPptPageInnerNav();
@@ -719,7 +832,7 @@ const PPT_DEMO_MODE = true;
                     window.location.href = './申请书bot.html?fromAux=quiz';
                     return;
                 }
-                window.location.href = './立案提交后路径选择.html';
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
             };
 
             const returnToDraftList = () => {
@@ -758,12 +871,13 @@ const PPT_DEMO_MODE = true;
                     clearInterval(typeInterval);
                     typeInterval = null;
                 }
-                stage.value = 'intro';
                 subStage.value = 0;
-                showDialog.value = true;
                 waitingForInteraction.value = false;
                 pendingWaitInteraction.value = false;
                 currentQuestionIndex.value = 0;
+                qaDemoFirstClickDone.value = false;
+                selectedOptionIndex.value = -1;
+                teardownVideoModalClickOutside();
                 reportStep.value = 1;
                 showVideoModal.value = false;
                 pendingNextQuestion.value = false;
@@ -774,15 +888,36 @@ const PPT_DEMO_MODE = true;
                     videoPlayer.value.currentTime = 0;
                 }
                 confirmModal.value.show = false;
-                showCaseTypeBadge.value = false;
                 currentDialogFull.value = '';
                 displayedText.value = '';
                 isTyping.value = false;
+
+                if (PPT_DEMO_MODE) {
+                    enterQaStageDirectly();
+                    return;
+                }
+
+                stage.value = 'intro';
+                showDialog.value = true;
+                showCaseTypeBadge.value = false;
                 speak("您好！我是您的智能立案助手“仲小雯”。欢迎来到广州仲裁委。");
             };
 
             const returnToPathChoice = () => {
-                window.location.href = './立案提交后路径选择.html';
+                window.location.href = './立案提交后路径选择.html?pptVisit=2';
+            };
+
+            const enterQaStageDirectly = () => {
+                stage.value = 'qa';
+                subStage.value = 0;
+                showDialog.value = true;
+                waitingForInteraction.value = false;
+                pendingWaitInteraction.value = false;
+                showCaseTypeBadge.value = true;
+                currentQuestionIndex.value = 0;
+                qaDemoFirstClickDone.value = false;
+                selectedOptionIndex.value = -1;
+                speak('为了更加全面、客观的分析案情，接下来请根据案件实际情况选择最接近的一项。');
             };
 
             // Init
@@ -796,23 +931,33 @@ const PPT_DEMO_MODE = true;
                 writeFilingStatus(filingStatus.value);
                 earnedBadges.value = [];
                 syncScoreFromStorage();
-                speak("您好！我是您的智能立案助手“仲小雯”。欢迎来到广州仲裁委。");
-                window.setTimeout(() => {
-                    if (stage.value === 'intro') {
-                        maybeShowStartBadgeToast();
-                    }
-                }, 900);
 
                 if (PPT_DEMO_MODE) {
-                    document.addEventListener('click', handlePptDemoClick);
+                    enterQaStageDirectly();
+                    window.setTimeout(() => {
+                        maybeShowStartBadgeToast();
+                    }, 900);
+                } else {
+                    speak("您好！我是您的智能立案助手“仲小雯”。欢迎来到广州仲裁委。");
+                    window.setTimeout(() => {
+                        if (stage.value === 'intro') {
+                            maybeShowStartBadgeToast();
+                        }
+                    }, 900);
+                }
+
+                if (PPT_DEMO_MODE) {
+                    bindPptDemoClick();
                     syncPptPageInnerNav();
                     window.addEventListener('demo-ppt-nav-ready', syncPptPageInnerNav);
                 }
             });
 
             onUnmounted(() => {
+                teardownVideoModalClickOutside();
                 if (PPT_DEMO_MODE) {
-                    document.removeEventListener('click', handlePptDemoClick);
+                    disposePptDemoClick?.();
+                    disposePptDemoClick = null;
                     unregisterPptPageInnerNav?.();
                     window.removeEventListener('demo-ppt-nav-ready', syncPptPageInnerNav);
                 }
@@ -832,7 +977,8 @@ const PPT_DEMO_MODE = true;
                 applyChannel, submitFinalApply, pathLength, pathOffset,
                 analysisData, filingMeta, confirmAnalysis,
                 showCaseTypeBadge, scorePopups, contactService,
-                showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
+                showVideoModal, videoSrc, videoSpeed, videoPlayer, videoModalPanel, setVideoSpeed, closeVideo,
+                selectedOptionIndex,
                 confirmModal, showConfirmModal, closeConfirmModal, executeConfirmAction,
                 score, badges, earnedBadges, toggleBadgeDrawer, isBadgeDrawerOpen,
                 reportStep, nextReportStep, prevReportStep,
