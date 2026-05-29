@@ -355,6 +355,362 @@
 
         <!-- AI Consultation Before Report -->
         <div v-if="stage === 'ai_consult'" class="ai-consult-card">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI模拟被申请人</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/shared/vue-mount-guard.css">
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./assets/defense-bot/defense-bot.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+</head>
+<body class="h-screen w-screen bg-gray-100">
+
+<div id="app" class="relative h-full w-full overflow-hidden">
+
+    <!-- Top HUD Bar -->
+    <div class="hud-bar" :class="{ 'hud-hidden': stage === 'intro' }">
+        <div class="flex items-center">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl mr-3 shadow-md">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <div>
+                <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">广州仲裁委</div>
+                <div class="font-bold text-slate-800 leading-tight">立案服务部</div>
+            </div>
+        </div>
+
+        <div class="filing-hud-progress" aria-label="立案全流程进度">
+            <div v-for="(step, index) in filingProgressSteps" :key="step" class="filing-hud-step" :class="getProgressStepClass(index)">
+                <span class="filing-hud-index"><i v-if="isProgressStepDone(index)" class="fas fa-check text-[11px]"></i><span v-else>{{ index + 1 }}</span></span>
+                <span class="filing-hud-label">{{ step }}</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center">
+                <div class="score-display" ref="scoreDisplay" :class="{ 'score-bump': scoreAnimate }">
+                    <i class="fas fa-star mr-2 text-yellow-400"></i>
+                    <span class="score-value">{{ score }}</span>
+                </div>
+            </div>
+
+            <button type="button" @click="openPointsPage" class="score-cta">
+                获取积分
+            </button>
+
+            <button type="button" @click="toggleBadgeDrawer" class="relative group">
+                <div class="w-10 h-10 rounded-full bg-slate-100 hover:bg-blue-50 flex items-center justify-center transition-colors border-2 border-slate-200">
+                    <i class="fas fa-medal text-slate-400 group-hover:text-blue-500 transition-colors"></i>
+                </div>
+                <div v-if="newBadgeCount > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-bounce">
+                    {{ newBadgeCount }}
+                </div>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Badge Drawer -->
+    <div v-if="isBadgeDrawerOpen" class="badge-drawer-overlay" @click="toggleBadgeDrawer"></div>
+    <div class="badge-drawer" :class="{ 'open': isBadgeDrawerOpen }">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-slate-800">我的成就</h3>
+            <button type="button" @click="toggleBadgeDrawer" class="text-slate-400 hover:text-slate-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-2">
+            <div v-for="badge in badges" :key="badge.id" 
+                 class="badge-item" 
+                 :class="{ 'earned': earnedBadges.includes(badge.id) }">
+                <div class="badge-icon">
+                    {{ badge.icon }}
+                </div>
+                <div>
+                    <div class="font-bold text-slate-700">{{ badge.name }}</div>
+                    <div class="text-xs text-slate-500">{{ badge.desc }}</div>
+                </div>
+                <div v-if="earnedBadges.includes(badge.id)" class="ml-auto text-green-500">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestone Toast -->
+    <div class="milestone-toast" :class="{ 'show': currentMilestone }">
+        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div>
+            <div class="font-bold text-slate-800">里程碑达成!</div>
+            <div class="text-xs text-slate-500">{{ currentMilestone }}</div>
+        </div>
+    </div>
+
+    <!-- Flying Scores Container -->
+    <div v-for="fly in flyingScores" :key="fly.id" 
+         class="flying-score"
+         :style="{ left: fly.x + 'px', top: fly.y + 'px', opacity: fly.opacity, transform: `scale(${fly.scale})` }">
+        {{ fly.text }}
+    </div>
+
+    <!-- Score Popups (Legacy, keeping for text feedback) -->
+    <div v-for="popup in scorePopups" :key="popup.id" class="score-popup" :style="{ left: popup.x + 'px', top: popup.y + 'px' }">
+        {{ popup.text }}
+    </div>
+
+    <!-- 1. Background Map -->
+    <div class="map-container" :class="{ 'map-blur': showOverlayPanel }">
+        <!-- High Quality Map Background -->
+        <div class="absolute inset-0 z-0">
+             <img :src="mapImage" class="w-full h-full object-cover" alt="流程背景" />
+        </div>
+
+        <svg class="w-full max-w-6xl h-4/5 pointer-events-none relative z-10" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+            <!-- 路径背景 -->
+            <path d="M 150 200 L 650 200" 
+                    fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
+            <!-- 进度路径 -->
+            <path d="M 150 200 L 650 200" 
+                    fill="none" stroke="#3B82F6" stroke-width="6" stroke-linecap="round" 
+                    class="transition-all duration-1000"
+                    :style="{ 'stroke-dasharray': pathLength, 'stroke-dashoffset': pathOffset }"
+                    ref="progressPath"/>
+
+            <!-- 地点节点 -->
+            <g v-for="(pos, index) in mapPoints" :key="index">
+                <!-- 连线点 -->
+                <circle :cx="pos.x" :cy="pos.y" r="8" fill="white" stroke="#94A3B8" stroke-width="3"
+                        class="map-node transition-all duration-500"
+                        :class="{ 
+                            'active': index === currentMapNodeIndex, 
+                            'completed': index < currentMapNodeIndex 
+                        }" />
+                
+                <!-- 地点名称标签 -->
+                <text :x="pos.x" :y="pos.y + 30" text-anchor="middle" font-size="11" fill="#475569" font-weight="bold" 
+                        class="transition-opacity duration-300"
+                        :style="{ opacity: (index === currentMapNodeIndex || index === 0 || index === mapPoints.length -1) ? 1 : 0.4 }">
+                    {{ pos.label }}
+                </text>
+
+                <!-- 玩家头像 (当前位置) -->
+                <foreignObject v-if="index === currentMapNodeIndex" 
+                                :x="pos.x - 29" :y="pos.y - 70" width="58" height="58">
+                    <div class="progress-character-marker">
+                        <div class="progress-character-frame">
+                            <img :src="npcImage" class="progress-character-half" alt="进度角色">
+                        </div>
+                        <div class="progress-character-pulse"></div>
+                    </div>
+                </foreignObject>
+            </g>
+        </svg>
+    </div>
+
+    <!-- 2. Overlay Panels (Forms, Reports, etc.) -->
+    <div v-if="showOverlayPanel" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" :class="{'pb-48': !['report', 'ai_consult'].includes(stage), 'pb-4': ['report', 'ai_consult'].includes(stage), 'ai-demo-overlay': stage === 'ai_consult'}">
+        
+
+
+        <!-- Enter Application Page (Mediation/Arbitration Form) -->
+        <div v-if="stage === 'enter_apply'" class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 animate__animated animate__fadeInUp">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 text-center">{{ applyChannel === '调解' ? '调解申请提交成功' : '申请提交成功' }}</h2>
+            <div class="h-4"></div>
+            
+            <div class="bg-slate-50 rounded-2xl p-7 md:p-8 mb-8 space-y-7">
+                <div class="flex items-center">
+                    <div class="w-32 text-slate-700 text-[17px] md:text-[18px] font-bold">收案号：</div>
+                    <div class="text-slate-800 text-[18px] md:text-[19px] font-normal tracking-wide">{{ filingMeta.caseNo }}</div>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-32 text-slate-700 text-[17px] md:text-[18px] font-bold">提交时间：</div>
+                    <div class="text-slate-800 text-[18px] md:text-[19px] font-normal">{{ filingMeta.submitTime }}</div>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-32 text-slate-700 text-[17px] md:text-[18px] font-bold">当前状态：</div>
+                    <div class="text-slate-800 text-[18px] md:text-[19px] font-normal">{{ filingMeta.status }}</div>
+                </div>
+            </div>
+
+            <button type="button" @click="resetGame" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all">
+                <i class="fas fa-arrow-left mr-2"></i> 返回
+            </button>
+            <button type="button" @click="openPointsPage" class="points-hint-btn">
+                <div class="points-hint-content">
+                    <div class="points-hint-copy">
+                        <div class="points-hint-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="points-hint-text">
+                            <div class="points-hint-title">获取积分，了解更多仲裁服务内容</div>
+                            <div class="points-hint-desc">完成任务可获得积分，并持续完善立案准备</div>
+                        </div>
+                    </div>
+                    <span class="points-hint-pill">
+                        获取积分
+                        <i class="fas fa-arrow-right text-[11px]"></i>
+                    </span>
+                </div>
+            </button>
+        </div>
+
+        <!-- AI Parsing Loading (Tech Style) -->
+        <div v-if="stage === 'parsing'" class="text-center text-white animate__animated animate__fadeIn flex flex-col items-center">
+            <div class="tech-loader-container">
+                <div class="tech-ring"></div>
+                <div class="tech-ring"></div>
+                <div class="tech-ring"></div>
+                <div class="tech-core">
+                    <i class="fas fa-microchip text-4xl text-blue-300"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold mb-3 tracking-wide" style="text-shadow: 0 0 10px rgba(59,130,246,0.5);">智能解析中...</h2>
+            <p class="text-blue-200 text-lg tracking-wider">正在分析案情要素</p>
+        </div>
+
+        <!-- Analysis Result Page -->
+        <div v-if="stage === 'analysis_result'" class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-0 overflow-hidden animate__animated animate__fadeInUp flex flex-col" style="max-height: calc(100vh - 220px);">
+            <div class="bg-[#2367E8] p-6 text-white text-center relative overflow-hidden">
+                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                 <h2 class="text-2xl font-bold relative z-10">智能解析结果</h2>
+                 <p class="text-blue-200 text-sm mt-1 relative z-10">系统已自动提取案情要素，请核对</p>
+            </div>
+            
+            <div class="p-8 overflow-y-auto custom-scrollbar bg-gradient-to-b from-slate-50 to-blue-50/70 flex-1">
+                <div class="space-y-6">
+                    <!-- Case Type -->
+                    <div class="relative pl-6 border-l-2 border-slate-200 hover:border-blue-400 transition-colors group">
+                         <div class="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors"></div>
+                         <div class="mb-1 text-xs text-slate-500 font-bold uppercase tracking-wider">案件类型</div>
+                         <div class="relative overflow-hidden bg-gradient-to-br from-blue-50 to-white p-4 rounded-2xl border border-blue-100 shadow-sm group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all">
+                             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue-100/60"></div>
+                             <div class="relative flex items-center gap-3">
+                                 <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20">
+                                     <i class="fas fa-gavel"></i>
+                                 </div>
+                                 <div class="text-slate-900 font-bold text-lg">{{ analysisData.caseType }}</div>
+                             </div>
+                         </div>
+                    </div>
+                    
+                    <!-- Amount -->
+                    <div class="relative pl-6 border-l-2 border-slate-200 hover:border-blue-400 transition-colors group">
+                         <div class="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors"></div>
+                         <div class="mb-1 text-xs text-slate-500 font-bold uppercase tracking-wider">标的金额</div>
+                         <div class="relative overflow-hidden bg-gradient-to-br from-amber-50 to-white p-4 rounded-2xl border border-amber-100 shadow-sm group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all">
+                             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-amber-100/70"></div>
+                             <div class="relative flex items-center gap-3">
+                                 <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20">
+                                     <i class="fas fa-coins"></i>
+                                 </div>
+                                 <div class="text-slate-900 font-bold text-lg">{{ analysisData.amount }}</div>
+                             </div>
+                         </div>
+                    </div>
+
+                    <!-- All Requests -->
+                    <div class="relative pl-6 border-l-2 border-slate-200 hover:border-blue-400 transition-colors group">
+                         <div class="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors"></div>
+                         <div class="mb-1 text-xs text-slate-500 font-bold uppercase tracking-wider">案件所有请求</div>
+                         <div class="space-y-3">
+                             <div v-for="(request, index) in analysisData.requests" :key="index" class="relative overflow-hidden bg-white p-4 rounded-2xl border border-blue-100 shadow-sm group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all">
+                                 <div class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-blue-500 to-cyan-400"></div>
+                                 <div class="flex items-center justify-between gap-3 mb-2">
+                                     <div class="flex items-center gap-2 text-sm font-bold text-blue-700">
+                                         <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">{{ index + 1 }}</span>
+                                         <span>请求 {{ index + 1 }}</span>
+                                     </div>
+                                     <div class="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-3 py-1">{{ request.amount }}</div>
+                                 </div>
+                                 <div class="text-slate-800 font-medium leading-relaxed">{{ request.content }}</div>
+                             </div>
+                         </div>
+                    </div>
+
+                    <!-- Row 1: Types -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative pl-6 border-l-2 border-slate-200 hover:border-blue-400 transition-colors group">
+                             <div class="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors"></div>
+                             <div class="mb-1 text-xs text-slate-500 font-bold uppercase tracking-wider">申请人类型</div>
+                             <div class="bg-gradient-to-br from-emerald-50 to-white p-4 rounded-2xl border border-emerald-100 shadow-sm group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all">
+                                 <div class="flex items-center gap-3">
+                                     <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                                         <i class="fas fa-user"></i>
+                                     </div>
+                                     <div class="text-slate-900 font-bold">{{ analysisData.applicantType }}</div>
+                                 </div>
+                             </div>
+                        </div>
+                        <div class="relative pl-6 border-l-2 border-slate-200 hover:border-blue-400 transition-colors group">
+                             <div class="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors"></div>
+                             <div class="mb-1 text-xs text-slate-500 font-bold uppercase tracking-wider">被申请人类型</div>
+                             <div class="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-2xl border border-indigo-100 shadow-sm group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all">
+                                 <div class="flex items-center gap-3">
+                                     <div class="w-9 h-9 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
+                                         <i class="fas fa-building"></i>
+                                     </div>
+                                     <div class="text-slate-900 font-bold">{{ analysisData.respondentType }}</div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="p-6 bg-white border-t border-slate-100 z-10">
+                <button type="button" @click="confirmAnalysis" class="w-full bg-[#2367E8] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-[1.02]">
+                    确认无误，下一步
+                </button>
+            </div>
+        </div>
+
+        <!-- Q&A Panel (Persistent Card) -->
+        <div v-if="stage === 'qa'" class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden flex flex-col animate__animated animate__fadeInUp z-40 mt-8 mb-24" style="min-height: 400px;">
+            <div class="qa-card-header p-4 flex justify-between items-center">
+                <div class="font-bold flex items-center">
+                    <button type="button" v-if="currentQuestionIndex > 0" @click="prevQuestion" class="mr-3 hover:text-blue-200 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <i class="fas fa-layer-group mr-2" v-else></i>
+                    案情闯关
+                </div>
+                <div class="text-sm bg-white/20 px-3 py-1 rounded-full font-bold">关卡 {{ currentQuestionIndex + 1 }} / {{ questions.length }}</div>
+            </div>
+            <div class="flex-1 p-8 overflow-y-auto">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 leading-relaxed">{{ currentQuestion.text }}</h3>
+                <div class="space-y-4">
+                    <button type="button" v-for="(opt, idx) in currentQuestion.options" :key="idx" 
+                            @click="answerQuestion(opt, $event)"
+                            class="w-full text-left p-4 rounded-xl qa-option-btn flex items-center group relative">
+                        <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-4 group-hover:bg-[#2367E8] group-hover:text-white font-bold text-sm transition-colors">{{ ['一','二','三','四'][idx] }}</span>
+                        <span class="text-slate-700 group-hover:text-[#2367E8] font-medium">{{ opt }}</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Footer with Progress -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+                 <div class="h-2 bg-slate-200 rounded-full w-full overflow-hidden">
+                    <div class="h-full bg-[#2367E8] transition-all duration-500" :style="{ width: ((currentQuestionIndex) / questions.length * 100) + '%' }"></div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- AI Consultation Before Report -->
+        <div v-if="stage === 'ai_consult'" class="ai-consult-card animate__animated animate__fadeInUp">
             <div class="ai-consult-header">
                 <div class="ai-bot-mark">
                     <div class="ai-bot-bubble">
