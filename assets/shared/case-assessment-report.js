@@ -12,6 +12,18 @@ window.CaseAssessmentReport = {
             type: Boolean,
             default: false
         },
+        singlePageMode: {
+            type: Boolean,
+            default: false
+        },
+        showTopHint: {
+            type: Boolean,
+            default: false
+        },
+        bottomActionHint: {
+            type: String,
+            default: '立案流程最后一步，请在下方选择后续处理方式'
+        },
         showBackButton: {
             type: Boolean,
             default: false
@@ -23,7 +35,7 @@ window.CaseAssessmentReport = {
     },
     emits: ['back', 'next', 'prev', 'confirm'],
     template: `
-        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col animate__animated animate__zoomIn mt-8" style="max-height: calc(100vh - 120px);">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col animate__animated animate__zoomIn mt-8" :style="singlePageMode ? 'max-height: none;' : 'max-height: calc(100vh - 120px);'">
             <div class="px-6 pt-8 pb-6 border-b border-slate-100 flex justify-between items-center bg-white z-10 rounded-t-2xl">
                 <div class="flex items-center gap-3">
                     <button type="button" v-if="showBackButton" @click="$emit('back')" class="report-back-btn" aria-label="上一步">
@@ -34,13 +46,13 @@ window.CaseAssessmentReport = {
                 <div class="text-sm text-slate-400">报告生成时间：{{ new Date().toLocaleDateString() }}</div>
             </div>
 
-            <div v-if="!isFilingCompleted" class="report-top-status-bar">
+            <div v-if="showTopHint || !isFilingCompleted" class="report-top-status-bar">
                 <i class="fas fa-exclamation-circle" style="color:#d97706;font-size:18px;flex-shrink:0;"></i>
                 <span>最后一步：阅读完毕后请在底部选择您的后续路径。</span>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50 custom-scrollbar">
-                <div v-if="reportStep === 1" class="space-y-8 animate__animated animate__fadeIn">
+            <div :class="singlePageMode ? 'p-8 space-y-8 bg-slate-50' : 'flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50 custom-scrollbar'">
+                <div v-if="singlePageMode || reportStep === 1" class="space-y-8 animate__animated animate__fadeIn">
                     <div class="bg-red-50/50 rounded-2xl p-6 border border-red-100">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center">
@@ -118,7 +130,7 @@ window.CaseAssessmentReport = {
                     </div>
                 </div>
 
-                <div v-if="reportStep === 2" class="space-y-8 animate__animated animate__fadeIn">
+                <div v-if="singlePageMode || reportStep === 2" class="space-y-8 animate__animated animate__fadeIn">
                     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm flex items-start space-x-4">
                         <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md">
                             <i class="fas fa-lightbulb text-lg"></i>
@@ -218,17 +230,39 @@ window.CaseAssessmentReport = {
             </div>
 
             <div class="p-4 border-t border-slate-100 bg-white/95 backdrop-blur rounded-b-2xl z-10 flex flex-col items-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                <div v-if="reportStep === 1" class="w-full flex justify-center">
+                <div v-if="singlePageMode" class="w-full path-action-highlight">
+                    <div class="text-center mb-3" style="padding-top:6px;">
+                        <span style="font-size:12px;font-weight:700;color:#2FA39A;letter-spacing:0.02em;">
+                            {{ bottomActionHint }}
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-4 w-full justify-center">
+                        <button type="button" @click="$emit('confirm', 'withdraw')" class="flex-none px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-lg shadow-lg shadow-amber-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
+                            <i class="fas fa-undo-alt mr-2"></i>撤回案件
+                        </button>
+
+                        <button type="button" @click="$emit('confirm', 'mediation')"
+                                class="flex-1 max-w-[200px] py-2.5 bg-gradient-to-r from-[#2FA39A] to-[#258e86] text-white font-bold rounded-lg shadow-lg shadow-teal-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm btn-mediation-glow">
+                            <i class="fas fa-handshake mr-2"></i>{{ mediationLabel }}
+                        </button>
+                    </div>
+
+                    <button type="button" @click="$emit('confirm', 'arbitration')" class="mt-3 text-slate-400 text-xs hover:text-blue-500 transition-colors flex items-center justify-center w-full">
+                        <span class="underline ml-1">联系客服，进行仲裁</span>
+                    </button>
+                </div>
+
+                <div v-else-if="reportStep === 1" class="w-full flex justify-center">
                     <button type="button" @click="$emit('next')" class="w-full max-w-sm py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                         <span>查看维权策略推荐</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
 
-                <div v-if="reportStep === 2" class="w-full" :class="{'path-action-highlight': !isFilingCompleted}">
-                    <div v-if="!isFilingCompleted" class="text-center mb-3" style="padding-top:6px;">
+                <div v-else-if="reportStep === 2" class="w-full" :class="{'path-action-highlight': !isFilingCompleted}">
+                    <div v-if="showTopHint || !isFilingCompleted" class="text-center mb-3" style="padding-top:6px;">
                         <span style="font-size:12px;font-weight:700;color:#2FA39A;letter-spacing:0.02em;">
-                            立案流程最后一步，请在下方选择后续处理方式
+                            {{ bottomActionHint }}
                         </span>
                     </div>
                     <div class="flex items-center space-x-4 w-full justify-center">
@@ -241,8 +275,7 @@ window.CaseAssessmentReport = {
                         </button>
 
                         <button type="button" @click="$emit('confirm', 'mediation')"
-                                :class="{'btn-mediation-glow': !isFilingCompleted}"
-                                class="flex-1 max-w-[200px] py-2.5 bg-gradient-to-r from-[#2FA39A] to-[#258e86] text-white font-bold rounded-lg shadow-lg shadow-teal-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
+                                class="flex-1 max-w-[200px] py-2.5 bg-gradient-to-r from-[#2FA39A] to-[#258e86] text-white font-bold rounded-lg shadow-lg shadow-teal-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm btn-mediation-glow">
                             <i class="fas fa-handshake mr-2"></i>{{ mediationLabel }}
                         </button>
                     </div>

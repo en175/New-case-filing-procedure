@@ -14,11 +14,35 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./assets/filing-bot/filing-bot.css">
-  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
 </head>
 <body class="h-screen w-screen bg-gray-100">
 
-<div id="app" class="relative h-full w-full overflow-hidden">
+<div id="app" class="relative min-h-full w-full">
+
+    <!-- AI Auxiliary Service Notice -->
+    <div v-if="showAiServiceNotice" class="ai-service-notice-mask" role="dialog" aria-modal="true" aria-labelledby="ai-service-notice-title">
+        <div class="ai-service-notice-panel animate__animated animate__fadeInUp">
+            <div class="ai-service-notice-header">
+                <div class="ai-service-notice-icon" aria-hidden="true">
+                    <i class="fas fa-scale-balanced"></i>
+                </div>
+                <div>
+                    <h1 id="ai-service-notice-title" class="ai-service-notice-title">AI 辅助服务使用提示</h1>
+                </div>
+            </div>
+            <div class="ai-service-notice-body">
+                <p>本系统提供的智能问答、材料识别、内容生成、风险提示等 AI 辅助能力，仅用于帮助当事人梳理案件事实、整理申请材料和生成文书参考内容。</p>
+                <p>AI 生成或提示的内容不代表广州仲裁委员会、本委工作人员、调解员、仲裁庭或任何案件处理人员的意见，不构成法律意见、裁判意见或案件结果承诺。</p>
+                <p>当事人应对其提交材料、陈述内容及确认提交的文书内容的真实性、准确性、完整性负责。系统生成内容需由当事人自行核对、修改并确认后使用。</p>
+            </div>
+            <div class="ai-service-notice-footer">
+                <button type="button" class="ai-service-notice-confirm" @click="acknowledgeAiServiceNotice">
+                    我已知晓并继续
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Top HUD Bar -->
     <div class="hud-bar" :class="{ 'hud-hidden': stage === 'intro' }">
@@ -304,83 +328,113 @@
         </div>
 
         <!-- AI Consultation Before Report -->
-        <div v-if="stage === 'ai_consult'" class="ai-consult-card animate__animated animate__fadeInUp">
-            <div class="ai-consult-header">
-                <div class="ai-prototype-brand">
-                    <div class="ai-logo-wrap">
-                        <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
+        <div v-if="stage === 'ai_consult'" class="application-workbench animate__animated animate__fadeInUp">
+            <div class="application-workbench-shell">
+                <section class="application-workbench-left">
+                    <div class="application-workbench-head">
+                        <div>
+                            <div class="application-workbench-title">{{ applicationGenerated ? '仲裁申请书（已生成）' : '仲裁申请书（模板）' }}</div>
+                            <div class="application-workbench-sub">{{ applicationGenerated ? (applicationEditable ? '当前可编辑，请核对修正后确认进入下一步' : '当前为只读预览，可点击编辑后修改') : '示例参考' }}</div>
+                        </div>
+                        <div class="ai-model-badge">
+                            <span>已接入 DeepSeek V4 Pro</span>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="ai-consult-title">智能申请书生成助手</h2>
-                        <p class="ai-consult-desc">围绕申请人信息、仲裁请求、事实理由和证据材料，辅助生成仲裁申请书初稿</p>
+                    <div class="application-doc-frame custom-scrollbar">
+                        <div v-if="applicationGenerating" class="application-generation-loading">
+                            <div class="application-generation-orbit">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="application-generation-title">正在生成仲裁申请书</div>
+                            <div class="application-generation-desc">系统正在整理主体信息、仲裁请求、事实理由和证据目录。</div>
+                        </div>
+                        <div v-else class="application-paper doc-template application-paper-workbench" :class="{ 'is-template': !applicationGenerated, 'is-generated': applicationGenerated, 'is-editing': applicationEditable }" v-html="finalApplicationHtml || applicationTemplateHtml"></div>
                     </div>
-                </div>
-                <div class="ai-model-badge">
-                    <span>已接入 DeepSeek V4 Pro</span>
-                </div>
-                <button v-if="showApplicationDemoStepButton" @click="playDemoNextStep" class="ai-demo-step-btn" :disabled="aiIsThinking">
-                    <i class="fas fa-forward-step"></i>
-                    演示下一步
-                </button>
-                <button v-if="showApplicationAutoFillButton" @click="autoFillApplicationTemplate" class="ai-demo-step-btn" :disabled="aiIsThinking">
-                    <i class="fas fa-file-lines"></i>
-                    自动填写模板
-                </button>
-            </div>
+                    <div v-if="applicationGenerated && !applicationGenerating" class="application-doc-actions">
+                        <button type="button" class="flow-primary-btn" @click="confirmGeneratedApplicationAndNext">确认并下一步</button>
+                    </div>
+                </section>
 
-            <div class="ai-prototype-panel">
-                <div class="ai-scroll-content custom-scrollbar" ref="aiScrollBody" @click="handleAiPanelClick" @change="handleAiPanelChange" @input="handleAiPanelInput">
-                    <div class="ai-chat-body" ref="aiChatBody">
-                        <div v-for="message in aiMessages" :key="message.id" class="ai-message-row" :class="[message.role, { 'application-guide-row': message.type }]">
-                            <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
-                                <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
+                <section class="application-workbench-right">
+                    <div class="ai-consult-header">
+                        <div class="ai-prototype-brand">
+                            <div class="ai-logo-wrap">
+                                <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
                             </div>
-                            <div class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming }" v-html="message.content"></div>
-                        </div>
-                        <div v-if="aiIsThinking" class="ai-message-row">
-                            <div class="ai-avatar ai-bot-mark compact">
-                                <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
-                            </div>
-                            <div class="ai-bubble">
-                                <span class="ai-thinking">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </span>
+                            <div>
+                                <h2 class="ai-consult-title">智能申请书生成助手</h2>
+                                <p class="ai-consult-desc">围绕申请人信息、仲裁请求、事实理由和证据材料，辅助生成仲裁申请书初稿</p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="ai-input-area">
-                    <div class="ai-input-shell">
-                            <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" placeholder=""></textarea>
-                        <div class="ai-input-options">
-                            <button @click="triggerAiFileUpload" class="ai-attach-btn" :class="{ 'upload-needed': isCurrentUploadStep }" aria-label="上传附件">
-                                <i class="fas fa-paperclip"></i>
-                            </button>
-                            <input ref="aiFileInput" type="file" class="hidden" :accept="currentUploadRule.accept" multiple @change="handleAiFileChange" />
-                            <button @click="sendAiMessage" class="ai-send-btn" aria-label="发送">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                    <div class="ai-prototype-panel">
+                        <div class="ai-scroll-content custom-scrollbar" ref="aiScrollBody" @click="handleAiPanelClick" @change="handleAiPanelChange" @input="handleAiPanelInput">
+                            <div class="ai-chat-body" ref="aiChatBody">
+                                <div v-for="message in aiMessages" :key="message.id" class="ai-message-row" :class="[message.role, { 'application-guide-row': message.type }]">
+                                    <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
+                                        <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
+                                    </div>
+                                    <div class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming, 'ai-bubble-file': message.attachments && message.attachments.length }">
+                                        <div v-if="message.content" class="ai-message-text" v-html="message.content"></div>
+                                        <div v-if="message.attachments && message.attachments.length" class="ai-message-attachments">
+                                            <button
+                                                v-for="file in message.attachments"
+                                                :key="file.id"
+                                                type="button"
+                                                class="ai-file-card"
+                                                @click="openFilePreview(file)"
+                                            >
+                                                <div class="ai-file-icon" :class="file.kind">
+                                                    <i :class="file.kind === 'image' ? 'fas fa-image' : 'fas fa-file-pdf'"></i>
+                                                </div>
+                                                <div class="ai-file-meta">
+                                                    <div class="ai-file-name">{{ file.name }}</div>
+                                                </div>
+                                                <div class="ai-file-action">
+                                                    <i class="fas fa-eye"></i>
+                                                    预览
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="aiIsThinking" class="ai-message-row">
+                                    <div class="ai-avatar ai-bot-mark compact">
+                                        <div class="ai-role-avatar"><img src="./图片/ai-assistant-logo.svg" alt="AI智能助手"></div>
+                                    </div>
+                                    <div class="ai-bubble">
+                                        <span class="ai-thinking">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="ai-upload-rule hidden" v-html="currentUploadRule.text"></div>
+
+                        <div class="ai-input-area">
+                            <div class="ai-input-shell">
+                                <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage" placeholder=""></textarea>
+                                <div class="ai-input-options">
+                                    <button @click="triggerAiFileUpload" class="ai-attach-btn" :class="{ 'upload-needed': isCurrentUploadStep }" aria-label="上传附件">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                    <input ref="aiFileInput" type="file" class="hidden" :accept="currentUploadRule.accept" multiple @change="handleAiFileChange" />
+                                    <button @click="sendAiMessage" class="ai-send-btn" aria-label="发送">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                                <div class="ai-upload-rule hidden" v-html="currentUploadRule.text"></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
-        <aside v-if="stage === 'ai_consult'" class="ai-side-tools">
-            <div class="ai-side-title">辅助工具</div>
-            <div class="ai-preset-grid">
-                <button v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 0 }" :disabled="aiIsThinking">
-                    <div class="ai-preset-icon">
-                        <i :class="card.icon"></i>
-                    </div>
-                    <div class="ai-preset-title">{{ card.title }}</div>
-                    <div class="ai-preset-desc">{{ card.desc }}</div>
-                </button>
-            </div>
-        </aside>
 
         <case-assessment-report
             v-if="stage === 'report'"
@@ -430,7 +484,7 @@
 
     </div>
 
-        <!-- 3. AVG Dialogue Interface (Fixed Bottom) -->
+    <!-- 3. AVG Dialogue Interface (Fixed Bottom) -->
     <div v-if="showDialog && stage !== 'report'" class="absolute bottom-0 left-0 w-full z-50 pb-8 pt-20 px-4 md:px-20 dialog-overlay flex flex-col justify-end">
         
         <!-- Character Portrait (Left Bottom) -->
@@ -504,6 +558,22 @@
             </div>
         </div>
 
+        <div v-if="filePreviewModal.show" class="fixed inset-0 z-[65] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate__animated animate__fadeIn">
+            <div class="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <button @click="closeFilePreview" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-slate-900/80 text-white hover:bg-slate-900 transition-colors" aria-label="关闭预览">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="file-preview-header">
+                    <div class="file-preview-title">{{ filePreviewModal.file?.name }}</div>
+                    <div class="file-preview-sub">{{ filePreviewModal.file?.desc }}</div>
+                </div>
+                <div class="file-preview-body">
+                    <img v-if="filePreviewModal.file?.kind === 'image'" :src="filePreviewModal.file?.url" class="file-preview-image" :alt="filePreviewModal.file?.name" />
+                    <iframe v-else :src="filePreviewModal.file?.url" class="file-preview-frame" title="文件预览"></iframe>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 <script src="./assets/filing-bot/filing-bot-data.js"></script>
@@ -544,7 +614,7 @@
         window.WebSocket = WrappedWebSocket;
     })();
 </script>
-  <script src="./assets/demo-shell/demo-config.js"></script>
-  <script src="./assets/demo-shell/demo-nav.js"></script>
+  <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
 </body>
 </html>

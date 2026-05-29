@@ -5,14 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>第四步：被申请人信息</title>
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+    :root {
+      --ink: #12213a;
+      --muted: #64748b;
+      --subtle: #8a9bb2;
+      --line: #dbe5f0;
+      --paper: #ffffff;
+      --wash: #f4f7fb;
+      --blue: #2563eb;
+      --blue-soft: #e9f1ff;
+      --teal: #14a293;
+      --teal-soft: #e8f8f5;
+      --amber: #f18716;
+      --amber-soft: #fff3e6;
+      --shadow: 0 24px 70px rgba(28, 43, 70, .13);
+    }
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 24px;
       background: #f8fafc;
       color: #1f2937;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
     }
     .container {
       max-width: 1500px;
@@ -413,6 +433,393 @@
       color: #fff;
     }
     .step-nav-btn.next:hover { background: #1d4db1; border-color: #1d4db1; }
+    .route-loading-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(16, 24, 40, .42);
+      backdrop-filter: blur(14px);
+    }
+    .route-loading-mask[hidden],
+    .route-choice-mask[hidden] {
+      display: none;
+    }
+    .route-loading-mask::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 28% 22%, rgba(37, 99, 235, .28), transparent 28%),
+        radial-gradient(circle at 74% 70%, rgba(20, 162, 147, .26), transparent 30%),
+        linear-gradient(135deg, rgba(15, 23, 42, .72), rgba(30, 58, 138, .56));
+      animation: routeBackdropMove 4.5s ease-in-out infinite alternate;
+    }
+    .route-loading-card {
+      position: relative;
+      width: min(440px, calc(100vw - 32px));
+      padding: 28px 28px 24px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 28px 72px rgba(15, 23, 42, .28), inset 0 1px 0 rgba(255,255,255,.9);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.72);
+      overflow: hidden;
+    }
+    .route-loading-card::after {
+      content: "";
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 0;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2367e8, #14a293, #2367e8);
+      background-size: 220% 100%;
+      animation: routeProgress 1.7s ease-in-out infinite;
+    }
+    .route-loading-ring {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      border: 4px solid rgba(219, 231, 248, .95);
+      border-top-color: #2367e8;
+      border-right-color: #14a293;
+      animation: routeSpin 1s linear infinite;
+      box-shadow: 0 0 0 10px rgba(37, 103, 232, .06);
+    }
+    .route-loading-ring::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2367e8, #14a293);
+      box-shadow: 0 12px 28px rgba(37, 103, 232, .28);
+    }
+    .route-loading-title {
+      color: #0f172a;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.4;
+    }
+    .route-loading-desc {
+      margin-top: 8px;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.6;
+      font-weight: 700;
+    }
+    @keyframes routeSpin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes routeBackdropMove {
+      from { transform: translate3d(-2%, -1%, 0) scale(1); }
+      to { transform: translate3d(2%, 1%, 0) scale(1.03); }
+    }
+    @keyframes routeProgress {
+      0% { background-position: 0% 50%; transform: scaleX(.34); opacity: .68; }
+      50% { background-position: 100% 50%; transform: scaleX(1); opacity: 1; }
+      100% { background-position: 0% 50%; transform: scaleX(.34); opacity: .68; }
+    }
+    .route-choice-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 210;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(18, 33, 58, .48);
+      backdrop-filter: blur(16px);
+    }
+    .route-choice-card {
+      width: min(1320px, 100%);
+      border-radius: 28px;
+      padding: 28px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,251,255,.96)),
+        radial-gradient(circle at 16% 16%, rgba(37,99,235,.08), transparent 26%);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, .24);
+      border: 1px solid rgba(219,229,240,.9);
+      animation: routeDialogIn .38s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes routeDialogIn {
+      from { opacity: 0; transform: translateY(18px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .route-choice-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .route-choice-title {
+      color: #0f172a;
+      font-size: 24px;
+      line-height: 1.3;
+      font-weight: 950;
+    }
+    .route-choice-sub {
+      margin-top: 6px;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 700;
+    }
+    .card-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .choice-card {
+      height: 456px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      perspective: 1300px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .choice-card:focus-visible {
+      outline: 3px solid rgba(37,99,235,.28);
+      outline-offset: 5px;
+      border-radius: 22px;
+    }
+
+    .choice-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .78s cubic-bezier(.19, 1, .22, 1);
+    }
+
+    .choice-card:hover .choice-card-inner,
+    .choice-card:focus-within .choice-card-inner,
+    .choice-card:focus-visible .choice-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 22px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      border: 1px solid #dfe8f2;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 18px 42px rgba(30, 46, 76, .11);
+    }
+
+    .card-front {
+      padding: 28px 26px 24px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 22px;
+      background:
+        radial-gradient(circle at 16% 12%, var(--tone-soft), transparent 34%),
+        radial-gradient(circle at 94% 92%, color-mix(in srgb, var(--tone) 9%, transparent), transparent 36%),
+        linear-gradient(160deg, rgba(255,255,255,.98) 0%, color-mix(in srgb, var(--tone) 5%, white) 100%);
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .card-front::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 5px;
+      background: var(--tone);
+    }
+
+    .card-front::after {
+      content: attr(data-order);
+      position: absolute;
+      right: 24px;
+      top: 56px;
+      color: var(--tone);
+      opacity: .09;
+      font-size: 58px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    .choice-card:hover .card-face {
+      box-shadow: 0 26px 58px rgba(30, 46, 76, .16);
+    }
+
+    .card-back {
+      padding: 24px 24px 22px;
+      transform: rotateY(180deg);
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+      gap: 12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,253,255,.96)),
+        radial-gradient(circle at 14% 12%, var(--tone-soft), transparent 42%);
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 16px 30px rgba(23, 41, 72, .08);
+      font-size: 28px;
+    }
+
+    .card-index {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .card-title {
+      margin: 0;
+      max-width: 260px;
+      font-size: 30px;
+      line-height: 1.24;
+      letter-spacing: -.01em;
+      font-weight: 900;
+    }
+
+    .card-desc {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .back-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 900;
+    }
+
+    .back-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .value-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .value-list li {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid #e2eaf3;
+      background: rgba(255,255,255,.88);
+    }
+
+    .value-list i {
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: var(--tone);
+      background: var(--tone-soft);
+      font-size: 14px;
+    }
+
+    .value-list strong {
+      display: block;
+      margin-bottom: 2px;
+      color: #17243c;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .value-list span {
+      display: block;
+      color: #66788f;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .enter-link {
+      height: 46px;
+      border-radius: 15px;
+      border: 1px solid color-mix(in srgb, var(--tone) 34%, white);
+      color: #fff;
+      background: var(--tone);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 900;
+      box-shadow: 0 16px 30px color-mix(in srgb, var(--tone) 22%, transparent);
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    .enter-link:hover {
+      transform: translateY(-2px);
+      filter: saturate(1.08);
+      box-shadow: 0 20px 38px color-mix(in srgb, var(--tone) 28%, transparent);
+    }
+
+    .enter-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .choice-card[data-tone="quiz"] {
+      --tone: var(--blue);
+      --tone-soft: var(--blue-soft);
+    }
+
+    .choice-card[data-tone="defense"] {
+      --tone: var(--teal);
+      --tone-soft: var(--teal-soft);
+    }
+
+    @media (max-width: 980px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .choice-card { height: 430px; }
+      .route-choice-card { padding: 20px; }
+      .route-choice-head { flex-direction: column; }
+    }
     /* @media (max-width: 1200px) {
       .form-grid { grid-template-columns: 1fr; }
       .upload-grid { grid-template-columns: 1fr; }
@@ -436,9 +843,84 @@
       <div class="add-btn-wrapper" id="addRespondentBtn"><div class="btn-icon"><i class="el-icon-plus"></i></div>添加被申请人</div>
       <div class="save-wrap"><button class="primary-btn" id="saveRespondentBtn">保存被申请人</button></div>
     </div>
-    <div class="step-footer">
+  <div class="step-footer">
       <button class="step-nav-btn prev" id="prevStepBtn">上一步</button>
       <button class="step-nav-btn next" id="nextStepBtn">下一步</button>
+    </div>
+  </div>
+
+  <div class="route-loading-mask" id="routeLoadingMask" hidden>
+    <div class="route-loading-card">
+      <div class="route-loading-ring"></div>
+      <div class="route-loading-title">正在分流办理路径</div>
+      <div class="route-loading-desc">系统正在根据您当前确认的案件信息，加载适合的后续办理方式。</div>
+    </div>
+  </div>
+  <div class="route-choice-mask" id="routeChoiceMask" hidden>
+    <div class="route-choice-card">
+      <div class="route-choice-head">
+        <div>
+          <div class="route-choice-title">请选择后续办理路径</div>
+          <div class="route-choice-sub">请根据您的办理偏好，选择后续进入的流程页面。</div>
+        </div>
+      </div>
+      <div class="card-grid">
+        <article class="choice-card" data-tone="quiz" tabindex="0" aria-label="案件信息问答评估">
+          <div class="choice-card-inner">
+            <div class="card-face card-front" data-order="01">
+              <div class="card-meta">
+                <div class="card-icon"><i class="fas fa-list-check"></i></div>
+              </div>
+              <div>
+                <h2 class="card-title">案情问答</h2>
+                <p class="card-desc">通过互动问答与视频讲解，帮助你梳理合同、履行、退款和证据要点。</p>
+              </div>
+            </div>
+            <div class="card-face card-back">
+              <div>
+                <h3 class="back-title">问答+普法小视频，辅助完成案情核对</h3>
+                <p class="back-copy">系统会用通俗问题+小视频带您梳理合同、付款、上课记录、退款沟通和销售承诺，最后引导您选择调解或完成本轮问答。</p>
+              </div>
+              <ul class="value-list">
+                <li><i class="fas fa-comments"></i><div><strong>不用自己判断法律重点</strong><span>系统把专业问题拆成您能直接回答的事实问题。</span></div></li>
+                <li><i class="fas fa-diagram-project"></i><div><strong>先发现材料缺口</strong><span>帮助您看清合同、课时、付款和沟通记录是否够完整。</span></div></li>
+                <li><i class="fas fa-handshake"></i><div><strong>问答后可直接选择调解</strong><span>信息越完整，越便于判断是否先用调解降低沟通成本。</span></div></li>
+              </ul>
+              <div class="enter-actions">
+                <a class="enter-link" href="./游戏化问答.html" data-enter="quiz">选择并进入问答 <i class="fas fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="choice-card" data-tone="defense" tabindex="0" aria-label="AI模拟对方抗辩">
+          <div class="choice-card-inner">
+            <div class="card-face card-front" data-order="02">
+              <div class="card-meta">
+                <div class="card-icon"><i class="fas fa-comments"></i></div>
+              </div>
+              <div>
+                <h2 class="card-title">AI模拟被申请人·提前看看对方会怎么说</h2>
+                <p class="card-desc">提前听一听对方可能如何回应您的退款主张。</p>
+              </div>
+            </div>
+            <div class="card-face card-back">
+              <div>
+                <h3 class="back-title">换到对方立场，看争议会怎么展开</h3>
+                <p class="back-copy">系统会直接扮演培训机构一方，围绕课程是否提供、退款条款、证据材料和协商空间进行回应。</p>
+              </div>
+              <ul class="value-list">
+                <li><i class="fas fa-shield-halved"></i><div><strong>提前感受对抗点</strong><span>看看对方可能从哪些角度不同意全额退款。</span></div></li>
+                <li><i class="fas fa-folder-open"></i><div><strong>反查证据是否够用</strong><span>如果对方否认承诺或服务问题，您能否拿出连续材料。</span></div></li>
+                <li><i class="fas fa-scale-balanced"></i><div><strong>帮助调整预期</strong><span>判断继续坚持全额退款，还是先争取可履行的协商方案。</span></div></li>
+              </ul>
+              <div class="enter-actions">
+                <a class="enter-link" href="./抗辩机器人.html" data-enter="defense">选择并进入模拟 <i class="fas fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
     </div>
   </div>
 
@@ -975,11 +1457,34 @@
     document.getElementById('prevStepBtn').onclick = () => {
       window.location.href = './Step3PartyConfirmation.html'
     }
-    document.getElementById('nextStepBtn').onclick = () => {
-      window.location.href = './Step5CaseInfoConfirmation.html'
+    const routeLoadingMask = document.getElementById('routeLoadingMask')
+    const routeChoiceMask = document.getElementById('routeChoiceMask')
+    const showRouteChoice = () => {
+      routeLoadingMask.hidden = false
+      routeChoiceMask.hidden = true
+      window.setTimeout(() => {
+        routeLoadingMask.hidden = true
+        routeChoiceMask.hidden = false
+      }, 1200)
     }
+    document.getElementById('nextStepBtn').onclick = showRouteChoice
+    const STORAGE_KEY = 'filingDemoCompletedPaths'
+    function markCompleted(path) {
+      try {
+        const completed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+        completed[path] = true
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(completed))
+      } catch (error) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ [path]: true }))
+      }
+    }
+    document.querySelectorAll('[data-enter]').forEach(link => {
+      link.addEventListener('click', () => markCompleted(link.dataset.enter))
+    })
 
     render()
   </script>
+  <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
 </body>
 </html>

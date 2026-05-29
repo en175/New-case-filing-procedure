@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI模拟被申请人</title>
     <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/shared/vue-mount-guard.css">
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Tailwind CSS -->
@@ -14,11 +15,12 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./assets/defense-bot/defense-bot.css">
-  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-ppt-nav.css">
 </head>
-<body class="h-screen w-screen bg-gray-100">
+<body class="w-screen bg-gray-100">
 
-<div id="app" class="relative h-full w-full overflow-hidden">
+<div id="app" class="relative min-h-screen w-full">
 
     <!-- Top HUD Bar -->
     <div class="hud-bar" :class="{ 'hud-hidden': stage === 'intro' }">
@@ -163,7 +165,7 @@
     </div>
 
     <!-- 2. Overlay Panels (Forms, Reports, etc.) -->
-    <div v-if="showOverlayPanel" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" :class="{'pb-48': !['report', 'ai_consult'].includes(stage), 'pb-4': ['report', 'ai_consult'].includes(stage), 'ai-demo-overlay': stage === 'ai_consult'}">
+    <div v-if="showOverlayPanel" class="fixed inset-0 z-30 flex items-center justify-center overflow-y-auto bg-black/40 backdrop-blur-sm p-4" :class="{'pb-48': !['report', 'ai_consult'].includes(stage), 'pb-4': ['report', 'ai_consult'].includes(stage), 'ai-demo-overlay': stage === 'ai_consult'}">
         
 
 
@@ -352,7 +354,7 @@
         </div>
 
         <!-- AI Consultation Before Report -->
-        <div v-if="stage === 'ai_consult'" class="ai-consult-card animate__animated animate__fadeInUp">
+        <div v-if="stage === 'ai_consult'" class="ai-consult-card">
             <div class="ai-consult-header">
                 <div class="ai-bot-mark">
                     <div class="ai-bot-bubble">
@@ -368,61 +370,75 @@
                 <div>
                     <h2 class="ai-consult-title">AI模拟被申请人</h2>
                 </div>
-                <a class="ai-back-link" href="./立案提交后路径选择.html">
+                <!-- <a class="ai-back-link" href="./立案提交后路径选择.html">
                     <i class="fas fa-arrow-left"></i>
                     <span>返回路径选择</span>
-                </a>
+                </a> -->
             </div>
 
-            <div class="ai-chat-body custom-scrollbar" ref="aiChatBody">
-                <div class="ai-welcome-panel">
-                    <h3 class="ai-welcome-title">你好<strong>李明</strong>，下面将模拟被申请人与您直接对话。</h3>
-                    <p class="ai-welcome-desc">请选择一个争议场景，由培训机构一方直接回应您的退款主张，重点呈现对方可能坚持的事实和理由。</p>
-                    <div class="ai-preset-grid">
-                        <button type="button" v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking || aiPartialRefundScriptActive">
-                      
-                            <div class="ai-preset-icon">
-                                <i :class="card.icon"></i>
+            <div class="ai-card-scroll-area custom-scrollbar">
+                <div class="ai-chat-body" ref="aiChatBody">
+                    <div class="ai-welcome-panel" :class="{ 'collapsed': hasSelectedAiPreset }">
+                        <div class="ai-preset-stage" :class="{ 'collapsed': hasSelectedAiPreset }">
+                            <h3 class="ai-welcome-title">您好，下面将模拟被申请人与您直接对话。</h3>
+                            <p class="ai-welcome-desc">请选择一个争议场景，由培训机构一方直接回应您的退款主张，重点呈现对方可能坚持的事实和理由。</p>
+                            <div v-if="!hasSelectedAiPreset" class="ai-preset-grid">
+                                <button type="button" v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking || aiPartialRefundScriptActive">
+                                    <div class="ai-preset-icon">
+                                        <i :class="card.icon"></i>
+                                    </div>
+                                    <div class="ai-preset-title">{{ card.title }}</div>
+                                    <div class="ai-preset-desc">{{ card.desc }}</div>
+                                    <div class="ai-preset-tag">{{ card.tag }}</div>
+                                </button>
                             </div>
-                            <div class="ai-preset-title">{{ card.title }}</div>
-                            <div class="ai-preset-desc">{{ card.desc }}</div>
-                            <div class="ai-preset-tag">{{ card.tag }}</div>
-                        </button>
-                    </div>
-                </div>
+                        </div>
 
-                <div v-for="message in aiMessages" :key="message.id" class="ai-message-row" :class="message.role">
-                    <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
-                        <div class="ai-bot-bubble">
-                            <div class="ai-bot-bars">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                        <div v-if="selectedAiPresetCard" class="ai-selected-chip">
+                            <div class="ai-selected-chip-icon"><i class="fas fa-circle-check"></i></div>
+                            <div class="ai-selected-chip-copy">
+                                <div class="ai-selected-chip-title">{{ selectedAiPresetCard.title }}</div>
+                                <div class="ai-selected-chip-desc">{{ selectedAiPresetCard.tag }}</div>
                             </div>
+                            <button type="button" class="ai-selected-chip-reset" @click="reopenAiPresetCards" :disabled="aiIsThinking || aiPartialRefundScriptActive">
+                                重新选择
+                            </button>
                         </div>
                     </div>
-                    <div class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming }" v-html="message.content"></div>
-                </div>
-                <div v-if="aiIsThinking" class="ai-message-row">
-                    <div class="ai-avatar ai-bot-mark compact">
-                        <div class="ai-bot-bubble">
-                            <div class="ai-bot-bars">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
+
+                    <div v-for="message in aiMessages" :key="message.id" class="ai-message-row" :class="message.role">
+                        <div v-if="message.role === 'assistant'" class="ai-avatar ai-bot-mark compact">
+                            <div class="ai-bot-bubble">
+                                <div class="ai-bot-bars">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
                             </div>
                         </div>
+                        <div class="ai-bubble" :class="{ 'ai-streaming-cursor': message.streaming }" v-html="message.content"></div>
                     </div>
-                    <div class="ai-bubble">
-                        <span class="ai-thinking">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </span>
+                    <div v-if="aiIsThinking" class="ai-message-row">
+                        <div class="ai-avatar ai-bot-mark compact">
+                            <div class="ai-bot-bubble">
+                                <div class="ai-bot-bars">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ai-bubble">
+                            <span class="ai-thinking">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -440,12 +456,38 @@
                         </button>
                     </div>
                 </div>
-                <button type="button" v-if="canFinishAiConsult" @click="finishAiConsult" class="ai-finish-btn" :disabled="!canFinishAiConsult">
-                    <span>{{ canFinishAiConsult ? '结束对话，进入下一步' : `还需对话 ${Math.max(0, 3 - aiDefenseRoundCount)} 轮` }}</span>
-                </button>
             </div>
         </div>
 
+        <div v-if="stage === 'ai_consult'" class="ai-finish-float">
+            <div class="ai-finish-tooltip" :class="{ 'show': !canFinishAiConsult && aiFinishTooltipVisible }">
+                为了后续为您提供更加个性化的AI服务，请完成 3 轮对话后可进入下一步
+            </div>
+            <button
+                type="button"
+                class="ai-finish-btn ready"
+                style="min-width: 180px;"
+                @click="goToStep5Direct"
+            >
+                <i class="fas fa-forward-step"></i>
+                <span>直接进入下一步</span>
+            </button>
+            <button
+                type="button"
+                class="ai-finish-btn"
+                :class="{ 'ready': canFinishAiConsult, 'locked': !canFinishAiConsult }"
+                :aria-disabled="(!canFinishAiConsult || aiIsThinking).toString()"
+                @click="handleFinishButtonClick"
+                @mouseenter="showAiFinishTooltip"
+                @mouseleave="hideAiFinishTooltip"
+                @focus="showAiFinishTooltip"
+                @blur="hideAiFinishTooltip"
+            >
+                <i class="fas" :class="canFinishAiConsult ? 'fa-arrow-right' : 'fa-lock'"></i>
+                <span>结束对话，进入下一步</span>
+            </button>
+        </div>
+        
         <!-- Report Card (Redesigned based on Images) -->
         <div v-if="stage === 'report'" class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col animate__animated animate__zoomIn mt-8" style="max-height: calc(100vh - 120px);">
             <!-- Header -->
@@ -689,9 +731,6 @@
                         </button>
                         
                         <!-- Button 2: Accept Mediation -->
-                        <button type="button" @click="showConfirmModal('mediation')" class="flex-1 max-w-[200px] py-2.5 bg-gradient-to-r from-[#2FA39A] to-[#258e86] text-white font-bold rounded-lg shadow-lg shadow-teal-500/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-sm">
-                            <i class="fas fa-handshake mr-2"></i>选择调解
-                        </button>
                     </div>
                     
                     <!-- Secondary Link -->
@@ -813,9 +852,26 @@
 
     </div>
 
+<script src="./assets/shared/data-desensitize.js"></script>
 <script src="./assets/ai-typewriter.js"></script>
 <script src="./assets/defense-bot/defense-bot-app.js"></script>
-  <script src="./assets/demo-shell/demo-config.js"></script>
-  <script src="./assets/demo-shell/demo-nav.js"></script>
+<script src="./assets/shared/ppt-click-helper.js"></script>
+  <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-ppt-nav.js"></script>
+  <script>
+    (function () {
+      if (typeof window.clickAnywhereToNext !== 'function') return;
+
+      window.clickAnywhereToNext({
+        ignore(target) {
+          if (target?.closest?.('.fixed.inset-0') && /z-\[(60|100)\]/.test(target.closest('.fixed.inset-0').className)) return true;
+          return !!target?.closest?.(
+            '.demo-global-nav, .demo-ppt-nav, button, a, input, textarea, select, [contenteditable="true"], video, .score-cta'
+          );
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

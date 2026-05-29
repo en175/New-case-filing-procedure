@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>案件评估报告</title>
+  <link rel="icon" href="data:,">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./assets/game-qa/game-qa.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
+  <style>
+    body {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .map-container {
+      position: relative;
+      min-height: 100vh;
+      height: auto;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 84px;
+    }
+
+    @media (max-width: 768px) {
+      .map-container {
+        padding-top: 72px;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen w-screen bg-gray-100 overflow-x-hidden">
+  <div id="app" class="relative min-h-screen w-full">
+    <div class="hud-bar">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl mr-3 shadow-md">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">广州仲裁委</div>
+          <div class="font-bold text-slate-800 leading-tight">立案服务部</div>
+        </div>
+      </div>
+    </div>
+    <div class="map-container">
+      <div class="absolute inset-0 z-0">
+        <img src="./图片/智能服务大厅背景.png" class="w-full h-full object-cover" alt="流程背景" />
+      </div>
+      <div class="relative z-20 w-full flex justify-center px-4 py-6 md:py-8">
+        <case-assessment-report
+          :report-step="reportStep"
+          :report-data="reportData"
+          :is-filing-completed="true"
+          :single-page-mode="true"
+          :show-top-hint="true"
+          bottom-action-hint="立案流程最后一步，请在下方选择后续处理方式"
+          mediation-label="参与调解"
+        ></case-assessment-report>
+      </div>
+    </div>
+  </div>
+  <script src="./assets/shared/case-assessment-report-data.js"></script>
+  <script src="./assets/shared/case-assessment-report.js"></script>
+  <script>
+    const { createApp } = Vue;
+    const app = createApp({
+      setup() {
+        const reportStep = 1;
+        const reportData = window.getCaseAssessmentReportData('default');
+        return { reportStep, reportData };
+      }
+    });
+    app.component('case-assessment-report', window.CaseAssessmentReport);
+    app.mount('#app');
+  </script>
+  <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
+</body>
+</html>

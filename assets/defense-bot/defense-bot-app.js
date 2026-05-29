@@ -136,6 +136,9 @@ const PARTIAL_REFUND_DIALOGUE = [
             const aiDefenseRoundCount = ref(0);
             const aiPartialRefundScriptActive = ref(false);
             const partialRefundCursor = ref(0);
+            const selectedAiPresetCard = ref(null);
+            const hasSelectedAiPreset = computed(() => Boolean(selectedAiPresetCard.value));
+            const aiFinishTooltipVisible = ref(false);
             const AI_DEFENSE_REQUIRED_ROUNDS = 3;
             const canFinishAiConsult = computed(() => aiDefenseRoundCount.value >= AI_DEFENSE_REQUIRED_ROUNDS);
             const aiInputPlaceholder = computed(() => {
@@ -526,7 +529,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                 if (isFilingCompleted.value) {
                     const pathLabelMap = {
                         withdraw: '撤回案件',
-                        mediation: '选择调解',
+                        mediation: '调解路径',
                         arbitration: '联系客服，进行仲裁'
                     };
                     return `已选择后续处理方式：${pathLabelMap[selectedReportPath.value] || '已完成'}`;
@@ -644,7 +647,7 @@ const PARTIAL_REFUND_DIALOGUE = [
 
             const nextReportStep = () => {
                 reportStep.value = 2;
-                speak('广州仲裁委员会秉持“为每一起纠纷提供最佳解决方案”的目标愿景，在您排队等待仲裁立案的过程中，我们向您提供了一个更为快速、便捷、低成本的解决方式：调解，让您足不出户，一键解纷。点击“<span class="font-bold text-red-500">选择调解</span>”进入多元解纷调解平台。', true);
+                speak('广州仲裁委员会秉持“为每一起纠纷提供最佳解决方案”的目标愿景，在您排队等待仲裁立案的过程中，我们向您提供了一个更为快速、便捷、低成本的解决方式：调解，让您足不出户，一键解纷。', true);
             };
 
             const prevReportStep = () => {
@@ -717,7 +720,7 @@ const PARTIAL_REFUND_DIALOGUE = [
             const showConfirmModal = (type) => {
                 confirmModal.value.type = type;
                 if (type === 'mediation') {
-                    confirmModal.value.title = '确认选择调解？';
+                    confirmModal.value.title = '确认进入调解？';
                     confirmModal.value.message = '您的案件将进入快速调解通道，三个工作日内会有调解员与您联系。';
                 } else if (type === 'withdraw') {
                     confirmModal.value.title = '确认撤回案件？';
@@ -839,7 +842,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                 }
                 return aiTypewriter;
             };
-            const mediationEntryHtml = '<br><br><span class="text-slate-500">如果希望降低对抗成本，可以直接申请调解：</span><br><a class="ai-mediation-link" href="./调解申请提交结果.html"><i class="fas fa-handshake"></i>进入调解</a>';
+            const mediationEntryHtml = '';
             const shouldShowMediationEntry = () => (
                 stage.value === 'ai_consult' && aiDefenseRoundCount.value >= AI_DEFENSE_REQUIRED_ROUNDS
             );
@@ -861,10 +864,38 @@ const PARTIAL_REFUND_DIALOGUE = [
                 scrollAiChatToBottom();
             };
 
+            const showAiFinishTooltip = () => {
+                if (canFinishAiConsult.value) return;
+                aiFinishTooltipVisible.value = true;
+            };
+
+            const hideAiFinishTooltip = () => {
+                aiFinishTooltipVisible.value = false;
+            };
+
+            const syncAiPresetState = (card) => {
+                selectedAiPresetCard.value = card ? { title: card.title, tag: card.tag } : null;
+            };
+
+            const reopenAiPresetCards = () => {
+                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                selectedAiPresetCard.value = null;
+                aiMessages.value = [];
+                aiMessageId = 0;
+                aiDefenseRoundCount.value = 0;
+                aiInput.value = '';
+                aiAttachmentName.value = '';
+                clearAiReplyTimer();
+                clearAiStreamTimer();
+                aiPartialRefundScriptActive.value = false;
+                partialRefundCursor.value = 0;
+                setAiStaticGreeting();
+            };
+
             const finishPartialRefundScript = () => {
                 aiPartialRefundScriptActive.value = false;
                 partialRefundCursor.value = 0;
-                pushAiChatAssistantMessage('', { showMediation: true });
+                pushAiChatAssistantMessage('本轮模拟对话已完成。您可以继续追问，也可以结束对话进入下一步。');
             };
 
             const advancePartialRefundAfterUserSend = () => {
@@ -898,6 +929,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                 aiInput.value = '';
                 aiAttachmentName.value = '';
                 aiPartialRefundScriptActive.value = true;
+                syncAiPresetState(card);
                 partialRefundCursor.value = 0;
 
                 if (card && card.title) {
@@ -944,6 +976,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                     }
                 ];
                 aiIsThinking.value = false;
+                aiFinishTooltipVisible.value = false;
                 scrollAiChatToTop();
             };
 
@@ -955,6 +988,8 @@ const PARTIAL_REFUND_DIALOGUE = [
                 aiMessageId = 0;
                 aiMessages.value = [];
                 aiDefenseRoundCount.value = 0;
+                selectedAiPresetCard.value = null;
+                aiFinishTooltipVisible.value = false;
                 aiIsThinking.value = true;
                 stage.value = 'ai_consult';
                 scrollAiChatToBottom();
@@ -1010,6 +1045,7 @@ const PARTIAL_REFUND_DIALOGUE = [
 
             const chooseAiPreset = (card) => {
                 if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                syncAiPresetState(card);
                 if (card.scriptId === 'partial-refund') {
                     startPartialRefundScript(card);
                     return;
@@ -1056,8 +1092,12 @@ const PARTIAL_REFUND_DIALOGUE = [
             };
 
             const finishAiConsult = () => {
-                if (!canFinishAiConsult.value) return;
+                if (!canFinishAiConsult.value || aiIsThinking.value) {
+                    showAiFinishTooltip();
+                    return;
+                }
                 aiIsThinking.value = false;
+                hideAiFinishTooltip();
                 clearAiReplyTimer();
                 clearAiStreamTimer();
                 aiPartialRefundScriptActive.value = false;
@@ -1069,12 +1109,34 @@ const PARTIAL_REFUND_DIALOGUE = [
                 } catch (error) {
                     localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ defense: true }));
                 }
-                if (localStorage.getItem('filingDemoAuxReturn') === 'report') {
-                    localStorage.setItem('filingDemoOpenReport', 'auxTool');
-                    window.location.href = './申请书bot.html?fromAux=defense';
+                window.location.href = './Step5CaseInfoConfirmation.html';
+            };
+
+            const goToStep5Direct = () => {
+                if (aiIsThinking.value) {
+                    aiIsThinking.value = false;
+                    clearAiReplyTimer();
+                    clearAiStreamTimer();
+                    aiPartialRefundScriptActive.value = false;
+                    partialRefundCursor.value = 0;
+                }
+                try {
+                    const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
+                    completed.defense = true;
+                    localStorage.setItem('filingDemoCompletedPaths', JSON.stringify(completed));
+                } catch (error) {
+                    localStorage.setItem('filingDemoCompletedPaths', JSON.stringify({ defense: true }));
+                }
+                window.location.href = './Step5CaseInfoConfirmation.html';
+            };
+
+            const handleFinishButtonClick = (event) => {
+                if (!canFinishAiConsult.value || aiIsThinking.value) {
+                    event?.preventDefault?.();
+                    showAiFinishTooltip();
                     return;
                 }
-                window.location.href = './立案提交后路径选择.html';
+                finishAiConsult();
             };
 
             const advanceQuestionLogic = () => {
@@ -1171,6 +1233,8 @@ const PARTIAL_REFUND_DIALOGUE = [
                 aiMessageId = 0;
                 aiMessages.value = [];
                 aiDefenseRoundCount.value = 0;
+                selectedAiPresetCard.value = null;
+                aiFinishTooltipVisible.value = false;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
                 clearAiStreamTimer();
@@ -1217,9 +1281,10 @@ const PARTIAL_REFUND_DIALOGUE = [
                 showCaseTypeBadge, scorePopups, contactService,
                 showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
                 aiInput, aiInputPlaceholder, aiMessages, aiPresetCards, aiIsThinking, aiPartialRefundScriptActive, aiChatBody, aiFileInput, aiAttachmentName,
-                aiDefenseRoundCount, canFinishAiConsult,
+                aiDefenseRoundCount, canFinishAiConsult, selectedAiPresetCard, hasSelectedAiPreset, aiFinishTooltipVisible,
                 filingProgressSteps, isProgressStepDone, getProgressStepClass,
-                sendAiMessage, chooseAiPreset, triggerAiFileUpload, handleAiFileChange, finishAiConsult,
+                sendAiMessage, chooseAiPreset, triggerAiFileUpload, handleAiFileChange, finishAiConsult, handleFinishButtonClick, goToStep5Direct,
+                reopenAiPresetCards, showAiFinishTooltip, hideAiFinishTooltip,
                 confirmModal, showConfirmModal, closeConfirmModal, executeConfirmAction,
                 score, badges, earnedBadges, toggleBadgeDrawer, isBadgeDrawerOpen,
                 reportStep, nextReportStep, prevReportStep,

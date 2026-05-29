@@ -7,8 +7,6 @@
     <link rel="icon" href="data:,">
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="./assets/shared/case-assessment-report-data.js"></script>
-    <script src="./assets/shared/case-assessment-report.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Animate.css -->
@@ -16,7 +14,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./assets/game-qa/game-qa.css">
-  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css">
+  <link rel="stylesheet" href="./assets/demo-shell/demo-nav.css?v=20260529">
 </head>
 <body class="h-screen w-screen bg-gray-100">
 
@@ -124,22 +122,22 @@
                 <div class="intro-flow-step">
                     <div class="intro-flow-node">01</div>
                     <div class="intro-flow-copy">
-                        <strong>智能分析案件材料</strong>
-                        <span>识别基础事实</span>
+                        <strong>核对已提取案情</strong>
+                        <span>确认案件类型、标的金额和请求事项</span>
                     </div>
                 </div>
                 <div class="intro-flow-step">
                     <div class="intro-flow-node">02</div>
                     <div class="intro-flow-copy">
                         <strong>问答梳理案情</strong>
-                        <span>4-5 个问题确认关键事实</span>
+                        <span>通过关卡问题补充关键事实</span>
                     </div>
                 </div>
                 <div class="intro-flow-step">
                     <div class="intro-flow-node">03</div>
                     <div class="intro-flow-copy">
-                        <strong>生成案件评估报告</strong>
-                        <span>输出风险与路径建议</span>
+                        <strong>选择后续体验</strong>
+                        <span>继续辅助体验或填写下一步信息</span>
                     </div>
                 </div>
             </div>
@@ -150,7 +148,11 @@
     <div
         v-if="showOverlayPanel"
         class="game-overlay-panel absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-        :class="{'pb-48': stage !== 'report', 'pb-4 report-overlay-panel': stage === 'report'}"
+        :class="{
+            'pb-48': stage !== 'report' && stage !== 'route_choice',
+            'pb-4 report-overlay-panel': stage === 'report',
+            'route-choice-overlay-panel': stage === 'route_choice'
+        }"
     >
         
 
@@ -339,22 +341,6 @@
             </div>
         </div>
 
-        <button type="button" v-if="stage === 'report'" @click="returnToPathChoice" class="absolute left-12 top-20 z-40 px-4 py-2.5 rounded-xl bg-white/90 hover:bg-white text-slate-700 text-sm font-bold transition-colors flex items-center gap-2 shadow-lg border border-white/70">
-            <i class="fas fa-arrow-left"></i>
-            返回路径选择
-        </button>
-
-        <case-assessment-report
-            v-if="stage === 'report'"
-            :report-step="reportStep"
-            :report-data="currentReportData"
-            :is-filing-completed="isFilingCompleted"
-            mediation-label="参与调解"
-            @next="nextReportStep"
-            @prev="prevReportStep"
-            @confirm="showConfirmModal"
-        ></case-assessment-report>
-        
         <!-- Final Success -->
         <div v-if="stage === 'success'" class="text-center animate__animated animate__bounceIn">
             <div class="text-6xl mb-4 text-white"><i class="fas fa-circle-check"></i></div>
@@ -363,6 +349,75 @@
             <button type="button" @click="resetGame" class="mt-8 px-6 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/50 backdrop-blur-sm transition">
                 返回首页
             </button>
+        </div>
+
+        <div v-if="stage === 'route_choice'" class="route-choice-card game-route-choice-card animate__animated animate__zoomIn">
+            <div class="route-choice-head">
+                <div>
+                    <div class="route-choice-title">是否继续游戏化体验</div>
+                    <div class="route-choice-sub">问答已完成。您可以继续体验辅助工具，也可以直接继续填写下一步案件信息。</div>
+                </div>
+                <button type="button" class="continue-next-btn" @click="continueNextInfo">
+                    继续填写下一步信息 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            <div class="card-grid">
+                <article class="choice-card" data-tone="defense" tabindex="0" aria-label="AI模拟对方抗辩">
+                    <div class="choice-card-inner">
+                        <div class="card-face card-front" data-order="02">
+                            <div class="card-meta">
+                                <div class="card-icon"><i class="fas fa-comments"></i></div>
+                            </div>
+                            <div>
+                                <h2 class="card-title">AI模拟被申请人·提前看看对方会怎么说</h2>
+                                <p class="card-desc">提前听一听对方可能如何回应您的退款主张。</p>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div>
+                                <h3 class="back-title">换到对方立场，看争议会怎么展开</h3>
+                                <p class="back-copy">系统会直接扮演培训机构一方，围绕课程是否提供、退款条款、证据材料和协商空间进行回应。</p>
+                            </div>
+                            <ul class="value-list">
+                                <li><i class="fas fa-shield-halved"></i><div><strong>提前感受对抗点</strong><span>看看对方可能从哪些角度不同意全额退款。</span></div></li>
+                                <li><i class="fas fa-folder-open"></i><div><strong>反查证据是否够用</strong><span>如果对方否认承诺或服务问题，您能否拿出连续材料。</span></div></li>
+                                <li><i class="fas fa-scale-balanced"></i><div><strong>帮助调整预期</strong><span>判断继续坚持全额退款，还是先争取可履行的协商方案。</span></div></li>
+                            </ul>
+                            <div class="enter-actions">
+                                <a class="enter-link" href="./抗辩机器人.html" data-enter="defense" @click.prevent="openExperiencePath('defense')">选择并进入模拟 <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="choice-card" data-tone="route" tabindex="0" aria-label="了解调解仲裁路径">
+                    <div class="choice-card-inner">
+                        <div class="card-face card-front" data-order="03">
+                            <div class="card-meta">
+                                <div class="card-icon"><i class="fas fa-route"></i></div>
+                            </div>
+                            <div>
+                                <h2 class="card-title">调解/仲裁，哪种方式更适合你</h2>
+                                <p class="card-desc">用一页图解看懂调解与仲裁的区别，帮助你选择更合适的处理方式。</p>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div>
+                                <h3 class="back-title">先理解两条路的区别，再做选择</h3>
+                                <p class="back-copy">系统会把调解和仲裁放在同一个页面对比，说明大概周期、办理节点和结果形式，帮助您降低选择成本。</p>
+                            </div>
+                            <ul class="value-list">
+                                <li><i class="fas fa-chart-line"></i><div><strong>对比周期和压力</strong><span>直观看到调解更快、更灵活，仲裁更正式、准备要求更高。</span></div></li>
+                                <li><i class="fas fa-map-location-dot"></i><div><strong>同屏看两条路径</strong><span>不用来回切页面，就能理解两种方式的办理节点。</span></div></li>
+                                <li><i class="fas fa-arrow-pointer"></i><div><strong>选择后进入路径说明</strong><span>看清调解与仲裁的办理节点后，再决定是否优先选择调解。</span></div></li>
+                            </ul>
+                            <div class="enter-actions">
+                                <a class="enter-link" href="./案件路径图.html" data-enter="map" @click.prevent="openExperiencePath('route')">选择并查看路径 <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
         </div>
 
         <!-- Custom Confirm Modal -->
@@ -466,7 +521,7 @@
     </div>
 
 <script src="./assets/game-qa/game-qa-app.js"></script>
-  <script src="./assets/demo-shell/demo-config.js"></script>
-  <script src="./assets/demo-shell/demo-nav.js"></script>
+  <script src="./assets/demo-shell/demo-config.js?v=20260529"></script>
+  <script src="./assets/demo-shell/demo-nav.js?v=20260529"></script>
 </body>
 </html>
