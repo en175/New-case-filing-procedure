@@ -21,6 +21,11 @@
 
 <div id="app" class="relative h-full w-full overflow-hidden">
 
+    <a class="page-return-button" href="./立案提交后路径选择.html" aria-label="返回">
+        <i class="fas fa-arrow-left"></i>
+        <span>返回</span>
+    </a>
+
     <!-- Top HUD Bar -->
     <div class="hud-bar" :class="{ 'hud-hidden': stage === 'intro' }">
         <div class="flex items-center">
@@ -372,10 +377,10 @@
                 <div class="ai-chat-body" ref="aiChatBody">
                     <div class="ai-welcome-panel" :class="{ 'collapsed': hasSelectedAiPreset }">
                         <div class="ai-preset-stage" :class="{ 'collapsed': hasSelectedAiPreset }">
-                            <h3 class="ai-welcome-title">您好，下面将模拟被申请人与您直接对话。</h3>
-                            <p class="ai-welcome-desc">请选择一个争议场景，由培训机构一方直接回应您的退款主张，重点呈现对方可能坚持的事实和理由。</p>
+                            <h3 class="ai-welcome-title">请选择你方主张的争议焦点。</h3>
+                            <p class="ai-welcome-desc">可围绕权利依据、履行事实、证据材料或金额计算选择下方场景。</p>
                             <div v-if="!hasSelectedAiPreset" class="ai-preset-grid">
-                                <button type="button" v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking || aiPartialRefundScriptActive">
+                                <button type="button" v-for="(card, index) in aiPresetCards" :key="card.title" @click="chooseAiPreset(card)" class="ai-preset-card" :class="{ 'featured': index === 2 }" :disabled="aiIsThinking">
                                     <div class="ai-preset-icon">
                                         <i :class="card.icon"></i>
                                     </div>
@@ -392,7 +397,7 @@
                                 <div class="ai-selected-chip-title">{{ selectedAiPresetCard.title }}</div>
                                 <div class="ai-selected-chip-desc">{{ selectedAiPresetCard.tag }}</div>
                             </div>
-                            <button type="button" class="ai-selected-chip-reset" @click="reopenAiPresetCards" :disabled="aiIsThinking || aiPartialRefundScriptActive">
+                            <button type="button" class="ai-selected-chip-reset" @click="reopenAiPresetCards" :disabled="aiIsThinking">
                                 重新选择
                             </button>
                         </div>
@@ -437,15 +442,20 @@
 
             <div class="ai-input-area">
                 <div class="ai-input-shell">
-                    <textarea v-model="aiInput" @keydown.enter.exact.prevent="sendAiMessage"></textarea>
+                    <textarea v-model="aiInput" :placeholder="aiInputPlaceholder" :disabled="aiIsThinking || !hasSelectedAiPreset" @keydown.enter.exact.prevent="sendAiMessage"></textarea>
                     <div class="ai-input-options">
-                        <button type="button" @click="triggerAiFileUpload" class="ai-attach-btn" aria-label="上传附件">
+                        <button type="button" @click="triggerAiFileUpload" class="ai-attach-btn" :disabled="aiIsThinking || !hasSelectedAiPreset" aria-label="上传PDF材料" title="上传PDF材料">
                             <i class="fas fa-paperclip"></i>
                         </button>
-                        <input ref="aiFileInput" type="file" class="hidden" @change="handleAiFileChange" />
-                        <button type="button" @click="sendAiMessage" class="ai-send-btn" :disabled="aiIsThinking" aria-label="发送">
+                        <input ref="aiFileInput" type="file" accept=".pdf,application/pdf" class="hidden" @change="handleAiFileChange" />
+                        <button type="button" @click="sendAiMessage" class="ai-send-btn" :disabled="aiIsThinking || !hasSelectedAiPreset" aria-label="发送">
                             <i class="fas fa-paper-plane"></i>
                         </button>
+                    </div>
+                    <div v-if="aiAttachmentName" class="ai-upload-status" :class="'is-' + aiOcrStatus">
+                        <i class="fas fa-file-pdf"></i>
+                        <span class="ai-upload-name">{{ aiAttachmentName }}</span>
+                        <span class="ai-upload-state">{{ aiOcrStatusText }}</span>
                     </div>
                 </div>
             </div>
@@ -457,8 +467,7 @@
             </div>
             <button
                 type="button"
-                class="ai-finish-btn ready"
-                style="min-width: 180px;"
+                class="ai-finish-btn ai-demo-skip-btn"
                 @click="goToStep5Direct"
             >
                 <i class="fas fa-forward-step"></i>

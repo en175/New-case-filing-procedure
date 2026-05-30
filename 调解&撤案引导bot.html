@@ -98,6 +98,42 @@
         .diversion-finish-float .ai-finish-btn.locked::before {
             display: none;
         }
+        .diversion-card {
+            padding: 0;
+        }
+        .diversion-card .ai-consult-header {
+            padding: 22px 26px 18px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.72);
+            background:
+                radial-gradient(circle at 12% 20%, rgba(199, 215, 255, 0.72), transparent 34%),
+                linear-gradient(135deg, #f8fbff 0%, #ffffff 54%, #eef6ff 100%);
+        }
+        .diversion-panel {
+            flex: 1;
+            min-height: 0;
+            border: 0;
+            border-radius: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+            overflow: hidden;
+        }
+        .diversion-panel .ai-scroll-content {
+            flex: 1;
+            min-height: 0;
+            padding: 22px 26px 0;
+        }
+        .diversion-panel .ai-chat-body {
+            min-height: 0;
+            padding: 0;
+        }
+        .diversion-panel .ai-input-area {
+            padding: 12px 26px 14px;
+            border-top: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.66) 0%, #ffffff 100%);
+        }
+        .diversion-panel .ai-input-shell {
+            margin: 0;
+        }
     </style>
 </head>
 <body class="h-screen w-screen bg-gray-100">
@@ -152,6 +188,10 @@
             <section class="ai-consult-card diversion-card animate__animated animate__fadeInUp">
                 <div class="ai-consult-header">
                     <div class="ai-prototype-brand">
+                        <a class="diversion-card-back" href="./Step4RespondentConfirmation.html" aria-label="返回上一页">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>返回</span>
+                        </a>
                         <div class="ai-logo-wrap">
                             <img src="./图片/ai-assistant-logo.svg" alt="AI智能助手">
                         </div>

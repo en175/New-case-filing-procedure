@@ -21,6 +21,16 @@
 
 <div id="app" class="relative h-full w-full overflow-hidden">
 
+    <a
+        class="game-page-back-btn"
+        :class="{ 'intro-position': stage === 'intro' }"
+        href="./调解&amp;撤案引导bot.html"
+        aria-label="返回调解与撤案引导页"
+    >
+        <i class="fas fa-arrow-left"></i>
+        <span>返回</span>
+    </a>
+
     <!-- Top HUD Bar -->
     <div class="hud-bar" :class="{ 'hud-hidden': stage === 'intro' }">
         <div class="flex items-center">

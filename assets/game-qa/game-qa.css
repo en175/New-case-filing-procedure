@@ -941,6 +941,50 @@
 
         /* --- New Gamification Styles --- */
 
+        .game-page-back-btn {
+            position: fixed;
+            top: 80px;
+            left: 16px;
+            z-index: 1100;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 0 15px;
+            border: 1px solid rgba(191, 219, 254, 0.94);
+            border-radius: 10px;
+            color: #1d4ed8;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.14);
+            backdrop-filter: blur(12px);
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .game-page-back-btn.intro-position {
+            top: 16px;
+        }
+
+        body.demo-nav-ready .game-page-back-btn {
+            left: calc(var(--demo-nav-width) + 16px);
+            transition: left 0.22s ease, transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .game-page-back-btn:hover {
+            background: #ffffff;
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 900px) {
+            body.demo-nav-ready .game-page-back-btn {
+                left: 16px;
+            }
+        }
+
         /* HUD Bar */
         .hud-bar {
             position: fixed;

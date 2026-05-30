@@ -1,13 +1,13 @@
 (function () {
   const navItems = [
-    { key: 'index', short: '1', title: '申请书准备方式', href: './index.html' },
-    { key: 'filing', short: '2', title: 'AI生成申请书bot', href: './申请书bot.html', bot: true },
+    { key: 'index', short: '1', title: 'step1:申请书准备方式', href: './index.html' },
+    { key: 'filing', short: '2', title: '生成申请书bot', href: './申请书bot.html', bot: true },
     { key: 'step2', short: '3', title: 'step2:提交案件材料', href: './Step2SmartExtraction.html' },
     { key: 'step3', short: '4', title: 'step3:申请人信息', href: './Step3PartyConfirmation.html' },
     { key: 'step4', short: '5', title: 'step4:被申请人信息', href: './Step4RespondentConfirmation.html' },
     { key: 'diversionBot', short: '6', title: '调解/仲裁引导bot', href: './调解&撤案引导bot.html', bot: true },
     { key: 'qa', short: '7', title: '游戏化问答', href: './游戏化问答.html' },
-    { key: 'defense', short: '8', title: 'AI模拟被申请人bot', href: './抗辩机器人.html', bot: true },
+    { key: 'defense', short: '8', title: '模拟被申请人bot', href: './抗辩机器人.html', bot: true },
     { key: 'path', short: '9', title: '调解/仲裁路径对比', href: './案件路径图.html' },
     { key: 'step5', short: '10', title: 'step5:案件信息确认', href: './Step5CaseInfoConfirmation.html' },
     { key: 'step6', short: '11', title: 'step6:送达地址确认', href: './Step6DeliveryAddressConfirmation.html' },

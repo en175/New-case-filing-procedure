@@ -1,38 +1,5 @@
 const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
-const PARTIAL_REFUND_DIALOGUE = [
-    { role: 'assistant', text: '李明，你要求全额退还15800元，我们不同意。你现在的说法是“对方没有提供服务”，但事实并不是这样。账号已经开通，导学课程已经开放，你也有登录学习记录。你不能一边使用了服务，一边主张对方零履行、全额退款。' },
-    { role: 'user', text: '我只是看了两节导学录播课，核心直播课根本没开。' },
-    { role: 'assistant', text: '你不要把“核心直播课延期”偷换成“合同完全没有履行”。这是两个问题。延期最多说明履行存在争议，不等于你当然有权解除合同，更不等于你当然可以拿回全部费用。' },
-    { role: 'user', text: '可是合同和宣传页都写了12周核心直播课、一对一辅导和作业点评。' },
-    { role: 'assistant', text: '那请你拿出合同正文。宣传页不是退款条款，也不是解除条款。你要全额退款，就请明确指出合同里哪一条写着：只要直播课延期，学员可以无条件全额退款。如果没有，你的请求就是把自己的理解当成合同约定。' },
-    { role: 'user', text: '合同虽然没有写无条件全额退款，但你们没有按约提供主要服务。' },
-    { role: 'assistant', text: '“主要服务没有提供”也不是你单方定义的。合同约定的是一揽子培训服务，不是只要某一项服务没有按你期待的时间提供，就可以否定全部履行。你已经获得账号、课程入口、导学内容、班主任服务，这些你准备怎么解释？' },
-    { role: 'user', text: '这些不是我真正购买的核心内容。' },
-    { role: 'assistant', text: '你说“不是真正购买的核心内容”，这是你的主观评价。仲裁看的是合同约定和实际履行，不是你事后认为哪些值钱、哪些不值钱。你如果主张这些服务没有价值，就请举证说明两节导学课、平台账号、班主任服务的价值为零。' },
-    { role: 'user', text: '我不需要证明它们为零，你们要证明扣30%合理。' },
-    { role: 'assistant', text: '我们当然会证明。平台开通记录、课程配置记录、班主任服务记录、学习记录都可以证明服务已经开始履行。反过来，你要证明自己有权全额退款。你目前的证据只能证明延期，不能直接证明全额退款成立。' },
-    { role: 'user', text: '你们延期了三次，而且一直不给明确开课时间。' },
-    { role: 'assistant', text: '延期三次不等于合同目的必然无法实现。你报名这个课程有没有明确写明必须在某个日期前完成？有没有约定逾期开课几天就可以全额退款？有没有证据证明我们明确拒绝继续履行？如果这些都没有，你的解除理由并不稳。' },
-    { role: 'user', text: '你们一直拖，我当然不能无限期等。' },
-    { role: 'assistant', text: '你可以不等，但“不愿意继续等”和“依法可以全额退款”不是一回事。你现在最大的问题是：你把履行瑕疵直接放大成根本违约，把部分退款争议直接包装成全额退款请求。这个逻辑在仲裁里未必站得住。' },
-    { role: 'user', text: '那你们准备怎么处理？' },
-    { role: 'assistant', text: '我们的立场很明确：不同意全额退款。最多退还70%，也就是11060元。这个金额已经考虑了未开核心直播课的情况。如果你坚持15800元，我们就进入仲裁，由仲裁庭判断你已经使用的服务是否应当扣减。' },
-    { role: 'user', text: '11060元太低了，我不能接受。' },
-    { role: 'assistant', text: '那你也要清楚，仲裁不是你说退多少就退多少。你主张14500元，等于只允许我们扣1300元。这个金额凭什么来？你如何证明已经开通的课程、账号、资料、班主任服务、平台资源全部只值1300元？' },
-    { role: 'user', text: '因为你们真正核心的课没有开，这些东西本来就不值这么多钱。' },
-    { role: 'assistant', text: '“不值这么多钱”仍然是你的判断。我们不接受这种没有计算依据的金额。我们可以调解，但不是因为认可你的全部主张，而是为了减少双方程序成本。调解金额可以提高到13000元，一次性支付。超过这个金额，我们建议直接仲裁。' },
-    { role: 'user', text: '13000元还是太低。我最低接受14000元。' },
-    { role: 'assistant', text: '14000元已经接近全额退款。我们没有义务在证据和合同依据都存在争议的情况下接受这个金额。最后方案：13500元，5个工作日内一次性支付，合同解除，双方就本合同费用返还问题一次性了结。你接受，就调解；不接受，就走仲裁。' },
-    { role: 'user', text: '我还是要求14000元。' },
-    { role: 'assistant', text: '可以，那我们把话说清楚：如果走仲裁，我们会抗辩三点。第一，你已经使用部分服务，不存在全额退款基础；第二，延期不等于根本违约；第三，合同没有约定你可以无条件全额退款。你要承担仲裁周期、举证压力和金额被扣减的风险。' },
-    { role: 'user', text: '我知道有风险，但我也有证据证明你们没有提供核心课程。' },
-    { role: 'assistant', text: '所以这就是一个退款比例争议，不是你单方主张全额退款就能解决。我们最终可以在13500元基础上再让一步，退还13800元，5个工作日内一次性支付。这个金额已经接近我们的调解上限。' },
-    { role: 'user', text: '如果是13800元，我还要考虑。但我更希望14000元。' },
-    { role: 'assistant', text: '14000元可以作为最终一次性方案，但必须附带两个条件：第一，付款完成后双方合同解除，费用争议一次性了结；第二，你不得再就本合同另行主张违约金、利息、赔偿或其他费用。逾期未付款的，你可以继续申请仲裁。这个条件接受，才有调解空间。' },
-    { role: 'user', text: '可以。只要5个工作日内一次性退14000元，我接受。' }
-];
-
     createApp({
         setup() {
             // Assets
@@ -129,73 +96,105 @@ const PARTIAL_REFUND_DIALOGUE = [
             const aiChatBody = ref(null);
             const aiFileInput = ref(null);
             const aiAttachmentName = ref('');
+            const aiOcrStatus = ref('idle');
+            let aiOcrTimer = null;
             const aiReplyDelay = 3000;
             let aiMessageId = 0;
             const aiMessages = ref([]);
             let aiTypewriter = null;
             const aiDefenseRoundCount = ref(0);
-            const aiPartialRefundScriptActive = ref(false);
-            const partialRefundCursor = ref(0);
             const selectedAiPresetCard = ref(null);
             const hasSelectedAiPreset = computed(() => Boolean(selectedAiPresetCard.value));
             const aiFinishTooltipVisible = ref(false);
             const AI_DEFENSE_REQUIRED_ROUNDS = 3;
             const canFinishAiConsult = computed(() => aiDefenseRoundCount.value >= AI_DEFENSE_REQUIRED_ROUNDS);
             const aiInputPlaceholder = computed(() => {
-                if (!aiPartialRefundScriptActive.value) return '';
-                const step = PARTIAL_REFUND_DIALOGUE[partialRefundCursor.value];
-                if (step && step.role === 'user') {
-                    return `请扮演申请人输入（可参考）：${step.text}`;
-                }
-                return '请等待被申请人回复…';
+                return '';
+            });
+            const aiOcrStatusText = computed(() => {
+                if (aiOcrStatus.value === 'processing') return '材料识别中';
+                if (aiOcrStatus.value === 'success') return '材料识别完成';
+                if (aiOcrStatus.value === 'error') return '材料识别失败';
+                return '';
             });
             const aiPresetCards = ref([
                 {
-                    title: '课程已经提供',
-                    desc: '模拟机构认为服务已开通、已排课、已投入资源。',
-                    tag: '履行争议',
+                    id: 'D1',
+                    title: '权利依据不清',
+                    desc: '主张缺少明确权利来源。',
+                    tag: '依据争议',
                     icon: 'fas fa-file-contract',
-                    prompt: '我要求你们退还全部培训费。',
-                    answer: '我们不同意全额退款。课程账号已经开通，教务老师已经安排排课，部分课程也已经实际提供。您后来没有继续参加学习，并不代表我们没有履行合同。<br><br>如果您认为还有未履行课时，请先说明具体是哪几节课、对应时间、预约记录和我们拒绝提供服务的记录。不能只因为学习效果不符合预期，就要求把全部费用退回。'
+                    openingMessage: '我方不认可你方对权利来源和责任依据的概括。你方现在主张我方承担责任，具体依据是哪一份协议、合同、订单、结算文件或确认记录？',
+                    keyQuestions: [
+                        '你方主张权利的具体依据是什么？',
+                        '该依据是否明确指向我方应承担的责任？',
+                        '双方是否对交易内容、履行标准或结算结果作过确认？'
+                    ]
                 },
                 {
-                    title: '服务效果争议',
-                    desc: '模拟机构认为学习效果不等于当然退费条件。',
-                    tag: '效果争议',
+                    id: 'D2',
+                    title: '我方已经履行',
+                    desc: '不认可完全未履行说法。',
+                    tag: '履行争议',
                     icon: 'fas fa-chart-line',
-                    prompt: '你们承诺的学习效果没有达到，所以应当退款。',
-                    answer: '我们不认可仅凭学习效果没有达到就要求全额退款。培训服务的核心是提供课程、老师、教务安排和学习资源，不是保证每个人都能达到特定结果。<br><br>如果您主张我们承诺过保过、包效果或者无条件退款，请提供付款前的完整承诺记录，以及该承诺与合同条款之间的对应关系。否则我们仍然按照协议约定和已提供服务情况核算。'
+                    openingMessage: '我方不认可你方关于我方完全未履行的说法。即使双方存在争议，也不代表我方没有履行。你方具体认为我方哪一项义务没有完成？',
+                    keyQuestions: [
+                        '你方认为我方具体哪一项义务没有完成？',
+                        '该义务在协议、交易文件或沟通记录中如何约定？',
+                        '你方是否能区分已履行部分和争议部分？'
+                    ]
                 },
                 {
-                    title: '退款条款已告知',
-                    desc: '模拟机构引用报名协议、退费条款和页面确认记录。',
-                    tag: '条款争议',
+                    id: 'D3',
+                    title: '申请人也有责任',
+                    desc: '争议并非单方造成。',
+                    tag: '责任争议',
                     icon: 'fas fa-scroll',
-                    prompt: '你们的退款条款不合理，我没有被充分告知。',
-                    answer: '报名时协议中已经写明退费条件、课时扣除方式和特殊情形处理规则，您付款前也已经确认相关内容。我们不能接受现在完全不看协议、直接要求全额退款。<br><br>如果您认为销售人员作出过与协议相反的承诺，请提供完整聊天记录、承诺时间、承诺人员身份以及对应付款前后的上下文。否则我们仍按协议约定处理。'
+                    openingMessage: '我方不认可你方把责任全部归到我方。争议形成并不一定是单方原因，如果你方也存在未配合、未确认、迟延反馈或自行扩大损失的情况，责任不能全部由我方承担。你方是否已经完成自己的配合义务？',
+                    keyQuestions: [
+                        '你方是否已经完成付款、确认、验收、资料提供或其他配合义务？',
+                        '争议发生前，我方是否要求你方配合、确认或补充材料？',
+                        '你方是否存在迟延反馈、拒绝配合、未及时确认或扩大损失的情况？'
+                    ]
                 },
                 {
-                    title: '证据材料不足',
-                    desc: '模拟对方否认口头承诺、否认服务质量问题。',
+                    id: 'D4',
+                    title: '证据无法证明责任',
+                    desc: '现有材料支撑不足。',
                     tag: '证据争议',
                     icon: 'fas fa-folder-open',
-                    prompt: '我有聊天截图，可以证明你们承诺过退费。',
-                    answer: '您提交的截图如果不完整，我们无法确认聊天对象、上下文和具体承诺内容。部分沟通只是客服安抚或协商意向，不等于公司已经作出无条件退款承诺。<br><br>请您提供连续记录，证明付款项目、课程内容、退款申请、我们明确拒绝或明确承诺退款的全过程。否则我们认为现有材料不足以支持您的全部主张。'
+                    openingMessage: '我方不认可你方关于我方应承担责任的说法。你方目前更多是在陈述自己的理解，但需要有材料对应具体责任事实。你方具体依据哪份材料认定我方应承担责任？',
+                    keyQuestions: [
+                        '哪份材料能直接证明我方应承担该项责任？',
+                        '该材料是否能对应具体协议、交易事实、履行记录或结算结果？',
+                        '现有材料能否证明损失、金额或付款义务与我方行为之间存在关联？'
+                    ]
                 },
                 {
-                    title: '只接受部分退款',
-                    desc: '模拟双方就退款比例多轮拉锯，最终收敛到可调解金额。',
-                    tag: '调解争议',
+                    id: 'D5',
+                    title: '金额计算缺少依据',
+                    desc: '请求金额缺少拆分说明。',
+                    tag: '金额争议',
                     icon: 'fas fa-handshake',
-                    scriptId: 'partial-refund'
+                    openingMessage: '我方不认可你方主张的金额。你方不能只给出一个总数，就要求我方全部承担。请你方先说明每一项金额分别是什么、如何计算、依据是什么？',
+                    keyQuestions: [
+                        '本金、价款、费用、利息、违约金、损失或返还款是否已经分别拆分？',
+                        '每一项金额对应的协议依据、事实依据或计算依据是什么？',
+                        '是否存在重复计算或扩大计算？',
+                    ]
                 },
                 {
-                    title: '经营困难分期退',
-                    desc: '模拟机构认可部分退款，但要求延期或分期。',
-                    tag: '履行能力',
+                    id: 'D6',
+                    title: '只认可部分责任',
+                    desc: '可沟通但不接受全部请求。',
+                    tag: '协商争议',
                     icon: 'fas fa-receipt',
-                    prompt: '你们一直拖延退款，我不能接受分期。',
-                    answer: '我们并不是拒绝沟通，但公司目前经营压力较大，短时间内无法一次性支付您主张的全部金额。即便协商退款，也需要结合公司资金情况分期履行。<br><br>如果您不接受分期，我们只能按合同和实际履行情况继续说明。我们愿意把可退金额、付款节点和违约后果写清楚，但无法承诺立即全额支付。'
+                    openingMessage: '我方并不是完全拒绝沟通，但不接受你方没有区分事实和金额就要求我方承担全部责任。你方能否先说明，哪些请求是有明确协议依据、事实依据和证据依据的？',
+                    keyQuestions: [
+                        '你方哪些请求有明确协议依据、事实依据和证据依据？',
+                        '哪些金额属于你方主张，哪些金额可以客观核算？',
+                        '如果只能证明部分事实，你方是否接受在对应范围内沟通处理？'
+                    ]
                 }
             ]);
 
@@ -834,7 +833,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                         messagesRef: aiMessages,
                         thinkingRef: aiIsThinking,
                         replyDelay: aiReplyDelay,
-                        fallbackText: '我们不同意您的说法。是否退款、退多少，仍需结合合同约定、已提供服务、您是否配合履行以及完整沟通记录核算。',
+                        fallbackText: '我方不认可你方没有依据的概括主张。请先说明合同依据、事实依据、证据依据和金额计算依据。',
                         nextId: () => ++aiMessageId,
                         escapeHtml,
                         scrollToBottom: scrollAiChatToBottom
@@ -873,89 +872,107 @@ const PARTIAL_REFUND_DIALOGUE = [
                 aiFinishTooltipVisible.value = false;
             };
 
+            const clearAiOcrTimer = () => {
+                if (!aiOcrTimer) return;
+                clearTimeout(aiOcrTimer);
+                aiOcrTimer = null;
+            };
+
+            const resetAiAttachment = () => {
+                clearAiOcrTimer();
+                aiAttachmentName.value = '';
+                aiOcrStatus.value = 'idle';
+            };
+
             const syncAiPresetState = (card) => {
-                selectedAiPresetCard.value = card ? { title: card.title, tag: card.tag } : null;
+                selectedAiPresetCard.value = card ? {
+                    id: card.id,
+                    title: card.title,
+                    tag: card.tag,
+                    desc: card.desc,
+                    openingMessage: card.openingMessage,
+                    keyQuestions: Array.isArray(card.keyQuestions) ? [...card.keyQuestions] : []
+                } : null;
             };
 
             const reopenAiPresetCards = () => {
-                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                if (aiIsThinking.value) return;
                 selectedAiPresetCard.value = null;
                 aiMessages.value = [];
                 aiMessageId = 0;
                 aiDefenseRoundCount.value = 0;
                 aiInput.value = '';
-                aiAttachmentName.value = '';
+                resetAiAttachment();
                 clearAiReplyTimer();
                 clearAiStreamTimer();
-                aiPartialRefundScriptActive.value = false;
-                partialRefundCursor.value = 0;
                 setAiStaticGreeting();
             };
 
-            const finishPartialRefundScript = () => {
-                aiPartialRefundScriptActive.value = false;
-                partialRefundCursor.value = 0;
-                pushAiChatAssistantMessage('本轮模拟对话已完成。您可以继续追问，也可以结束对话进入下一步。');
+            const buildDefenseReply = (card, question) => {
+                const normalized = String(question || '').replace(/\s/g, '');
+                if (/伪造|补做证据|修改聊天记录|补签协议|删除不利|做假|造假/.test(normalized)) {
+                    return '我方不接受围绕虚假材料继续沟通。你方如果要主张责任，只能回到现有真实材料、合同条款和已发生的履行记录上。你方现有证据具体是哪一份？';
+                }
+                if (/胜诉概率|败诉概率|会不会支持|支持我吗|仲裁庭会|仲裁委会|结果一定|一定赢|一定输/.test(normalized)) {
+                    return '我方不能替仲裁机构预测处理结果，也不会用结果判断替代事实争议。你方如果坚持主张，请先说明权利依据、证据对应关系和金额计算依据。';
+                }
+                if (/代表广州仲裁委员会|代表仲裁庭|代表仲裁员|真实被申请人|作出承诺|官方表态/.test(normalized)) {
+                    return '我方不能代表仲裁机构、仲裁庭或真实当事人作出承诺。当前只围绕你方主张回应，请先说明你方请求对应的权利依据。';
+                }
+                const fallback = {
+                    D1: '我方不认可你方把单方理解直接当作责任依据。请先说明哪份协议、合同、订单、结算文件或确认记录写明了我方要承担你方主张的责任？',
+                    D2: '我方不认可你方把履行争议直接说成完全未履行。请先指出具体哪项义务没有完成，已履行部分和争议部分分别是什么？',
+                    D3: '我方不认可你方把责任全部归到我方。请先说明你方是否完成付款、配合、验收、资料提供、确认和及时反馈等义务？',
+                    D4: '我方不认可你方仅凭片段材料就认定我方应承担责任。请先说清楚，哪份材料能直接证明责任，又如何对应具体交易事实？',
+                    D5: '我方不认可你方只报一个总数。请把本金、价款、费用、利息、损失或返还款分别拆开，并说明每一项依据。',
+                    D6: '我方可以沟通，但只接受在可证明范围内讨论。请先说明哪些请求有明确依据、哪些金额能客观核算，再谈是否继续协商。'
+                };
+                const keyed = {
+                    D1: [
+                        ['条款', '我方需要看到协议、交易文件或确认记录中的明确内容。请你方先指出哪一项写明了责任来源？'],
+                        ['订单', '请你方把协议、订单、结算文件和确认记录对应起来，不能只作概括主张。'],
+                        ['确认', '如果有确认文件，请直接指出其中哪一页、哪一项能证明我方承担你方主张的责任。']
+                    ],
+                    D2: [
+                        ['履行', '请你方具体说明哪项义务没有做到，以及已履行部分和争议部分分别是什么。'],
+                        ['服务', '你方要区分服务已经提供的部分和你方认为有争议的部分，不能笼统说完全没履行。'],
+                        ['未按约', '请直接指出哪一次、哪一段、哪项服务未按约完成，不要只概括评价。']
+                    ],
+                    D3: [
+                        ['配合', '我方先问清楚，你方是否完成了必要配合、确认和资料提供？这些没完成，后果不能都算到我方。'],
+                        ['验收', '请你方说明是否已完成验收或确认，若未完成，争议责任怎么能直接归到我方？'],
+                        ['付款', '你方是否已经完成付款和相应义务？如果没有，先把这个链条说完整。']
+                    ],
+                    D4: [
+                        ['证据', '仅凭片段材料不能直接证明我方应承担责任。请你方说清楚哪份材料能对应哪项事实或义务。'],
+                        ['责任', '哪份材料能直接证明我方应承担责任？又如何对应具体协议、交易事实或履行记录？'],
+                        ['因果', '即便有争议材料，也要说明损失、金额或付款义务与我方行为之间的关联。']
+                    ],
+                    D5: [
+                        ['金额', '你方主张的金额必须拆分计算，不能只报总数。请先说本金、价款、费用、损失或返还款分别是多少。'],
+                        ['计算', '请你方把计算过程写清楚，是否存在重复计算或扩大计算？'],
+                        ['退款', '如果主张返还款项，请说明可客观核算的部分有哪些，不能只给一个笼统数字。']
+                    ],
+                    D6: [
+                        ['协商', '我方可以沟通，但只在可证明范围内谈。你方先说明哪些请求有明确依据。'],
+                        ['调解', '调解可以谈，但前提是把可核算金额和明确依据先列清楚。'],
+                        ['范围', '请你方先收窄到可证明范围内，再谈是否继续协商。']
+                    ]
+                };
+                const matched = (keyed[card?.id || ''] || []).find(([keyword]) => normalized.includes(keyword));
+                return matched ? matched[1] : (fallback[card?.id || 'D4'] || fallback.D4);
             };
 
-            const advancePartialRefundAfterUserSend = () => {
-                partialRefundCursor.value += 1;
-                if (partialRefundCursor.value >= PARTIAL_REFUND_DIALOGUE.length) {
-                    finishPartialRefundScript();
-                    return;
-                }
-
-                const next = PARTIAL_REFUND_DIALOGUE[partialRefundCursor.value];
-                if (!next || next.role !== 'assistant') {
-                    finishPartialRefundScript();
-                    return;
-                }
-
-                aiIsThinking.value = true;
-                scheduleAiReply(next.text, 650, {
-                    afterCompleteHtml: '',
-                    afterComplete: () => {
-                        partialRefundCursor.value += 1;
-                        aiIsThinking.value = false;
-                    }
-                });
-            };
-
-            const startPartialRefundScript = (card) => {
-                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
-
+            const startDefenseCard = (card) => {
+                if (!card || aiIsThinking.value) return;
                 clearAiReplyTimer();
                 clearAiStreamTimer();
                 aiInput.value = '';
-                aiAttachmentName.value = '';
-                aiPartialRefundScriptActive.value = true;
+                resetAiAttachment();
                 syncAiPresetState(card);
-                partialRefundCursor.value = 0;
-
-                if (card && card.title) {
-                    aiMessages.value.push({
-                        id: ++aiMessageId,
-                        role: 'user',
-                        content: `选择争议场景：${escapeHtml(card.title)}`,
-                        streaming: false
-                    });
-                }
-                scrollAiChatToBottom();
-
-                const opening = PARTIAL_REFUND_DIALOGUE[0];
-                if (!opening || opening.role !== 'assistant') {
-                    aiPartialRefundScriptActive.value = false;
-                    return;
-                }
-
                 aiIsThinking.value = true;
-                scheduleAiReply(opening.text, 650, {
-                    afterCompleteHtml: '',
-                    afterComplete: () => {
-                        partialRefundCursor.value = 1;
-                        aiIsThinking.value = false;
-                    }
-                });
+                scrollAiChatToBottom();
+                scheduleAiReply(card.openingMessage || buildDefenseReply(card, card.title), 650);
             };
             const streamAiMessage = (text, streamOptions = {}) => getAiTypewriter().streamMessage(text, {
                 afterCompleteHtml: getMediationAfterCompleteHtml(),
@@ -967,14 +984,7 @@ const PARTIAL_REFUND_DIALOGUE = [
             });
 
             const setAiStaticGreeting = () => {
-                aiMessages.value = [
-                    {
-                        id: ++aiMessageId,
-                        role: 'assistant',
-                        content: '我们先说明立场：全额退款我们目前无法接受。您可以直接就退款、违约、补课、调解或分期履行提出问题，我们会按合同约定和实际履行情况回应。',
-                        streaming: false
-                    }
-                ];
+                aiMessages.value = [];
                 aiIsThinking.value = false;
                 aiFinishTooltipVisible.value = false;
                 scrollAiChatToTop();
@@ -984,44 +994,29 @@ const PARTIAL_REFUND_DIALOGUE = [
                 waitingForInteraction.value = false;
                 showDialog.value = false;
                 aiInput.value = '';
-                aiAttachmentName.value = '';
+                resetAiAttachment();
                 aiMessageId = 0;
                 aiMessages.value = [];
                 aiDefenseRoundCount.value = 0;
                 selectedAiPresetCard.value = null;
                 aiFinishTooltipVisible.value = false;
-                aiIsThinking.value = true;
+                aiIsThinking.value = false;
                 stage.value = 'ai_consult';
-                scrollAiChatToBottom();
-                scheduleAiReply('我们先说明立场：全额退款我们目前无法接受。您可以直接就退款、违约、补课、调解或分期履行提出问题，我们会按合同约定和实际履行情况回应。', 650);
+                setAiStaticGreeting();
             };
 
             const getAiReply = (question) => {
-                const normalized = question.replace(/\s/g, '');
-                if (normalized.includes('已履行') || normalized.includes('履行') || normalized.includes('上课') || normalized.includes('课程')) {
-                    return '课程服务已经开通并安排过排课，我们也投入了老师、教务和系统资源。您中途停止学习，不能直接认定为我们没有履行合同。您如果主张未履行，请说明具体是哪一节课、哪一次预约失败、哪一项服务没有提供。';
-                }
-                if (normalized.includes('效果') || normalized.includes('承诺') || normalized.includes('保过') || normalized.includes('保证')) {
-                    return '我们不认可仅凭学习效果没有达到就要求全额退款。培训服务的核心是提供课程、老师、教务安排和学习资源，不是保证每个人都能达到特定结果。如果您主张我们承诺过保过、包效果或者无条件退款，请提供付款前的完整承诺记录，以及该承诺与合同条款之间的对应关系。';
-                }
-                if (normalized.includes('违约') || normalized.includes('缺课') || normalized.includes('没配合')) {
-                    return '我们不认可自己构成违约。课程推进需要您配合预约、上课和反馈，您后续没有持续参加学习，相关后果不能完全由我们承担。如果您认为我们违约，请拿出合同约定、服务承诺和我们未履行的对应记录。';
-                }
-                if (normalized.includes('退款规则') || normalized.includes('签字') || normalized.includes('条款') || normalized.includes('协议')) {
-                    return '退款规则在协议里已有明确约定，您付款前已经确认相关内容。我们只能按照合同约定和实际履行情况核算，不接受脱离协议直接全额退款。如果您说销售人员另有承诺，请提交完整证据。';
-                }
-                if (normalized.includes('材料') || normalized.includes('证据') || normalized.includes('付款') || normalized.includes('截图')) {
-                    return '单独几张截图不能证明完整事实。我们需要看到付款项目、课程内容、服务过程、退款申请和双方沟通的连续记录。如果材料不完整，我们不会认可您所说的全部承诺和退款金额。';
-                }
-                if (normalized.includes('调解') || normalized.includes('部分退款') || normalized.includes('全退')) {
-                    return '如果走调解，我们可以讨论部分退款、分期退款、延期服务或补课方案，但全额退款不现实。我们已经提供过服务并产生了成本，调解也应当考虑双方责任和实际履行情况。';
-                }
-                return '我们理解您要求退款的诉求，但不同意把责任全部归到机构一方。是否退款、退多少，要看合同条款、已提供服务、您是否配合履行以及双方沟通记录。请您先明确具体主张和对应事实。';
+                const card = selectedAiPresetCard.value || aiPresetCards.value[0];
+                return buildDefenseReply(card, question);
             };
 
             const sendAiMessage = () => {
                 const text = aiInput.value.trim();
                 if (!text || aiIsThinking.value) return;
+                if (!hasSelectedAiPreset.value) {
+                    showAiFinishTooltip();
+                    return;
+                }
                 clearAiStreamTimer();
 
                 aiMessages.value.push({
@@ -1034,38 +1029,18 @@ const PARTIAL_REFUND_DIALOGUE = [
                 aiInput.value = '';
                 scrollAiChatToBottom();
 
-                if (aiPartialRefundScriptActive.value) {
-                    advancePartialRefundAfterUserSend();
-                    return;
-                }
-
                 aiIsThinking.value = true;
                 scheduleAiReply(() => getAiReply(text));
             };
 
             const chooseAiPreset = (card) => {
-                if (aiIsThinking.value || aiPartialRefundScriptActive.value) return;
-                syncAiPresetState(card);
-                if (card.scriptId === 'partial-refund') {
-                    startPartialRefundScript(card);
-                    return;
-                }
+                if (aiIsThinking.value) return;
                 clearAiStreamTimer();
-                aiMessages.value.push({
-                    id: ++aiMessageId,
-                    role: 'user',
-                    content: escapeHtml(card.prompt),
-                    streaming: false
-                });
-                aiDefenseRoundCount.value += 1;
-                aiInput.value = '';
-                aiIsThinking.value = true;
-                scrollAiChatToBottom();
-
-                scheduleAiReply(card.answer);
+                startDefenseCard(card);
             };
 
             const triggerAiFileUpload = () => {
+                if (aiIsThinking.value || !hasSelectedAiPreset.value) return;
                 if (aiFileInput.value) {
                     aiFileInput.value.click();
                 }
@@ -1073,21 +1048,57 @@ const PARTIAL_REFUND_DIALOGUE = [
 
             const handleAiFileChange = (event) => {
                 const file = event.target.files && event.target.files[0];
-                if (!file || aiIsThinking.value || aiPartialRefundScriptActive.value) return;
+                if (!file || aiIsThinking.value || !hasSelectedAiPreset.value) return;
                 clearAiStreamTimer();
+                clearAiOcrTimer();
+                const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+                if (!isPdf) {
+                    aiAttachmentName.value = '';
+                    aiOcrStatus.value = 'error';
+                    aiMessages.value.push({
+                        id: ++aiMessageId,
+                        role: 'assistant',
+                        content: '当前仅支持上传 PDF 文件。请重新选择 PDF 材料，或直接说明相关内容。',
+                        streaming: false
+                    });
+                    event.target.value = '';
+                    scrollAiChatToBottom();
+                    return;
+                }
+                if (file.size > 20 * 1024 * 1024) {
+                    aiAttachmentName.value = '';
+                    aiOcrStatus.value = 'error';
+                    aiMessages.value.push({
+                        id: ++aiMessageId,
+                        role: 'assistant',
+                        content: '文件大小超过 20MB，请压缩后重新上传，或直接说明相关内容。',
+                        streaming: false
+                    });
+                    event.target.value = '';
+                    scrollAiChatToBottom();
+                    return;
+                }
                 aiAttachmentName.value = file.name;
+                aiOcrStatus.value = 'processing';
 
                 aiMessages.value.push({
                     id: ++aiMessageId,
                     role: 'user',
-                    content: `已上传附件：${escapeHtml(file.name)}`,
+                    content: `已上传 PDF 材料：${escapeHtml(file.name)}`,
                     streaming: false
                 });
-                aiDefenseRoundCount.value += 1;
-                aiIsThinking.value = true;
                 scrollAiChatToBottom();
-
-                scheduleAiReply('已看到您上传材料。仅凭附件名称还不能确认内容真实性和完整性。我们仍需核对合同条款、付款主体、课程履行记录和完整沟通上下文，再决定是否认可您的退款主张。');
+                aiOcrTimer = setTimeout(() => {
+                    aiOcrStatus.value = 'success';
+                    aiOcrTimer = null;
+                    aiMessages.value.push({
+                        id: ++aiMessageId,
+                        role: 'assistant',
+                        content: '我方已看到你方补充的材料。材料内容仍需结合协议、交易事实、履行记录和金额计算核对。请你方指出，这份材料具体对应哪一项请求？',
+                        streaming: false
+                    });
+                    scrollAiChatToBottom();
+                }, 900);
                 event.target.value = '';
             };
 
@@ -1100,8 +1111,6 @@ const PARTIAL_REFUND_DIALOGUE = [
                 hideAiFinishTooltip();
                 clearAiReplyTimer();
                 clearAiStreamTimer();
-                aiPartialRefundScriptActive.value = false;
-                partialRefundCursor.value = 0;
                 try {
                     const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
                     completed.defense = true;
@@ -1117,8 +1126,6 @@ const PARTIAL_REFUND_DIALOGUE = [
                     aiIsThinking.value = false;
                     clearAiReplyTimer();
                     clearAiStreamTimer();
-                    aiPartialRefundScriptActive.value = false;
-                    partialRefundCursor.value = 0;
                 }
                 try {
                     const completed = JSON.parse(localStorage.getItem('filingDemoCompletedPaths') || '{}');
@@ -1229,7 +1236,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                 showDialog.value = false;
                 stage.value = 'ai_consult';
                 aiInput.value = '';
-                aiAttachmentName.value = '';
+                resetAiAttachment();
                 aiMessageId = 0;
                 aiMessages.value = [];
                 aiDefenseRoundCount.value = 0;
@@ -1238,8 +1245,6 @@ const PARTIAL_REFUND_DIALOGUE = [
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
                 clearAiStreamTimer();
-                aiPartialRefundScriptActive.value = false;
-                partialRefundCursor.value = 0;
                 setAiStaticGreeting();
             };
 
@@ -1256,14 +1261,12 @@ const PARTIAL_REFUND_DIALOGUE = [
                 waitingForInteraction.value = false;
                 showDialog.value = false;
                 aiInput.value = '';
-                aiAttachmentName.value = '';
+                resetAiAttachment();
                 aiMessageId = 0;
                 aiDefenseRoundCount.value = 0;
                 aiIsThinking.value = false;
                 clearAiReplyTimer();
                 clearAiStreamTimer();
-                aiPartialRefundScriptActive.value = false;
-                partialRefundCursor.value = 0;
                 setAiStaticGreeting();
             });
 
@@ -1280,7 +1283,7 @@ const PARTIAL_REFUND_DIALOGUE = [
                 analysisData, filingMeta, confirmAnalysis,
                 showCaseTypeBadge, scorePopups, contactService,
                 showVideoModal, videoSrc, videoSpeed, videoPlayer, setVideoSpeed, closeVideo,
-                aiInput, aiInputPlaceholder, aiMessages, aiPresetCards, aiIsThinking, aiPartialRefundScriptActive, aiChatBody, aiFileInput, aiAttachmentName,
+                aiInput, aiInputPlaceholder, aiMessages, aiPresetCards, aiIsThinking, aiChatBody, aiFileInput, aiAttachmentName, aiOcrStatus, aiOcrStatusText,
                 aiDefenseRoundCount, canFinishAiConsult, selectedAiPresetCard, hasSelectedAiPreset, aiFinishTooltipVisible,
                 filingProgressSteps, isProgressStepDone, getProgressStepClass,
                 sendAiMessage, chooseAiPreset, triggerAiFileUpload, handleAiFileChange, finishAiConsult, handleFinishButtonClick, goToStep5Direct,

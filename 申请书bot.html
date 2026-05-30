@@ -333,9 +333,15 @@
             <div class="application-workbench-shell">
                 <section class="application-workbench-left">
                     <div class="application-workbench-head">
-                        <div>
-                            <div class="application-workbench-title">{{ applicationGenerated ? '仲裁申请书（已生成）' : '仲裁申请书（模板）' }}</div>
-                            <div class="application-workbench-sub">{{ applicationGenerated ? '当前为只读预览，请下载后进入下一步' : '示例参考' }}</div>
+                        <div class="application-workbench-heading">
+                            <a class="application-workbench-back" href="./index.html" aria-label="返回申请书准备方式">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>返回</span>
+                            </a>
+                            <div>
+                                <div class="application-workbench-title">{{ applicationGenerated ? '仲裁申请书（已生成）' : '仲裁申请书（模板）' }}</div>
+                                <div class="application-workbench-sub">{{ applicationGenerated ? '当前为只读预览，请下载后进入下一步' : '示例参考' }}</div>
+                            </div>
                         </div>
                         <div class="ai-model-badge">
                             <span>已接入 DeepSeek V4 Pro</span>

@@ -315,6 +315,37 @@
             100% { transform: translate(-50%, -400%) scale(1); opacity: 0; }
         }
 
+        .page-return-button {
+            position: fixed;
+            top: 108px;
+            left: calc(var(--demo-nav-width, 0px) + 64px);
+            z-index: 1500;
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(191, 219, 254, 0.95);
+            background: rgba(255, 255, 255, 0.94);
+            color: #1d4ed8;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.16);
+            backdrop-filter: blur(12px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1;
+            text-decoration: none;
+            transition: left 0.22s ease, top 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+        body:not(.demo-nav-ready) .page-return-button {
+            left: 64px;
+        }
+        .page-return-button:hover {
+            transform: translateY(-1px);
+            background: #ffffff;
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.22);
+        }
+
         /* Case Type Badge in Dialog */
         .case-type-badge {
             position: absolute;
@@ -701,8 +732,9 @@
             flex-direction: column;
         }
         .ai-card-scroll-area {
-            flex: 0 0 auto;
-            overflow: visible;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
         }
         .ai-demo-overlay {
@@ -1080,6 +1112,8 @@
             box-shadow: 0 12px 28px rgba(37, 99, 235, 0.18);
         }
         .ai-input-area {
+            flex: 0 0 auto;
+            margin-top: auto;
             padding: 10px 20px 12px;
             background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             border-top: 1px solid #e2e8f0;
@@ -1111,6 +1145,41 @@
             gap: 12px;
             border-top: 1px solid #eef2f7;
             padding-top: 6px;
+        }
+        .ai-upload-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+            margin-top: 7px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .ai-upload-status i {
+            color: #dc2626;
+            flex-shrink: 0;
+        }
+        .ai-upload-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .ai-upload-state {
+            margin-left: auto;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        .ai-upload-status.is-success .ai-upload-state {
+            color: #047857;
+        }
+        .ai-upload-status.is-error .ai-upload-state {
+            color: #b91c1c;
         }
         .ai-attach-btn {
             width: 32px;
@@ -1169,6 +1238,23 @@
             transform: translateY(6px);
             pointer-events: none;
             transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        .ai-demo-skip-btn {
+            min-width: 0;
+            padding: 7px 10px;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid #e2e8f0;
+            box-shadow: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .ai-demo-skip-btn:hover {
+            color: #334155;
+            background: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+            transform: none;
         }
         .ai-finish-tooltip.show {
             opacity: 1;
